@@ -28,7 +28,8 @@ describe('getSortedPagesData()', () => {
           publishedAt: '2020-12-27T04:04:30.107Z',
           revisedAt: '2020-12-27T04:04:30.107Z',
           description: 'description of draftlint',
-          title: 'Home'
+          title: 'Home',
+          category: []
         },
         {
           id: 'deck',
@@ -36,7 +37,8 @@ describe('getSortedPagesData()', () => {
           updatedAt: '2020-12-26T15:29:14.476Z',
           publishedAt: '2020-12-26T15:29:14.476Z',
           revisedAt: '2020-12-26T15:29:14.476Z',
-          title: 'Slides'
+          title: 'Slides',
+          category: []
         }
       ],
       totalCount: 2,
@@ -85,6 +87,11 @@ describe('getPagesData()', () => {
     expect(res).toStrictEqual({
       id: 'home',
       title: 'Home',
+      pageCount: -1,
+      pageNo: 1,
+      allCategory: [],
+      category: [],
+      curCategory: '',
       description: 'description of draftlint',
       articleTitle: 'Home',
       updated: '2020-12-27T04:04:30.107Z',

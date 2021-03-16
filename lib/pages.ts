@@ -55,7 +55,7 @@ export async function getSortedPagesData(
       query: {
         ...query,
         fields:
-          'id,createdAt,updatedAt,publishedAt,revisedAt,title,markdown,mainVisual'
+          'id,createdAt,updatedAt,publishedAt,revisedAt,title,markdown,category,mainVisual'
       },
       config: fetchConfig
     });
@@ -168,7 +168,7 @@ export async function getPagesData(
       params.id as string,
       {
         fields:
-          'id,createdAt,updatedAt,publishedAt,revisedAt,title,description,markdown,mainVisual'
+          'id,createdAt,updatedAt,publishedAt,revisedAt,title,markdown,category,mainVisual,description'
       }
     );
     const res = await client[apiName]._id(id).$get({

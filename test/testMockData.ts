@@ -8,6 +8,7 @@ export const mockDataPagesContents: PagesContents['contents'] = [
     publishedAt: '2020-12-27T04:04:30.107Z',
     revisedAt: '2020-12-27T04:04:30.107Z',
     title: 'Home',
+    category: [],
     description: 'description of draftlint',
     markdown: 'home page'
   },
@@ -18,6 +19,7 @@ export const mockDataPagesContents: PagesContents['contents'] = [
     publishedAt: '2020-12-26T15:29:14.476Z',
     revisedAt: '2020-12-26T15:29:14.476Z',
     title: 'Slides',
+    category: [],
     markdown: 'documents page'
   }
 ];

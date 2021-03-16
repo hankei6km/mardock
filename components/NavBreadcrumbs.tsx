@@ -38,7 +38,7 @@ const NavBreadcrumbs = ({ lastBreadcrumb, classes: inClasses }: Props) => {
       '/': [{ label: 'Home', href: '/' }],
       '/deck': [
         { label: 'Home', href: '/' },
-        { label: 'Slide', href: '/deck' }
+        { label: 'Slides', href: '/deck' }
       ],
       '/about': [
         { label: 'Home', href: '/' },

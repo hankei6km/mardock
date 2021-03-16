@@ -1,8 +1,8 @@
 import { GetStaticProps, GetStaticPaths } from 'next';
 import ErrorPage from 'next/error';
-import { makeStyles } from '@material-ui/core';
+// import { makeStyles } from '@material-ui/core';
 import Layout from '../../../components/Layout';
-import Link from '../../../components/Link';
+// import Link from '../../../components/Link';
 import List from '../../../components/List';
 import { PageData } from '../../../types/pageTypes';
 import {
