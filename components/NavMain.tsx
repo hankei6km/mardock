@@ -34,7 +34,7 @@ const NavMain = ({ classes: inClasses }: Props) => {
   } = {
     main: [
       { label: 'Home', href: '/' },
-      { label: 'Docs', href: '/docs' },
+      { label: 'Slides', href: '/deck' },
       { label: 'About', href: '/about' }
     ]
   };

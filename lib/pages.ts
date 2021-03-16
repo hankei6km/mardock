@@ -37,7 +37,7 @@ export async function getSortedPagesData(
       query: {
         ...query,
         fields:
-          'id,createdAt,updatedAt,publishedAt,revisedAt,title,html,mainVisual'
+          'id,createdAt,updatedAt,publishedAt,revisedAt,title,markdown,mainVisual'
       },
       config: fetchConfig
     });
@@ -102,7 +102,7 @@ export async function getPagesData(
       params.id as string,
       {
         fields:
-          'id,createdAt,updatedAt,publishedAt,revisedAt,title,description,html,mainVisual'
+          'id,createdAt,updatedAt,publishedAt,revisedAt,title,description,markdown,mainVisual'
       }
     );
     const res = await client[apiName]._id(id).$get({
@@ -111,7 +111,7 @@ export async function getPagesData(
     });
     const { articleTitle, html } = getTitleAndContent(
       res.title,
-      res.html || ''
+      res.markdown || ''
     );
     const ret: PageData = {
       ...blankPageData(),
@@ -119,7 +119,7 @@ export async function getPagesData(
       updated: res.updatedAt,
       title: res.title,
       articleTitle,
-      html: await rewrite(html)
+      markdown: await rewrite(html)
         .use(rewriteImg())
         .use(rewriteToc(tocTitleLabel))
         .use(rewriteEmbed())
@@ -136,7 +136,7 @@ export async function getPagesData(
         serverity: 'info'
       };
       const { html, messages, list } = await textLintInHtml(
-        ret.html,
+        ret.markdown,
         params.previewDemo !== 'true'
           ? undefined
           : getTextlintKernelOptions({
@@ -156,7 +156,7 @@ export async function getPagesData(
             })
       );
       if (messages.length > 0) {
-        ret.html = html;
+        ret.markdown = html;
         ret.notification.messageHtml = `${ret.notification.messageHtml}${list}`;
         ret.notification.serverity = 'warning';
       }

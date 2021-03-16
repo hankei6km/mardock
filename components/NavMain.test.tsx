@@ -20,10 +20,10 @@ describe('NavMain', () => {
     expect(a.length).toEqual(3);
     // expect(a[0].innerText).toEqual('Home');
     expect(a[0]).toContainHTML('Home');
-    expect(a[1]).toContainHTML('Docs');
+    expect(a[1]).toContainHTML('Slides');
     expect(a[2]).toContainHTML('About');
     expect(a[0].getAttribute('href')).toEqual('/');
-    expect(a[1].getAttribute('href')).toEqual('/docs');
+    expect(a[1].getAttribute('href')).toEqual('/deck');
     expect(a[2].getAttribute('href')).toEqual('/about');
   });
   test('renders nav and click', () => {
@@ -35,7 +35,7 @@ describe('NavMain', () => {
     );
     const a = getAllByRole('tab');
     fireEvent.click(a[1]);
-    expect(router.push).toHaveBeenCalledWith('/docs', '/docs', {
+    expect(router.push).toHaveBeenCalledWith('/deck', '/deck', {
       locale: undefined,
       scroll: true,
       shallow: undefined

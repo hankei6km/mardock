@@ -8,7 +8,7 @@ export type PageData = {
   };
   title: string;
   articleTitle: string;
-  html: string;
+  markdown: string;
   mainVisual: string;
   description: string;
 };
@@ -18,7 +18,7 @@ export const blankPageData = (): PageData => ({
   updated: '',
   title: '',
   articleTitle: '',
-  html: '',
+  markdown: '',
   mainVisual: '',
   description: ''
 });

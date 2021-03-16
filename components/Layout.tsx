@@ -223,7 +223,7 @@ const Layout = ({
   title = 'This is the default title',
   description,
   articleTitle,
-  html = '',
+  markdown: html = '',
   mainVisual = '',
   notification
 }: Props) => {
@@ -304,7 +304,7 @@ const Layout = ({
                 <NavMain classes={classes} />
               </Box>
             )}
-            {apiName === 'docs' && (
+            {apiName === 'deck' && (
               <Box className={classes['NavBreadcrumbs-outer']}>
                 <NavBreadcrumbs lastBreadcrumb={title} classes={classes} />
               </Box>
@@ -320,7 +320,7 @@ const Layout = ({
       >
         <>
           <Typography component="h2">{articleTitle}</Typography>
-          {apiName === 'docs' && (
+          {apiName === 'deck' && (
             <DateUpdated updated={updated} classes={classes} />
           )}
           <Divider />

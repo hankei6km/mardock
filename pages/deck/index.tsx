@@ -15,7 +15,7 @@ type Props = {
   items: PagesList;
 };
 
-const DocsPage = ({ pageData, items }: Props) => {
+const DeckPage = ({ pageData, items }: Props) => {
   // const classes = useStyles();
   if (pageData === undefined || !pageData.title) {
     return <ErrorPage statusCode={404} />;
@@ -36,10 +36,10 @@ const DocsPage = ({ pageData, items }: Props) => {
 export const getStaticProps: GetStaticProps = async (context) => {
   const pageData = await getPagesData('pages', {
     ...context,
-    params: { id: 'docs' }
+    params: { id: 'deck' }
   });
-  const items = await getSortedPagesData('docs');
+  const items = await getSortedPagesData('deck');
   return { props: { pageData, items } };
 };
 
-export default DocsPage;
+export default DeckPage;

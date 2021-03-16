@@ -6,20 +6,20 @@ import Link from '../../components/Link';
 import { PageData } from '../../types/pageTypes';
 import { getAllPagesIds, getPagesData } from '../../lib/pages';
 
-export default function Docs({ pageData }: { pageData: PageData }) {
+export default function Deck({ pageData }: { pageData: PageData }) {
   // const classes = useStyles();
   if (pageData === undefined || !pageData.title) {
     return <ErrorPage statusCode={404} />;
   }
   return (
-    <Layout apiName={'docs'} {...pageData} notification={pageData.notification}>
+    <Layout apiName={'deck'} {...pageData} notification={pageData.notification}>
       <Link href="/">{'Back to Home'}</Link>
     </Layout>
   );
 }
 
 export const getStaticPaths: GetStaticPaths = async () => {
-  const paths = (await getAllPagesIds('docs')).map((id) => ({
+  const paths = (await getAllPagesIds('deck')).map((id) => ({
     params: { id }
   }));
   return {
@@ -29,7 +29,7 @@ export const getStaticPaths: GetStaticPaths = async () => {
 };
 
 export const getStaticProps: GetStaticProps = async (context) => {
-  const pageData = await getPagesData('docs', context);
+  const pageData = await getPagesData('deck', context);
   return {
     props: {
       pageData

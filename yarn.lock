@@ -1325,11 +1325,6 @@ asn1@~0.2.3:
   dependencies:
     safer-buffer "~2.1.0"
 
-aspida-mock@^0.8.2:
-  version "0.8.2"
-  resolved "https://registry.yarnpkg.com/aspida-mock/-/aspida-mock-0.8.2.tgz#ac6553a72ac213c399c7fe587238055482666f62"
-  integrity sha512-QBqUjW4VSaq4DKxWFj7ADE0Yk3OjW/u2MG13vAI5vo40oEWqr1N4IuPMsC8j1fgFgmhao2G+9NhGISsTBufq9Q==
-
 aspida@^1.5.0:
   version "1.5.0"
   resolved "https://registry.yarnpkg.com/aspida/-/aspida-1.5.0.tgz#19155d0bd09caa0f31065c5e3def1b3ddfbf0dcc"

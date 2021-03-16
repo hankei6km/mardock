@@ -19,15 +19,15 @@ const handler = async (
         case 'home':
           location = `/`;
           break;
-        case 'docs':
-          location = `/docs`;
+        case 'deck':
+          location = `/deck`;
           break;
         case 'about':
           location = `/about`;
           break;
       }
       break;
-    case 'docs':
+    case 'deck':
       location = `/${req.query.apiName}/${id}`;
       break;
   }

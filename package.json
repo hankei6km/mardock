@@ -2,7 +2,7 @@
   "name": "mardock",
   "version": "0.1.0",
   "scripts": {
-    "api:build": "aspida && aspida-mock",
+    "api:build": "aspida",
     "licenses:build": "sh scripts/open_source_licenses.sh",
     "about:build": "sh scripts/about_license.sh",
     "copy:scripts": "sh scripts/copy_scripts.sh",
@@ -18,7 +18,6 @@
     "@material-ui/core": "^4.11.2",
     "@material-ui/icons": "^4.11.2",
     "@types/cheerio": "^0.22.24",
-    "aspida-mock": "^0.8.2",
     "cheerio": "^1.0.0-rc.5",
     "date-fns": "^2.17.0",
     "highlight.js": "^10.6.0",
