@@ -1,5 +1,5 @@
 {
-  "name": "draftlint",
+  "name": "mardock",
   "version": "0.1.0",
   "scripts": {
     "api:build": "aspida && aspida-mock",
