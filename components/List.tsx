@@ -7,6 +7,7 @@ import GridList from '@material-ui/core/GridList';
 import GridListTile from '@material-ui/core/GridListTile';
 import GridListTileBar from '@material-ui/core/GridListTileBar';
 import Link from '../components/Link';
+import { join } from 'path';
 import { PagesList } from '../types/client/contentTypes';
 import { pruneClasses } from '../utils/classes';
 
@@ -30,6 +31,7 @@ const useStyles = makeStyles(() => ({
 const classNames = ['List-thumb'];
 
 type Props = {
+  itemPath: string;
   items: PagesList;
   cellHeight?: number;
   cols?: [number, number];
@@ -39,6 +41,7 @@ type Props = {
 // } & { width: Breakpoint };
 
 const List = ({
+  itemPath,
   items,
   cellHeight = 180,
   cols = [2, 1],
@@ -46,6 +49,7 @@ const List = ({
   classes: inClasses
 }: Props) => {
   const classes = useStyles({ classes: pruneClasses(inClasses, classNames) });
+  const href = join(itemPath, '[id]');
   const imgHeight = imgWidth / 1.6;
   const q = new URLSearchParams('');
   q.append('w', `${imgWidth}`);
@@ -72,7 +76,7 @@ const List = ({
             cols={cols[0] === 2 && idx === 0 ? 2 : 1}
             className={classes['List-thumb-outer']}
           >
-            <Link href="/docs/[id]" as={`/docs/${item.id}`}>
+            <Link href={href} as={join(itemPath, item.id)}>
               {src !== '' ? (
                 <img
                   src={src}

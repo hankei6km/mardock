@@ -28,7 +28,7 @@ const IndexPage = ({ pageData, items }: Props) => {
     >
       <section>
         <h3>{listTitle}</h3>
-        <List items={items} />
+        <List itemPath={'/deck'} items={items} />
       </section>
     </Layout>
   );

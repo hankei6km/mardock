@@ -7,8 +7,12 @@ import List from '../../components/List';
 import { PagesList } from '../../types/client/contentTypes';
 import { PageData } from '../../types/pageTypes';
 import { getSortedPagesData, getPagesData } from '../../lib/pages';
+import NavPagination from '../../components/NavPagination';
 
 // const useStyles = makeStyles(() => ({}));
+
+const itemsPerPage = 10;
+const pagePath: string[] = [];
 
 type Props = {
   pageData: PageData;
@@ -27,17 +31,36 @@ const DeckPage = ({ pageData, items }: Props) => {
       notification={pageData.notification}
     >
       <section>
-        <List items={items} cols={[1, 1]} imgWidth={600} />
+        <List itemPath={'/deck'} items={items} cols={[1, 1]} imgWidth={600} />
+        <NavPagination
+          pageNo={pageData.pageNo}
+          pageCount={pageData.pageCount}
+          curCategory={pageData.curCategory}
+          paginationHref={'/deck/page/[..id]'}
+          paginationBaseAs={'/deck/page'}
+          paginationPagePath={pagePath}
+          paginationFirstPageHref={'/deck'}
+        />
       </section>
     </Layout>
   );
 };
 
 export const getStaticProps: GetStaticProps = async (context) => {
-  const pageData = await getPagesData('pages', {
-    ...context,
-    params: { id: 'deck' }
-  });
+  const pageNo = 1;
+  const curCategory = '';
+  const pageData = await getPagesData(
+    'pages',
+    {
+      ...context,
+      params: { id: 'deck' }
+    },
+    {
+      pageNo,
+      curCategory,
+      itemsPerPage
+    }
+  );
   const items = await getSortedPagesData('deck');
   return { props: { pageData, items } };
 };

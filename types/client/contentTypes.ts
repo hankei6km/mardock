@@ -13,8 +13,14 @@ type ContentList<T> = {
   limit: number;
 };
 
+export type PagesCategory = {
+  id: string;
+  title: string;
+};
+
 type Pages = {
   title: string;
+  category: PagesCategory[];
   markdown?: string;
   mainVisual?: { url: string; width: number; height: number };
   description?: string;
@@ -45,5 +51,6 @@ export const blankPagesList = (): PagesList => ({
 export const blankPageContent = (): PagesContent => ({
   ...contentBase,
   title: '',
+  category: [],
   markdown: ''
 });
