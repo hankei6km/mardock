@@ -58,7 +58,19 @@ const useStyles = makeStyles((theme) => ({
     marginTop: theme.spacing(1),
     marginBottom: theme.spacing(1)
   },
+  'Layout-section-root': {
+    display: 'flex',
+    justifyContent: 'center',
+    width: '100%'
+  },
+  'Layout-section-top': {
+    width: 300
+  },
+  'Layout-section-bottom': {
+    width: 300
+  },
   'Layout-section': {
+    flexGrow: 1,
     ...theme.typography.body1,
     paddingLeft: theme.spacing(1),
     paddingRight: theme.spacing(1),
@@ -207,6 +219,8 @@ const ogImageParamsStr = ogImageParams.toString();
 type Props = {
   apiName: ApiNameArticle;
   children?: ReactNode;
+  topSection?: ReactNode;
+  bottomSection?: ReactNode;
 } & Partial<PageData>;
 
 function getAvatarSrcSet(src: string): string {
@@ -219,6 +233,8 @@ const Layout = ({
   apiName,
   id,
   children,
+  topSection,
+  bottomSection,
   updated,
   title = 'This is the default title',
   description,
@@ -312,26 +328,34 @@ const Layout = ({
           </Box>
         </Container>
       </header>
-      <Container
-        component="section"
-        maxWidth="sm"
-        disableGutters
-        className={classes['Layout-section']}
-      >
-        <>
-          <Typography component="h2">{articleTitle}</Typography>
-          {apiName === 'deck' && (
-            <DateUpdated updated={updated} classes={classes} />
-          )}
-          <Divider />
-          <article
-            dangerouslySetInnerHTML={{
-              __html: html
-            }}
-          ></article>
-          {children}
-        </>
-      </Container>
+      <Box className={classes['Layout-section-root']}>
+        <Box component="section" className={classes['Layout-section-top']}>
+          {topSection}
+        </Box>
+        <Container
+          component="section"
+          maxWidth="sm"
+          disableGutters
+          className={classes['Layout-section']}
+        >
+          <>
+            <Typography component="h2">{articleTitle}</Typography>
+            {apiName === 'deck' && (
+              <DateUpdated updated={updated} classes={classes} />
+            )}
+            <Divider />
+            <article
+              dangerouslySetInnerHTML={{
+                __html: html
+              }}
+            ></article>
+            {children}
+          </>
+        </Container>
+        <Box component="section" className={classes['Layout-section-top']}>
+          {bottomSection}
+        </Box>
+      </Box>
       <footer className={classes.footer}>
         <Container maxWidth="sm" disableGutters>
           <Typography variant="body1">Copyright (c) 2021 hankei6km</Typography>

@@ -12,6 +12,7 @@ import {
 } from '../../../lib/pages';
 import { PagesList } from '../../../types/client/contentTypes';
 import NavPagination from '../../../components/NavPagination';
+import { GetQuery } from '../../../types/client/queryTypes';
 // import classes from '*.module.css';
 
 // const useStyles = makeStyles(() => ({}));
@@ -83,6 +84,16 @@ export const getStaticProps: GetStaticProps = async (context) => {
       itemsPerPage
     }
   );
-  const items = await getSortedPagesData('deck');
+  const q: GetQuery = {};
+  if (itemsPerPage !== undefined) {
+    q.limit = itemsPerPage;
+    if (pageNo !== undefined) {
+      q.offset = itemsPerPage * (pageNo - 1);
+    }
+  }
+  if (curCategory) {
+    q.filters = `category[contains]${curCategory}`;
+  }
+  const items = await getSortedPagesData('deck', q);
   return { props: { pageData, items } };
 };

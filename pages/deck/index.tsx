@@ -1,6 +1,6 @@
 import { GetStaticProps } from 'next';
 import ErrorPage from 'next/error';
-// import { makeStyles } from '@material-ui/core';
+import { makeStyles } from '@material-ui/core';
 import Layout from '../../components/Layout';
 import List from '../../components/List';
 // import Typography from '@material-ui/core/Typography';
@@ -8,8 +8,18 @@ import { PagesList } from '../../types/client/contentTypes';
 import { PageData } from '../../types/pageTypes';
 import { getSortedPagesData, getPagesData } from '../../lib/pages';
 import NavPagination from '../../components/NavPagination';
+import { GetQuery } from '../../types/client/queryTypes';
+import NavCategory from '../../components/NavCategory';
 
-// const useStyles = makeStyles(() => ({}));
+const useStyles = makeStyles(() => ({
+  'NavCategory-all-list': {
+    display: 'block',
+    listStyle: 'none',
+    '& li::before': {
+      content: '\u200B'
+    }
+  }
+}));
 
 const itemsPerPage = 10;
 const pagePath: string[] = [];
@@ -20,13 +30,22 @@ type Props = {
 };
 
 const DeckPage = ({ pageData, items }: Props) => {
-  // const classes = useStyles();
+  const classes = useStyles();
   if (pageData === undefined || !pageData.title) {
     return <ErrorPage statusCode={404} />;
   }
   return (
     <Layout
       apiName={'pages'}
+      topSection={
+        <NavCategory
+          all
+          categoryPath="/deck/category"
+          allCategory={pageData.allCategory}
+          category={pageData.category}
+          classes={classes}
+        />
+      }
       {...pageData}
       notification={pageData.notification}
     >
@@ -61,7 +80,17 @@ export const getStaticProps: GetStaticProps = async (context) => {
       itemsPerPage
     }
   );
-  const items = await getSortedPagesData('deck');
+  const q: GetQuery = {};
+  if (itemsPerPage !== undefined) {
+    q.limit = itemsPerPage;
+    if (pageNo !== undefined) {
+      q.offset = itemsPerPage * (pageNo - 1);
+    }
+  }
+  if (curCategory) {
+    q.filters = `category[contains]${curCategory}`;
+  }
+  const items = await getSortedPagesData('deck', q);
   return { props: { pageData, items } };
 };
 

@@ -186,8 +186,9 @@ export async function getPagesData(
       title: res.title,
       pageNo: options.pageNo !== undefined ? options.pageNo : 1,
       pageCount: -1, // あとで設定する
-      allCategory: [],
-      category: [],
+      // pages の各ページの category を all category として利用(API コール回数、定義数削減)
+      allCategory: apiName === 'pages' ? res.category || [] : [],
+      category: apiName !== 'pages' ? res.category || [] : [],
       curCategory: options.curCategory || '',
       articleTitle,
       markdown: await rewrite(html)
