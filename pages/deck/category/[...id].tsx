@@ -25,8 +25,8 @@ type Props = {
   items: PagesList;
 };
 
-// このページは /pages/posts/index.tsx とほぼ同じ.
-// (category では [...id].tsx で同じファイルで処理できている)
+// このページは /deck/posts/index.tsx とほぼ同じ.
+// (category ではで index と id の扱いを [...id].tsx で処理できている)
 export default function Page({ pageData, items }: Props) {
   if (pageData === undefined || !pageData.title) {
     return <ErrorPage statusCode={404} />;
@@ -84,10 +84,10 @@ export const getStaticProps: GetStaticProps = async (context) => {
   const pageNo = idLen > 1 ? parseInt(id[idLen - 1], 10) : 1;
   const curCategory = id[0];
   const pageData = await getPagesData(
-    'pages',
+    'category',
     {
       ...context,
-      params: { id: 'deck' }
+      params: { id: curCategory }
     },
     {
       pageNo,
