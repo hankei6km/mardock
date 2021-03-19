@@ -19,7 +19,7 @@ import NavMain from './NavMain';
 import NavBreadcrumbs from './NavBreadcrumbs';
 import DateUpdated from './DateUpdated';
 
-const siteName = 'draftlint';
+const siteName = 'mardock';
 
 const useStyles = makeStyles((theme) => ({
   header: {},
@@ -246,12 +246,12 @@ const Layout = ({
   const classes = useStyles({ apiName, id });
   // const router = useRouter();
   const avatarSrc =
-    'https://images.microcms-assets.io/assets/71827cdd928b42fbab94cd30dfbc2a85/a651c3b80a624d78bcc84d08722773fd/draftlint-icon.png?fit64=Y3JvcA&h64=MTIw&w64=MTIw';
+    'https://images.microcms-assets.io/assets/cc433627f35c4232b7cb97e0376507a7/d106c1f3df9849e58cbd5264c3abd841/mardock-site-icon.png?fit64=Y3JvcA&h64=MTIw&w64=MTIw';
   const avatarSrcSet = getAvatarSrcSet(avatarSrc);
   const _title =
     apiName === 'pages' && id === 'home'
-      ? `${title} | textlint in Next.js preview mode`
-      : `${title} | draftlint | textlint in Next.js preview mode`;
+      ? `${title} | static slide site`
+      : `${title} | mardock | static slide site`;
   const ogImageUrl = mainVisual ? `${mainVisual}?${ogImageParamsStr}` : '';
   useEffect(() => {
     const handleClick = (e: Event) => {
