@@ -8,7 +8,7 @@ import { PagesList } from '../types/client/contentTypes';
 import { PageData } from '../types/pageTypes';
 import { getSortedPagesData, getPagesData } from '../lib/pages';
 
-const listTitle = "ドキュメント"
+const listTitle = 'ドキュメント';
 
 type Props = {
   pageData: PageData;
@@ -28,7 +28,7 @@ const IndexPage = ({ pageData, items }: Props) => {
     >
       <section>
         <h3>{listTitle}</h3>
-        <List items={items} />
+        <List itemPath={'/deck'} items={items} />
       </section>
     </Layout>
   );
@@ -39,8 +39,8 @@ export const getStaticProps: GetStaticProps = async (context) => {
     ...context,
     params: { id: 'home' }
   });
-  const items = await getSortedPagesData('docs', {
-    filters: 'displayOnIndexPage[equals]true'
+  const items = await getSortedPagesData('deck', {
+    // filters: 'displayOnIndexPage[equals]true'
   });
   return { props: { pageData, items } };
 };

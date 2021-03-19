@@ -9,9 +9,9 @@ import NavBreadcrumbs from './NavBreadcrumbs';
 describe('NavBreadcrumbs', () => {
   test('renders nav breadcrumbs in blog', () => {
     const router = mockRouter();
-    router.pathname = '/docs';
-    router.route = '/docs';
-    router.asPath = '/docs';
+    router.pathname = '/deck';
+    router.route = '/deck';
+    router.asPath = '/deck';
     const { baseElement, getByText, getAllByRole } = render(
       <RouterContext.Provider value={router}>
         <NavBreadcrumbs />
@@ -23,7 +23,7 @@ describe('NavBreadcrumbs', () => {
     expect(ol).toBeInTheDocument();
     const home = getByText('Home');
     expect(home).toBeInTheDocument();
-    const blog = getByText('Docs');
+    const blog = getByText('Slides');
     expect(blog).toBeInTheDocument();
     const a = getAllByRole('link');
     expect(a.length).toEqual(1);
@@ -37,9 +37,9 @@ describe('NavBreadcrumbs', () => {
   });
   test('renders nav breadcrumbs with lastBreadcrumb', () => {
     const router = mockRouter();
-    router.pathname = '/docs';
-    router.route = '/docs';
-    router.asPath = '/docs';
+    router.pathname = '/deck';
+    router.route = '/deck';
+    router.asPath = '/deck';
     const { baseElement, getByText, getAllByRole } = render(
       <RouterContext.Provider value={router}>
         <NavBreadcrumbs lastBreadcrumb={'test-last'} />
@@ -51,16 +51,16 @@ describe('NavBreadcrumbs', () => {
     expect(ol).toBeInTheDocument();
     const home = getByText('Home');
     expect(home).toBeInTheDocument();
-    const blog = getByText('Docs');
+    const blog = getByText('Slides');
     expect(blog).toBeInTheDocument();
     const last = getByText('test-last');
     expect(last).toBeInTheDocument();
     const a = getAllByRole('link');
     expect(a.length).toEqual(2);
     expect(a[0].getAttribute('href')).toEqual('/');
-    expect(a[1].getAttribute('href')).toEqual('/docs');
+    expect(a[1].getAttribute('href')).toEqual('/deck');
     fireEvent.click(a[1]);
-    expect(router.push).toHaveBeenCalledWith('/docs', '/docs', {
+    expect(router.push).toHaveBeenCalledWith('/deck', '/deck', {
       locale: undefined,
       scroll: true,
       shallow: undefined

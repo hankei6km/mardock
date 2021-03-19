@@ -33,7 +33,7 @@ describe('previewSetupHandler()', () => {
     );
     const reqQuery = {
       previewSecret,
-      apiName: 'docs',
+      apiName: 'deck',
       slug: 'abcdefg-123',
       draftKey: 'qqqqqq-56'
     };
@@ -42,14 +42,14 @@ describe('previewSetupHandler()', () => {
     const res = mockNextApiResponse();
     await previewSetupHandler(fn)(req, res);
     expect(fetchMock).toHaveBeenCalledTimes(1);
-    expect(fetchMock.mock.calls[0][0]).toContain('/docs/abcdefg-123?');
+    expect(fetchMock.mock.calls[0][0]).toContain('/deck/abcdefg-123?');
     expect(queryParams(String(fetchMock.mock.calls[0][0]))).toStrictEqual({
       fields: 'id',
       draftKey: 'qqqqqq-56'
     });
     expect(res.setPreviewData).toHaveBeenCalledTimes(1);
     expect(res.setPreviewData.mock.calls[0][0]).toStrictEqual({
-      apiName: 'docs',
+      apiName: 'deck',
       slug: 'abcdefg-123',
       draftKey: 'qqqqqq-56'
     });
@@ -64,7 +64,7 @@ describe('previewSetupHandler()', () => {
     );
     const reqQuery = {
       previewSecret: 'invalid',
-      apiName: 'docs',
+      apiName: 'deck',
       slug: 'abcdefg-123',
       draftKey: 'qqqqqq-56'
     };
@@ -107,7 +107,7 @@ describe('previewSetupHandler()', () => {
     fetchMock.mockResponses([JSON.stringify({}), { status: 404 }]);
     const reqQuery = {
       previewSecret,
-      apiName: 'docs',
+      apiName: 'deck',
       slug: 'abcdefg-123',
       draftKey: 'qqqqqq-56'
     };
@@ -144,7 +144,7 @@ describe('apienter-.preview[apiName].handler()', () => {
     );
     const reqQuery = {
       previewSecret,
-      apiName: 'docs',
+      apiName: 'deck',
       slug: 'abcdefg-123',
       draftKey: 'qqqqqq-56'
     };
@@ -156,7 +156,7 @@ describe('apienter-.preview[apiName].handler()', () => {
     expect(res.writeHead).toHaveBeenCalledTimes(1);
     expect(res.writeHead.mock.calls[0][0]).toStrictEqual(307);
     expect(res.writeHead.mock.calls[0][1]).toStrictEqual({
-      Location: '/docs/abcdefg-123'
+      Location: '/deck/abcdefg-123'
     });
     expect(res.end).toHaveBeenCalledTimes(1);
     expect(res.end.mock.calls[0][0]).toStrictEqual('Preview mode enabled');

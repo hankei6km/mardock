@@ -17,7 +17,7 @@ describe('getSortedPagesData()', () => {
     expect(fetchMock.mock.calls[0][0]).toContain('/pages?');
     expect(queryParams(String(fetchMock.mock.calls[0][0]))).toStrictEqual({
       fields:
-        'id,createdAt,updatedAt,publishedAt,revisedAt,title,html,mainVisual'
+        'id,createdAt,updatedAt,publishedAt,revisedAt,title,markdown,category,mainVisual'
     });
     expect(res).toStrictEqual({
       contents: [
@@ -28,15 +28,17 @@ describe('getSortedPagesData()', () => {
           publishedAt: '2020-12-27T04:04:30.107Z',
           revisedAt: '2020-12-27T04:04:30.107Z',
           description: 'description of draftlint',
-          title: 'Home'
+          title: 'Home',
+          category: []
         },
         {
-          id: 'docs',
+          id: 'deck',
           createdAt: '2020-12-26T15:29:14.476Z',
           updatedAt: '2020-12-26T15:29:14.476Z',
           publishedAt: '2020-12-26T15:29:14.476Z',
           revisedAt: '2020-12-26T15:29:14.476Z',
-          title: 'Docs'
+          title: 'Slides',
+          category: []
         }
       ],
       totalCount: 2,
@@ -53,7 +55,7 @@ describe('getSortedPagesData()', () => {
     expect(fetchMock.mock.calls[0][0]).toContain('/pages?');
     expect(queryParams(String(fetchMock.mock.calls[0][0]))).toStrictEqual({
       fields:
-        'id,createdAt,updatedAt,publishedAt,revisedAt,title,html,mainVisual',
+        'id,createdAt,updatedAt,publishedAt,revisedAt,title,markdown,category,mainVisual',
       filters: 'displayOnIndexPage[equals]true'
     });
     // expect(fetchMock.mock.calls[0][1]?.headers) 環境変数の設定とメッセージによっては API キーが漏洩する可能性があるのでとりあえずやめる
@@ -69,7 +71,7 @@ describe('getAllPagesIds()', () => {
       fields: 'id',
       limit: '120000'
     });
-    expect(res).toStrictEqual(['home', 'docs']);
+    expect(res).toStrictEqual(['home', 'deck']);
   });
 });
 
@@ -80,15 +82,20 @@ describe('getPagesData()', () => {
     expect(fetchMock.mock.calls[0][0]).toContain('/pages/home');
     expect(queryParams(String(fetchMock.mock.calls[0][0]))).toStrictEqual({
       fields:
-        'id,createdAt,updatedAt,publishedAt,revisedAt,title,description,html,mainVisual'
+        'id,createdAt,updatedAt,publishedAt,revisedAt,title,markdown,category,mainVisual,description'
     });
     expect(res).toStrictEqual({
       id: 'home',
       title: 'Home',
+      pageCount: -1,
+      pageNo: 1,
+      allCategory: [],
+      category: [],
+      curCategory: '',
       description: 'description of draftlint',
       articleTitle: 'Home',
       updated: '2020-12-27T04:04:30.107Z',
-      html: '<p>home page</p>',
+      markdown: 'home page',
       mainVisual: ''
     });
   });

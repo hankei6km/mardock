@@ -19,7 +19,7 @@ import NavMain from './NavMain';
 import NavBreadcrumbs from './NavBreadcrumbs';
 import DateUpdated from './DateUpdated';
 
-const siteName = 'draftlint';
+const siteName = 'mardock';
 
 const useStyles = makeStyles((theme) => ({
   header: {},
@@ -58,7 +58,19 @@ const useStyles = makeStyles((theme) => ({
     marginTop: theme.spacing(1),
     marginBottom: theme.spacing(1)
   },
+  'Layout-section-root': {
+    display: 'flex',
+    justifyContent: 'center',
+    width: '100%'
+  },
+  'Layout-section-top': {
+    width: 300
+  },
+  'Layout-section-bottom': {
+    width: 300
+  },
   'Layout-section': {
+    flexGrow: 1,
     ...theme.typography.body1,
     paddingLeft: theme.spacing(1),
     paddingRight: theme.spacing(1),
@@ -207,6 +219,8 @@ const ogImageParamsStr = ogImageParams.toString();
 type Props = {
   apiName: ApiNameArticle;
   children?: ReactNode;
+  topSection?: ReactNode;
+  bottomSection?: ReactNode;
 } & Partial<PageData>;
 
 function getAvatarSrcSet(src: string): string {
@@ -219,23 +233,25 @@ const Layout = ({
   apiName,
   id,
   children,
+  topSection,
+  bottomSection,
   updated,
   title = 'This is the default title',
   description,
   articleTitle,
-  html = '',
+  markdown: html = '',
   mainVisual = '',
   notification
 }: Props) => {
   const classes = useStyles({ apiName, id });
   // const router = useRouter();
   const avatarSrc =
-    'https://images.microcms-assets.io/assets/71827cdd928b42fbab94cd30dfbc2a85/a651c3b80a624d78bcc84d08722773fd/draftlint-icon.png?fit64=Y3JvcA&h64=MTIw&w64=MTIw';
+    'https://images.microcms-assets.io/assets/cc433627f35c4232b7cb97e0376507a7/d106c1f3df9849e58cbd5264c3abd841/mardock-site-icon.png?fit64=Y3JvcA&h64=MTIw&w64=MTIw';
   const avatarSrcSet = getAvatarSrcSet(avatarSrc);
   const _title =
     apiName === 'pages' && id === 'home'
-      ? `${title} | textlint in Next.js preview mode`
-      : `${title} | draftlint | textlint in Next.js preview mode`;
+      ? `${title} | static slide site`
+      : `${title} | mardock | static slide site`;
   const ogImageUrl = mainVisual ? `${mainVisual}?${ogImageParamsStr}` : '';
   useEffect(() => {
     const handleClick = (e: Event) => {
@@ -304,7 +320,7 @@ const Layout = ({
                 <NavMain classes={classes} />
               </Box>
             )}
-            {apiName === 'docs' && (
+            {apiName === 'deck' && (
               <Box className={classes['NavBreadcrumbs-outer']}>
                 <NavBreadcrumbs lastBreadcrumb={title} classes={classes} />
               </Box>
@@ -312,26 +328,34 @@ const Layout = ({
           </Box>
         </Container>
       </header>
-      <Container
-        component="section"
-        maxWidth="sm"
-        disableGutters
-        className={classes['Layout-section']}
-      >
-        <>
-          <Typography component="h2">{articleTitle}</Typography>
-          {apiName === 'docs' && (
-            <DateUpdated updated={updated} classes={classes} />
-          )}
-          <Divider />
-          <article
-            dangerouslySetInnerHTML={{
-              __html: html
-            }}
-          ></article>
-          {children}
-        </>
-      </Container>
+      <Box className={classes['Layout-section-root']}>
+        <Box component="section" className={classes['Layout-section-top']}>
+          {topSection}
+        </Box>
+        <Container
+          component="section"
+          maxWidth="sm"
+          disableGutters
+          className={classes['Layout-section']}
+        >
+          <>
+            <Typography component="h2">{articleTitle}</Typography>
+            {apiName === 'deck' && (
+              <DateUpdated updated={updated} classes={classes} />
+            )}
+            <Divider />
+            <article
+              dangerouslySetInnerHTML={{
+                __html: html
+              }}
+            ></article>
+            {children}
+          </>
+        </Container>
+        <Box component="section" className={classes['Layout-section-top']}>
+          {bottomSection}
+        </Box>
+      </Box>
       <footer className={classes.footer}>
         <Container maxWidth="sm" disableGutters>
           <Typography variant="body1">Copyright (c) 2021 hankei6km</Typography>

@@ -1,6 +1,5 @@
 import aspida from '@aspida/fetch';
 import api from '../types/client/$api';
-import mock from '../types/client/$mock';
 
 export const fetchConfig = (() => {
   const getApiKey = process.env.GET_API_KEY || '';
@@ -14,10 +13,6 @@ export const fetchConfig = (() => {
   return { headers };
 })();
 
-const clientV1 = (process.env.USE_MOCK_CLIENT_FORCE === 'true' ||
-process.env.USE_MOCK_CLIENT === 'true'
-  ? mock(aspida(fetch))
-  : api(aspida(fetch))
-).api.v1;
+const clientV1 = api(aspida(fetch)).api.v1;
 
 export default clientV1;

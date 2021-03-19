@@ -13,14 +13,20 @@ type ContentList<T> = {
   limit: number;
 };
 
+export type PagesCategory = {
+  id: string;
+  title: string;
+};
+
 type Pages = {
   title: string;
-  html?: string;
+  category: PagesCategory[];
+  markdown?: string;
   mainVisual?: { url: string; width: number; height: number };
   description?: string;
 };
 export type PagesContent = ContentBase & Pages;
-export type PagesIndex = Omit<PagesContent, 'html'>;
+export type PagesIndex = Omit<PagesContent, 'markdown'>;
 export type PagesId = Pick<PagesContent, 'id'>;
 export type PagesContents = ContentList<PagesContent>;
 export type PagesIdsContents = Omit<PagesContents, 'offset' | 'limit'>;
@@ -45,5 +51,6 @@ export const blankPagesList = (): PagesList => ({
 export const blankPageContent = (): PagesContent => ({
   ...contentBase,
   title: '',
-  html: ''
+  category: [],
+  markdown: ''
 });
