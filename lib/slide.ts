@@ -1,15 +1,22 @@
+import { createWriteStream } from 'fs';
 import { spawn } from 'child_process';
-import { join } from 'path';
+import { join, dirname } from 'path';
 import { Writable } from 'stream';
-const marpPath = join(__dirname, '..', 'node_modules', '.bin', 'marp');
 // temp ファイル、fifo 等も考えたが今回は pipe で楽する。
 // 速度的に不利になったら考える。
 // import { marpCli } from '@marp-team/marp-cli';
+
+const basePath = dirname(dirname(dirname(process.argv[1])));
+
+export function slidePathBaseName(id: string): string {
+  return join('/', 'slides', id);
+}
 
 export function slideHtml(markdown: string, w: Writable): Promise<number> {
   // とりあえず。
   // writable として実装しておいた方が楽かな
   return new Promise((resolve) => {
+    const marpPath = join(basePath, 'node_modules', '.bin', 'marp');
     let e = '';
     const marpP = spawn(marpPath, []);
     marpP.stdout.pipe(w);
@@ -34,4 +41,14 @@ export function slideHtml(markdown: string, w: Writable): Promise<number> {
   //    }
   //  })
   //  .catch(console.error);
+}
+
+export async function slideWriteHtmlTo(
+  markdown: string,
+  slidePathHtml: string
+): Promise<{}> {
+  const w = createWriteStream(join(basePath, 'public', slidePathHtml));
+  await slideHtml(markdown, w);
+  // TOC を返すようにする予定(たぶん).
+  return {};
 }

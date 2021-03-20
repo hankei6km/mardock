@@ -191,12 +191,7 @@ export async function getPagesData(
       category: apiName !== 'pages' ? res.category || [] : [],
       curCategory: options.curCategory || '',
       articleTitle,
-      markdown: await rewrite(html)
-        .use(rewriteImg())
-        .use(rewriteToc(tocTitleLabel))
-        .use(rewriteEmbed())
-        .use(rewriteCode())
-        .run(),
+      markdown: res.markdown || '',
       mainVisual: res.mainVisual?.url || '',
       description: res.description || ''
     };

@@ -5,8 +5,15 @@ import Layout from '../../components/Layout';
 import Link from '../../components/Link';
 import { PageData } from '../../types/pageTypes';
 import { getAllPagesIds, getPagesData } from '../../lib/pages';
+import { slidePathBaseName, slideWriteHtmlTo } from '../../lib/slide';
 
-export default function Deck({ pageData }: { pageData: PageData }) {
+type Props = {
+  pageData: PageData;
+  slideHtml?: string;
+  slidePdf?: string;
+};
+
+export default function Deck({ pageData }: Props) {
   // const classes = useStyles();
   if (pageData === undefined || !pageData.title) {
     return <ErrorPage statusCode={404} />;
@@ -30,9 +37,15 @@ export const getStaticPaths: GetStaticPaths = async () => {
 
 export const getStaticProps: GetStaticProps = async (context) => {
   const pageData = await getPagesData('deck', context);
+  const slidePath = slidePathBaseName(pageData.id);
+  const slidePathHtml = `${slidePath}.html`;
+  console.log(pageData.markdown);
+  await slideWriteHtmlTo(pageData.markdown, slidePathHtml);
   return {
     props: {
-      pageData
+      pageData,
+      slideHtml: slidePathHtml,
+      slidePdf: `${slidePath}.pdf`
     }
   };
 };
