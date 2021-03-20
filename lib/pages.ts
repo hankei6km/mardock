@@ -55,7 +55,7 @@ export async function getSortedPagesData(
       query: {
         ...query,
         fields:
-          'id,createdAt,updatedAt,publishedAt,revisedAt,title,markdown,category,mainVisual'
+          'id,createdAt,updatedAt,publishedAt,revisedAt,title,html,category,mainVisual'
       },
       config: fetchConfig
     });
@@ -168,7 +168,7 @@ export async function getPagesData(
       params.id as string,
       {
         fields:
-          'id,createdAt,updatedAt,publishedAt,revisedAt,title,markdown,category,mainVisual,description'
+          'id,createdAt,updatedAt,publishedAt,revisedAt,title,html,category,mainVisual,description'
       }
     );
     const res = await client[apiName]._id(id).$get({
@@ -177,7 +177,7 @@ export async function getPagesData(
     });
     const { articleTitle, html } = getTitleAndContent(
       res.title,
-      res.markdown || ''
+      res.html || ''
     );
     const ret: PageData = {
       ...blankPageData(),
@@ -191,7 +191,12 @@ export async function getPagesData(
       category: apiName !== 'pages' ? res.category || [] : [],
       curCategory: options.curCategory || '',
       articleTitle,
-      markdown: res.markdown || '',
+      html: await rewrite(html)
+        .use(rewriteImg())
+        .use(rewriteToc(tocTitleLabel))
+        .use(rewriteEmbed())
+        .use(rewriteCode())
+        .run(),
       mainVisual: res.mainVisual?.url || '',
       description: res.description || ''
     };
@@ -203,7 +208,7 @@ export async function getPagesData(
         serverity: 'info'
       };
       const { html, messages, list } = await textLintInHtml(
-        ret.markdown,
+        ret.html,
         params.previewDemo !== 'true'
           ? undefined
           : getTextlintKernelOptions({
@@ -223,7 +228,7 @@ export async function getPagesData(
             })
       );
       if (messages.length > 0) {
-        ret.markdown = html;
+        ret.html = html;
         ret.notification.messageHtml = `${ret.notification.messageHtml}${list}`;
         ret.notification.serverity = 'warning';
       }

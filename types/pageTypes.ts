@@ -15,7 +15,7 @@ export type PageData = {
   curCategory: string; //  route 上で選択されているカテゴリ、getStaticProps で付与される.選択されていないときは ''
   title: string;
   articleTitle: string;
-  markdown: string;
+  html: string;
   mainVisual: string;
   description: string;
 };
@@ -30,7 +30,7 @@ export const blankPageData = (): PageData => ({
   category: [],
   curCategory: '',
   articleTitle: '',
-  markdown: '',
+  html: '',
   mainVisual: '',
   description: ''
 });

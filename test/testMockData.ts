@@ -10,7 +10,7 @@ export const mockDataPagesContents: PagesContents['contents'] = [
     title: 'Home',
     category: [],
     description: 'description of draftlint',
-    markdown: 'home page'
+    html: 'home page'
   },
   {
     id: 'deck',
@@ -20,7 +20,7 @@ export const mockDataPagesContents: PagesContents['contents'] = [
     revisedAt: '2020-12-26T15:29:14.476Z',
     title: 'Slides',
     category: [],
-    markdown: 'documents page'
+    html: 'documents page'
   }
 ];
 export const mockDataPages: PagesContents = {
@@ -43,7 +43,7 @@ export const mockDataPagesList = {
   ...mockDataPages,
   contents: mockDataPages.contents.map((v) => ({
     ...v,
-    markdown: undefined
+    html: undefined
   }))
 };
 

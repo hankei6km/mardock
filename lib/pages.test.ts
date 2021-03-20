@@ -17,7 +17,7 @@ describe('getSortedPagesData()', () => {
     expect(fetchMock.mock.calls[0][0]).toContain('/pages?');
     expect(queryParams(String(fetchMock.mock.calls[0][0]))).toStrictEqual({
       fields:
-        'id,createdAt,updatedAt,publishedAt,revisedAt,title,markdown,category,mainVisual'
+        'id,createdAt,updatedAt,publishedAt,revisedAt,title,html,category,mainVisual'
     });
     expect(res).toStrictEqual({
       contents: [
@@ -55,7 +55,7 @@ describe('getSortedPagesData()', () => {
     expect(fetchMock.mock.calls[0][0]).toContain('/pages?');
     expect(queryParams(String(fetchMock.mock.calls[0][0]))).toStrictEqual({
       fields:
-        'id,createdAt,updatedAt,publishedAt,revisedAt,title,markdown,category,mainVisual',
+        'id,createdAt,updatedAt,publishedAt,revisedAt,title,html,category,mainVisual',
       filters: 'displayOnIndexPage[equals]true'
     });
     // expect(fetchMock.mock.calls[0][1]?.headers) 環境変数の設定とメッセージによっては API キーが漏洩する可能性があるのでとりあえずやめる
@@ -82,7 +82,7 @@ describe('getPagesData()', () => {
     expect(fetchMock.mock.calls[0][0]).toContain('/pages/home');
     expect(queryParams(String(fetchMock.mock.calls[0][0]))).toStrictEqual({
       fields:
-        'id,createdAt,updatedAt,publishedAt,revisedAt,title,markdown,category,mainVisual,description'
+        'id,createdAt,updatedAt,publishedAt,revisedAt,title,html,category,mainVisual,description'
     });
     expect(res).toStrictEqual({
       id: 'home',
@@ -95,7 +95,7 @@ describe('getPagesData()', () => {
       description: 'description of draftlint',
       articleTitle: 'Home',
       updated: '2020-12-27T04:04:30.107Z',
-      markdown: 'home page',
+      html: 'home page',
       mainVisual: ''
     });
   });
