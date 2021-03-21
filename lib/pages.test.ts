@@ -1,6 +1,15 @@
-import { mockDataPagesList, mockDataPagesHome } from '../test/testMockData';
+import {
+  mockDataPagesList,
+  mockDataPagesHome,
+  mockDataDeckSlide1
+} from '../test/testMockData';
 import { FetchMock } from 'jest-fetch-mock';
-import { getSortedPagesData, getAllPagesIds, getPagesData } from './pages';
+import {
+  getSortedPagesData,
+  getAllPagesIds,
+  getPagesData,
+  getPagesSlideData
+} from './pages';
 import { queryParams } from '../test/testUtils';
 import { mockDataPagesIds } from '../test/testMockData';
 // https://github.com/jefflau/jest-fetch-mock/issues/83
@@ -17,7 +26,7 @@ describe('getSortedPagesData()', () => {
     expect(fetchMock.mock.calls[0][0]).toContain('/pages?');
     expect(queryParams(String(fetchMock.mock.calls[0][0]))).toStrictEqual({
       fields:
-        'id,createdAt,updatedAt,publishedAt,revisedAt,title,markdown,category,mainVisual'
+        'id,createdAt,updatedAt,publishedAt,revisedAt,title,html,source,category,mainVisual'
     });
     expect(res).toStrictEqual({
       contents: [
@@ -55,7 +64,7 @@ describe('getSortedPagesData()', () => {
     expect(fetchMock.mock.calls[0][0]).toContain('/pages?');
     expect(queryParams(String(fetchMock.mock.calls[0][0]))).toStrictEqual({
       fields:
-        'id,createdAt,updatedAt,publishedAt,revisedAt,title,markdown,category,mainVisual',
+        'id,createdAt,updatedAt,publishedAt,revisedAt,title,html,source,category,mainVisual',
       filters: 'displayOnIndexPage[equals]true'
     });
     // expect(fetchMock.mock.calls[0][1]?.headers) 環境変数の設定とメッセージによっては API キーが漏洩する可能性があるのでとりあえずやめる
@@ -82,7 +91,7 @@ describe('getPagesData()', () => {
     expect(fetchMock.mock.calls[0][0]).toContain('/pages/home');
     expect(queryParams(String(fetchMock.mock.calls[0][0]))).toStrictEqual({
       fields:
-        'id,createdAt,updatedAt,publishedAt,revisedAt,title,markdown,category,mainVisual,description'
+        'id,createdAt,updatedAt,publishedAt,revisedAt,title,html,category,mainVisual,description'
     });
     expect(res).toStrictEqual({
       id: 'home',
@@ -95,8 +104,22 @@ describe('getPagesData()', () => {
       description: 'description of draftlint',
       articleTitle: 'Home',
       updated: '2020-12-27T04:04:30.107Z',
-      markdown: 'home page',
+      html: 'home page',
       mainVisual: ''
     });
+  });
+});
+
+describe('getPagesSlideData()', () => {
+  it('should returns slideData', async () => {
+    fetchMock.mockResponseOnce(JSON.stringify(mockDataDeckSlide1));
+    const res = await getPagesSlideData('deck', { params: { id: 'slide1' } });
+    expect(fetchMock.mock.calls[0][0]).toContain('/deck/slide1');
+    expect(queryParams(String(fetchMock.mock.calls[0][0]))).toStrictEqual({
+      fields:
+        'id,createdAt,updatedAt,publishedAt,revisedAt,title,source,category,mainVisual,description'
+    });
+    expect(JSON.stringify(res.head)).toContain('slide1');
+    expect(JSON.stringify(res.body)).toContain('item1');
   });
 });

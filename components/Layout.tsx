@@ -239,7 +239,7 @@ const Layout = ({
   title = 'This is the default title',
   description,
   articleTitle,
-  markdown: html = '',
+  html: html = '',
   mainVisual = '',
   notification
 }: Props) => {

@@ -48,6 +48,7 @@
     "@types/react": "^16.9.16",
     "@types/react-dom": "^16.9.4",
     "@types/traverse": "^0.6.32",
+    "@types/unist": "^2.0.3",
     "jest": "^26.6.3",
     "jest-fetch-mock": "^3.0.3",
     "jest-watch-typeahead": "^0.6.1",

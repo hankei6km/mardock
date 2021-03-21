@@ -39,8 +39,7 @@ export const getStaticProps: GetStaticProps = async (context) => {
   const pageData = await getPagesData('deck', context);
   const slidePath = slidePathBaseName(pageData.id);
   const slidePathHtml = `${slidePath}.html`;
-  console.log(pageData.markdown);
-  await slideWriteHtmlTo(pageData.markdown, slidePathHtml);
+  await slideWriteHtmlTo(pageData.html, slidePathHtml);
   return {
     props: {
       pageData,
