@@ -1,5 +1,5 @@
 import { Writable } from 'stream';
-import { slideHtml } from './slide';
+import { slideHtml, getSlideData } from './slide';
 
 describe('slideHtml()', () => {
   it('should convert slide to html', async () => {
@@ -15,5 +15,15 @@ describe('slideHtml()', () => {
     expect(b).toContain('html');
     expect(await slideHtml('', w)).toEqual(0);
     expect(b).toContain('');
+  });
+});
+
+describe('getSlideData()', () => {
+  it('should convert slide source to slideData', async () => {
+    const slideData = await getSlideData(
+      '---\ntitle: slide1\n---\n#test1 \n\n---\n- item1\n- item2'
+    );
+    expect(JSON.stringify(slideData.head)).toContain('slide1');
+    expect(JSON.stringify(slideData.body)).toContain('item1');
   });
 });

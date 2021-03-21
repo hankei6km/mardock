@@ -51,3 +51,19 @@ export const mockDataPagesIds = {
   ...mockDataPages,
   contents: mockDataPages.contents.map(({ id }) => ({ id }))
 };
+
+export const mockDataDeckContents: PagesContents['contents'] = [
+  {
+    id: 'slide1',
+    createdAt: '2020-12-26T15:29:14.476Z',
+    updatedAt: '2020-12-26T15:29:14.476Z',
+    publishedAt: '2020-12-26T15:29:14.476Z',
+    revisedAt: '2020-12-26T15:29:14.476Z',
+    title: 'Slides',
+    category: [],
+    html: 'test slide page',
+    source: '---\ntitle: slide1\n---\n#test1 \n\n---\n- item1\n- item2'
+  }
+];
+
+export const mockDataDeckSlide1 = mockDataDeckContents[0];

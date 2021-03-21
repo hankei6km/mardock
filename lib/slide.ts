@@ -2,6 +2,8 @@ import { createWriteStream } from 'fs';
 import { spawn } from 'child_process';
 import { join, dirname } from 'path';
 import { Writable } from 'stream';
+import cheerio from 'cheerio';
+import { SlideData, blankSlideData } from '../types/pageTypes';
 // temp ファイル、fifo 等も考えたが今回は pipe で楽する。
 // 速度的に不利になったら考える。
 // import { marpCli } from '@marp-team/marp-cli';
@@ -51,4 +53,61 @@ export async function slideWriteHtmlTo(
   await slideHtml(markdown, w);
   // TOC を返すようにする予定(たぶん).
   return {};
+}
+
+export async function getSlideData(source: string): Promise<SlideData> {
+  let html = '';
+  const s = new Writable({
+    write(data) {
+      html = html + data;
+    }
+  });
+  await slideHtml(source, s);
+
+  const ret = blankSlideData();
+  const $ = cheerio.load(html);
+  $('head')
+    .children()
+    .each((_idx, elm) => {
+      if (elm.type === 'tag') {
+        const attribs = elm.attribs ? { ...elm.attribs } : {};
+        if (elm.attribs.class) {
+          attribs.className = elm.attribs.class;
+          delete attribs.class;
+        }
+        ret.head.push({
+          tagName: elm.tagName,
+          attribs: attribs,
+          html: $(elm).html() || ''
+        });
+      }
+    });
+  $('script').each((_idx, elm) => {
+    if ((elm as any).children) {
+      (elm as any).children.forEach((c: any) => {
+        ret.head.push({
+          tagName: 'script',
+          attribs: {},
+          html: c.data || ''
+        });
+      });
+    }
+  });
+  $('body')
+    .children()
+    .each((_idx, elm) => {
+      if (elm.type === 'tag') {
+        const attribs = elm.attribs ? { ...elm.attribs } : {};
+        if (elm.attribs.class) {
+          attribs.className = elm.attribs.class;
+          delete attribs.class;
+        }
+        ret.body.push({
+          tagName: elm.tagName,
+          attribs: attribs,
+          html: $(elm).html() || ''
+        });
+      }
+    });
+  return ret;
 }

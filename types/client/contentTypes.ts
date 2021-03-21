@@ -22,11 +22,12 @@ type Pages = {
   title: string;
   category: PagesCategory[];
   html?: string;
+  source?: string;
   mainVisual?: { url: string; width: number; height: number };
   description?: string;
 };
 export type PagesContent = ContentBase & Pages;
-export type PagesIndex = Omit<PagesContent, 'html'>;
+export type PagesIndex = PagesContent;
 export type PagesId = Pick<PagesContent, 'id'>;
 export type PagesContents = ContentList<PagesContent>;
 export type PagesIdsContents = Omit<PagesContents, 'offset' | 'limit'>;
