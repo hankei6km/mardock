@@ -1,25 +1,24 @@
 import { GetStaticProps, GetStaticPaths } from 'next';
 import ErrorPage from 'next/error';
 // import { makeStyles } from '@material-ui/core';
-import Layout from '../../components/Layout';
+import LayoutSlide from '../../components/LayoutSlide';
 import Link from '../../components/Link';
 import { SlideData } from '../../types/pageTypes';
-import { getAllPagesIds, getPagesData } from '../../lib/pages';
-import { slidePathBaseName, slideWriteHtmlTo } from '../../lib/slide';
+import { getAllPagesIds, getPagesSlideData } from '../../lib/pages';
 
 type Props = {
-  pageData: SlideData;
+  slideData: SlideData;
 };
 
-export default function Deck({ pageData }: Props) {
+export default function Deck({ slideData }: Props) {
   // const classes = useStyles();
-  if (pageData === undefined || !pageData.body) {
+  if (slideData === undefined || slideData.body.length === 0) {
     return <ErrorPage statusCode={404} />;
   }
   return (
-    <Layout apiName={'deck'} {...pageData} notification={pageData.notification}>
+    <LayoutSlide {...slideData} notification={slideData.notification}>
       <Link href="/">{'Back to Home'}</Link>
-    </Layout>
+    </LayoutSlide>
   );
 }
 
@@ -34,10 +33,10 @@ export const getStaticPaths: GetStaticPaths = async () => {
 };
 
 export const getStaticProps: GetStaticProps = async (context) => {
-  const pageData = await getPagesData('deck', context);
+  const slideData = await getPagesSlideData('deck', context);
   return {
     props: {
-      pageData
+      slideData
     }
   };
 };

@@ -80,33 +80,44 @@ export async function getSlideData(source: string): Promise<SlideData> {
           attribs: attribs,
           html: $(elm).html() || ''
         });
+      } else if ((elm.type as any) === 'style') {
+        if ((elm as any).children) {
+          (elm as any).children.forEach((c: any) => {
+            ret.head.push({
+              tagName: 'style',
+              attribs: {},
+              html: c.data || ''
+            });
+          });
+        }
       }
     });
-  $('script').each((_idx, elm) => {
-    if ((elm as any).children) {
-      (elm as any).children.forEach((c: any) => {
-        ret.head.push({
-          tagName: 'script',
-          attribs: {},
-          html: c.data || ''
-        });
-      });
-    }
-  });
+  // $('script').each((_idx, elm) => {
+  // });
   $('body')
     .children()
     .each((_idx, elm) => {
       if (elm.type === 'tag') {
         const attribs = elm.attribs ? { ...elm.attribs } : {};
-        if (elm.attribs.class) {
-          attribs.className = elm.attribs.class;
-          delete attribs.class;
-        }
+        // if (elm.attribs.class) {
+        //   attribs.className = elm.attribs.class;
+        //   delete attribs.class;
+        // }
         ret.body.push({
           tagName: elm.tagName,
           attribs: attribs,
           html: $(elm).html() || ''
         });
+      } else if ((elm.type as any) === 'script') {
+        if ((elm as any).children) {
+          (elm as any).children.forEach((c: any) => {
+            ret.body.push({
+              tagName: 'script',
+              attribs: {},
+              html: c.data || ''
+            });
+          });
+        }
       }
     });
   return ret;
