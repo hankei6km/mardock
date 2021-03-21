@@ -5,7 +5,7 @@ import Layout from '../../components/Layout';
 import Link from '../../components/Link';
 import { PageData } from '../../types/pageTypes';
 import { getAllPagesIds, getPagesData } from '../../lib/pages';
-import { slidePathBaseName, slideWriteHtmlTo } from '../../lib/slide';
+import { slideWriteHtmlTo } from '../../lib/slide';
 
 type Props = {
   pageData: PageData;
@@ -31,13 +31,13 @@ export const getStaticPaths: GetStaticPaths = async () => {
   }));
   return {
     paths,
-    fallback: true
+    fallback: process.env.USE_FALLBACK ? true : false
   };
 };
 
 export const getStaticProps: GetStaticProps = async (context) => {
   const pageData = await getPagesData('deck', context);
-  const slidePath = slidePathBaseName(pageData.id);
+  const slidePath = ''; //slidePathBaseName(pageData.id);
   const slidePathHtml = `${slidePath}.html`;
   await slideWriteHtmlTo(pageData.html, slidePathHtml);
   return {

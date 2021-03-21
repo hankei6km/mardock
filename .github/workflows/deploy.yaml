@@ -1,0 +1,75 @@
+name: deplpoy
+on:
+  push:
+    branches:
+      - main
+  repository_dispatch:
+    # types: [opened, deleted]
+
+jobs:
+
+  deploy:
+    runs-on: ubuntu-latest
+    environment: pages
+    # repository_dispatch しか使えないならいらない?
+    # if: github.ref == 'refs/heads/main'
+
+    steps:
+    - run: echo "${{ github.event.action }}"
+    - uses: actions/checkout@v2
+
+    - name: Use Node.js 14.5
+      uses: actions/setup-node@v1
+      with:
+         node-version: 14.5
+
+    - name: Get yarn cache directory path
+      id: yarn-cache-dir-path
+      run: echo "::set-output name=dir::$(yarn cache dir)"
+
+    # https://docs.github.com/ja/free-pro-team@latest/actions/guides/caching-dependencies-to-speed-up-workflows
+    - name: Cache node modules
+      uses: actions/cache@v2
+      env:
+        cache-name: cache-node-modules
+      with:
+        path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
+        key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/yarn.lock') }}
+        restore-keys: |
+          ${{ runner.os }}-build-${{ env.cache-name }}-
+          ${{ runner.os }}-build-
+          ${{ runner.os }}-
+
+    # https://err.sh/next.js/no-cache
+    - name: Cache next build
+      uses: actions/cache@v2
+      with:
+        path: ${{ github.workspace }}/.next/cache
+        key: ${{ runner.os }}-nextjs-${{ hashFiles('**/yarn.lock') }}
+
+    - name: Install modules
+      run: yarn install
+
+    # https://qiita.com/ozaki25/items/fe9912fc41c3a5c5bfea
+    # https://qiita.com/manten120/items/87e9e822800403904dc8
+    - name: Build
+      run: yarn build
+      env:
+        API_BASE_URL: ${{ secrets.API_BASE_URL }}
+        GET_API_KEY: ${{ secrets.GET_API_KEY }}
+        # API route は動作しない
+        # PREVIEW_SECRET: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Export
+      run: yarn export
+
+    - name: Add nojekyll
+      run: touch ./out/.nojekyll
+
+    - name: Deploy
+      uses: peaceiris/actions-gh-pages@v3
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        publish_dir: ./out
+        publish_branch: gh-pages
+
