@@ -9,10 +9,9 @@ describe('slideHtml()', () => {
         b = b + data.toString();
       }
     });
-    // w.on('data', (data) => console.log(data.toString()));
-
     expect(await slideHtml('#test1 \n\n---\n- item1\n- item2', w)).toEqual(0);
     expect(b).toContain('html');
+    b=''
     expect(await slideHtml('', w)).toEqual(0);
     expect(b).toContain('');
   });

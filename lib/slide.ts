@@ -26,6 +26,7 @@ export function slideHtml(markdown: string, w: Writable): Promise<number> {
       e = e + data.toString('utf8');
     });
     marpP.on('close', (code) => {
+      marpP.stdout.unpipe(w); // flush ぽい動作が必要?
       resolve(code);
       if (code !== 0) {
         throw new Error(`slideHtml error: ${e}`);
@@ -62,7 +63,9 @@ export async function getSlideData(source: string): Promise<SlideData> {
       html = html + data;
     }
   });
+  const waitUnpiped = new Promise((resolve) => s.on('unpipe', () => resolve()));
   await slideHtml(source, s);
+  await waitUnpiped;
 
   const ret = blankSlideData();
   const $ = cheerio.load(html);
@@ -92,8 +95,6 @@ export async function getSlideData(source: string): Promise<SlideData> {
         }
       }
     });
-  // $('script').each((_idx, elm) => {
-  // });
   $('body')
     .children()
     .each((_idx, elm) => {
