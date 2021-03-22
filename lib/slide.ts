@@ -1,17 +1,30 @@
 import { createWriteStream } from 'fs';
+// import { access, constants } from 'fs/promises';
 import { execFile } from 'child_process';
-import { join, dirname } from 'path';
+import { join } from 'path';
 import { Writable } from 'stream';
 import cheerio from 'cheerio';
 import { SlideData, blankSlideData } from '../types/pageTypes';
+import { PagesImage } from '../types/client/contentTypes';
 // temp ファイル、fifo 等も考えたが今回は pipe で楽する。
 // 速度的に不利になったら考える。
 // import { marpCli } from '@marp-team/marp-cli';
 
 //https://stackoverflow.com/questions/10111163/in-node-js-how-can-i-get-the-path-of-a-module-i-have-loaded-via-require-that-is
-const basePath = dirname(
-  dirname(dirname(dirname(dirname(require.resolve('@marp-team/marp-cli')))))
-);
+// const basePath = dirname(
+//   dirname(dirname(require.resolve('@marp-team/marp-cli')))
+// );
+// 上記方法だと絶対パスになっていなかった(勘違いか?)
+// とりあえず相対パス:
+// TODO: 絶対パスで取得
+const basePath = '.';
+export function getSlideImagePath(name: string): string {
+  return join(basePath, 'public', 'assets', 'images', name);
+}
+export function getSlideImageAbsPath(name: string): string {
+  return join('/', 'assets', 'images', name);
+}
+
 // console.log(basePath);
 const marpPath = join(basePath, 'node_modules', '.bin', 'marp');
 
@@ -44,6 +57,47 @@ export function slideHtml(markdown: string, w: Writable): Promise<number> {
   //  .catch(console.error);
 }
 
+export function slideImage(
+  markdown: string,
+  w: Writable,
+  options: { encoding?: string } = { encoding: 'binary' }
+): Promise<number> {
+  // とりあえず。
+  return new Promise((resolve) => {
+    const marpP = execFile(
+      marpPath,
+      ['--image', 'png'],
+      (err, stdout, _stderr) => {
+        if (err) {
+          // throw new Error(`slideHtml error: ${err}`);
+          resolve(1);
+          return;
+        }
+        // TODO: どうにかして stream にできないか？
+        w.write(stdout);
+        resolve(0);
+      }
+    );
+    if (marpP && marpP.stdin) {
+      marpP.stdin.write(markdown);
+      marpP.stdin.end();
+    }
+    if (marpP && marpP.stdout) {
+      // marpP.stdout.setEncoding('base64');
+      marpP.stdout.setEncoding(options.encoding || 'binary');
+    }
+  });
+  //marpCli(['./slides/slide-deck.md', '-o', './dist/index.html'])
+  //  .then((exitStatus) => {
+  //    if (exitStatus > 0) {
+  //      console.error(`Failure (Exit status: ${exitStatus})`);
+  //    } else {
+  //      console.log('Success');
+  //    }
+  //  })
+  //  .catch(console.error);
+}
+
 export async function slideWriteHtmlTo(
   markdown: string,
   slidePathHtml: string
@@ -52,6 +106,32 @@ export async function slideWriteHtmlTo(
   await slideHtml(markdown, w);
   // TOC を返すようにする予定(たぶん).
   return {};
+}
+
+export async function writeSlideTitleImage(
+  source: string,
+  id: string
+): Promise<PagesImage> {
+  const ret: PagesImage = {
+    url: getSlideImageAbsPath(`${id}.png`),
+    width: 1280,
+    height: 720
+  };
+  const p = getSlideImagePath(`${id}.png`);
+  const w = createWriteStream(p, { flags: 'wx', encoding: 'binary' });
+  w.on('error', () => {
+    // 'wx' で上書き失敗したときのエラー
+  });
+  const res = await slideImage(source, w).catch(() => {});
+  if (res !== 0) {
+    // コマンド実行が失敗したのでテンポラリ画像(chrome が無い環境だと失敗する)
+    ret.url =
+      'https://images.microcms-assets.io/assets/cc433627f35c4232b7cb97e0376507a7/eb84db7f1a7a4409bd20ffc27abe60e4/mardock-temp-image.png';
+    ret.width = 1280;
+    ret.height = 720;
+  }
+  w.close();
+  return ret;
 }
 
 export async function getSlideData(source: string): Promise<SlideData> {

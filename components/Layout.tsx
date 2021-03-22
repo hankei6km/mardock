@@ -240,7 +240,7 @@ const Layout = ({
   description,
   articleTitle,
   html: html = '',
-  mainVisual = '',
+  mainVisual = { url: '', width: 0, height: 0 },
   notification
 }: Props) => {
   const classes = useStyles({ apiName, id });

@@ -28,7 +28,8 @@ yarn-error.log*
 
 .vercel
 /tmp
+/work
 /open_source_licenses.*
 /public/open_source_licenses.*
 /public/scripts
-/public/slides
+/public/assets

@@ -48,6 +48,10 @@ jobs:
     - name: Install modules
       run: yarn install
 
+    # https://qiita.com/developer-kikikaikai/items/198d75efd10eb525c41f
+    - name: Install japanese fonts
+      run: sudo apt-get update && sudo apt-get install fonts-noto-cjk
+
     # https://qiita.com/ozaki25/items/fe9912fc41c3a5c5bfea
     # https://qiita.com/manten120/items/87e9e822800403904dc8
     - name: Build
@@ -63,9 +67,6 @@ jobs:
 
     - name: Add nojekyll
       run: touch ./out/.nojekyll
-
-    - name: Remove ".html"
-      run: rm ./out/.html
 
     - name: Deploy
       uses: peaceiris/actions-gh-pages@v3
