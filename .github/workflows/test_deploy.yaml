@@ -64,6 +64,9 @@ jobs:
     - name: Add nojekyll
       run: touch ./out/.nojekyll
 
+    - name: Remove ".html"
+      run: rm ./out/.html
+
     - name: Deploy
       uses: peaceiris/actions-gh-pages@v3
       with:
