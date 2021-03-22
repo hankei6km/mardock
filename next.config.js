@@ -21,11 +21,29 @@ module.exports = (phase) => {
       //  $USE_MOCK_CLIENT_FORCE を定義すると強制的に mock client を使う .
       if (isDev && process.env.DISABLE_MOCK_CLIENT !== 'true') return 'true';
       return '';
+    })(),
+    USE_FALLBACK: (() => {
+      // export されたときには使えないので false ('') にする
+      // 今回は GitHub 上で実行されていたら pages に export されるという想定.
+      // Pages with `fallback` enabled in `getStaticPaths` can not be exported.
+      // See more info here: https://err.sh/next.js/ssg-fallback-true-export
+      if (process.env.GITHUB_REPOSITORY) return '';
+      return 'true';
     })()
   };
 
+  // https://docs.github.com/ja/actions/reference/environment-variables
+  const assetPrefix = process.env.GITHUB_REPOSITORY
+    ? `/${process.env.GITHUB_REPOSITORY.split('/', 2)[1]}`
+    : '';
+  const basePath = assetPrefix;
+
+  console.log(`assetPrefix:${assetPrefix}`);
+
   // next.config.js object
   return {
+    assetPrefix,
+    basePath,
     env
   };
 };

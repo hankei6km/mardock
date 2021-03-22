@@ -1,5 +1,5 @@
 import { createWriteStream } from 'fs';
-import { spawn } from 'child_process';
+import { execFile } from 'child_process';
 import { join, dirname } from 'path';
 import { Writable } from 'stream';
 import cheerio from 'cheerio';
@@ -8,32 +8,30 @@ import { SlideData, blankSlideData } from '../types/pageTypes';
 // 速度的に不利になったら考える。
 // import { marpCli } from '@marp-team/marp-cli';
 
-const basePath = dirname(dirname(dirname(process.argv[1])));
-
-export function slidePathBaseName(id: string): string {
-  return join('/', 'slides', id);
-}
+//https://stackoverflow.com/questions/10111163/in-node-js-how-can-i-get-the-path-of-a-module-i-have-loaded-via-require-that-is
+const basePath = dirname(
+  dirname(dirname(dirname(dirname(require.resolve('@marp-team/marp-cli')))))
+);
+// console.log(basePath);
+const marpPath = join(basePath, 'node_modules', '.bin', 'marp');
 
 export function slideHtml(markdown: string, w: Writable): Promise<number> {
   // とりあえず。
-  // writable として実装しておいた方が楽かな
   return new Promise((resolve) => {
-    const marpPath = join(basePath, 'node_modules', '.bin', 'marp');
-    let e = '';
-    const marpP = spawn(marpPath, []);
-    marpP.stdout.pipe(w);
-    marpP.stderr.on('data', (data) => {
-      e = e + data.toString('utf8');
-    });
-    marpP.on('close', (code) => {
-      marpP.stdout.unpipe(w); // flush ぽい動作が必要?
-      resolve(code);
-      if (code !== 0) {
-        throw new Error(`slideHtml error: ${e}`);
+    // spawn で stdout.pipe を使うと後ろのデータがドロップしてしまう
+    // (GitHub Actions のときに 8 割りくらい確率で)
+    // しかたないので stdout の内容をべたで扱う.
+    const marpP = execFile(marpPath, [], (err, stdout, _strderr) => {
+      if (err) {
+        throw new Error(`slideHtml error: ${err}`);
       }
+      w.write(stdout);
+      resolve(0);
     });
-    marpP.stdin.write(markdown);
-    marpP.stdin.end();
+    if (marpP && marpP.stdin) {
+      marpP.stdin.write(markdown);
+      marpP.stdin.end();
+    }
   });
   //marpCli(['./slides/slide-deck.md', '-o', './dist/index.html'])
   //  .then((exitStatus) => {
@@ -50,7 +48,7 @@ export async function slideWriteHtmlTo(
   markdown: string,
   slidePathHtml: string
 ): Promise<{}> {
-  const w = createWriteStream(join(basePath, 'public', slidePathHtml));
+  const w = createWriteStream(join('public', slidePathHtml));
   await slideHtml(markdown, w);
   // TOC を返すようにする予定(たぶん).
   return {};
@@ -60,12 +58,13 @@ export async function getSlideData(source: string): Promise<SlideData> {
   let html = '';
   const s = new Writable({
     write(data) {
-      html = html + data;
+      html = html + data.toString();
     }
   });
-  const waitUnpiped = new Promise((resolve) => s.on('unpipe', () => resolve()));
   await slideHtml(source, s);
-  await waitUnpiped;
+  // test で実行したときで 64659 となるので、
+  // (style やら script ご殆どだろうから)普通に使っている分にはそれほど増えないかな。
+  // console.log(html.length);
 
   const ret = blankSlideData();
   const $ = cheerio.load(html);

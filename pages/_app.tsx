@@ -1,12 +1,14 @@
 // https://github.com/mui-org/material-ui/blob/8558ec2e55486561503f2f736f57f70eea48e044/examples/nextjs/pages/_app.js
 import React from 'react';
 import { AppProps } from 'next/app';
+import { useRouter } from 'next/router';
 import PropTypes from 'prop-types';
 import Head from 'next/head';
 import { ThemeProvider } from '@material-ui/core/styles';
 import { makeStyles } from '@material-ui/core/styles';
 import CssBaseline from '@material-ui/core/CssBaseline';
 import theme from '../src/theme';
+import { join } from 'path';
 import 'highlight.js/styles/hybrid.css';
 import 'lite-youtube-embed/src/lite-yt-embed.css';
 import { SnackbarProvider } from 'notistack';
@@ -32,6 +34,7 @@ export default function MyApp({ Component, pageProps }: AppProps) {
   // sessionStorage は?
   // https://ja.reactjs.org/docs/hooks-faq.html#how-to-avoid-passing-callbacks-down
 
+  const router = useRouter();
   return (
     <React.Fragment>
       <Head>
@@ -41,8 +44,12 @@ export default function MyApp({ Component, pageProps }: AppProps) {
           content="minimum-scale=1, initial-scale=1, width=device-width"
         />
         {/* lite-youtube-embed を適用すると Youtube を埋め込んだページで
-         server と browser で異なる内容になる */}
-        <script type="text/javascript" src="/scripts/lite-yt-embed.js"></script>
+         server と browser で異なる内容になる
+        */}
+        <script
+          type="text/javascript"
+          src={join(router.basePath, '/scripts/lite-yt-embed.js')}
+        ></script>
       </Head>
       <ThemeProvider theme={theme}>
         <SnackbarProvider
