@@ -18,12 +18,18 @@ export type PagesCategory = {
   title: string;
 };
 
+export type PagesImage = {
+  url: string;
+  width: number;
+  height: number;
+};
+
 type Pages = {
   title: string;
   category: PagesCategory[];
   html?: string;
   source?: string;
-  mainVisual?: { url: string; width: number; height: number };
+  mainVisual?: PagesImage;
   description?: string;
 };
 export type PagesContent = ContentBase & Pages;

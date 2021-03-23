@@ -29,7 +29,11 @@ export type PageData = {
   title: string;
   articleTitle: string;
   html: string;
-  mainVisual: string;
+  mainVisual: {
+    url: string;
+    width: number;
+    height: number;
+  };
   description: string;
 };
 
@@ -50,7 +54,7 @@ export const blankPageData = (): PageData => ({
   curCategory: '',
   articleTitle: '',
   html: '',
-  mainVisual: '',
+  mainVisual: { url: '', width: 0, height: 0 },
   description: ''
 });
 

@@ -1,3 +1,4 @@
+// import { Writable } from 'stream';
 import { ParsedUrlQuery } from 'querystring';
 import { GetStaticPropsContext } from 'next';
 import client, { fetchConfig } from './client';
@@ -31,7 +32,7 @@ import {
   paginationIdsFromPageCount,
   pageCountFromTotalCount
 } from '../utils/pagination';
-import { getSlideData } from './slide';
+import { getSlideData, writeSlideTitleImage } from './slide';
 // import { getTextlintKernelOptions } from '../utils/textlint';
 
 // id が 1件で 40byte  と想定、 content-length が 5M 程度とのことなので、1000*1000*5 / 40 で余裕を見て決めた値。
@@ -174,7 +175,7 @@ export async function getPagesData(
       params.id as string,
       {
         fields:
-          'id,createdAt,updatedAt,publishedAt,revisedAt,title,html,category,mainVisual,description'
+          'id,createdAt,updatedAt,publishedAt,revisedAt,title,html,source,category,mainVisual,description'
       }
     );
     const res = await client[apiName]._id(id).$get({
@@ -203,9 +204,16 @@ export async function getPagesData(
         .use(rewriteEmbed())
         .use(rewriteCode())
         .run(),
-      mainVisual: res.mainVisual?.url || '',
+      mainVisual: {
+        url: res.mainVisual?.url || '',
+        width: res.mainVisual?.width || 0,
+        height: res.mainVisual?.height || 0
+      },
       description: res.description || ''
     };
+    if (ret.mainVisual.url === '' && res.source) {
+      ret.mainVisual = await writeSlideTitleImage(res.source, res.id);
+    }
     // params.previewDemo は boolean ではない
     if (preview || params.previewDemo === 'true') {
       ret.notification = {

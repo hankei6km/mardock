@@ -91,7 +91,7 @@ describe('getPagesData()', () => {
     expect(fetchMock.mock.calls[0][0]).toContain('/pages/home');
     expect(queryParams(String(fetchMock.mock.calls[0][0]))).toStrictEqual({
       fields:
-        'id,createdAt,updatedAt,publishedAt,revisedAt,title,html,category,mainVisual,description'
+        'id,createdAt,updatedAt,publishedAt,revisedAt,title,html,source,category,mainVisual,description'
     });
     expect(res).toStrictEqual({
       id: 'home',
@@ -105,7 +105,7 @@ describe('getPagesData()', () => {
       articleTitle: 'Home',
       updated: '2020-12-27T04:04:30.107Z',
       html: 'home page',
-      mainVisual: ''
+      mainVisual: { url: '', width: 0, height: 0 }
     });
   });
 });
