@@ -8,8 +8,8 @@ import GridListTile from '@material-ui/core/GridListTile';
 import GridListTileBar from '@material-ui/core/GridListTileBar';
 import Link from '../components/Link';
 import { join } from 'path';
-import { PagesList } from '../types/client/contentTypes';
 import { pruneClasses } from '../utils/classes';
+import { IndexList } from '../types/pageTypes';
 
 const useStyles = makeStyles(() => ({
   'List-root': {},
@@ -32,7 +32,7 @@ const classNames = ['List-thumb'];
 
 type Props = {
   itemPath: string;
-  items: PagesList;
+  items: IndexList;
   cellHeight?: number;
   cols?: [number, number];
   imgWidth?: number;
@@ -43,8 +43,8 @@ type Props = {
 const List = ({
   itemPath,
   items,
-  cellHeight = 180,
-  cols = [2, 1],
+  cellHeight = 220,
+  cols = [1, 1],
   imgWidth = 380,
   classes: inClasses
 }: Props) => {
@@ -65,26 +65,35 @@ const List = ({
       cols={cols[0]}
       className={classes['List-root']}
     >
-      {items.contents.map((item, idx) => {
-        let src = '';
-        if (item.mainVisual) {
-          src = `${item.mainVisual.url}?${q.toString()}`;
-        }
+      {items.contents.map((item) => {
+        // if (item.mainVisual) {
+        //   src = `${item.mainVisual.url}?${q.toString()}`;
+        // }
         return (
           <GridListTile
             key={item.id}
-            cols={cols[0] === 2 && idx === 0 ? 2 : 1}
+            cols={1}
             className={classes['List-thumb-outer']}
           >
             <Link href={href} as={join(itemPath, item.id)}>
-              {src !== '' ? (
-                <img
-                  src={src}
-                  className={classes['List-thumb']}
-                  width={imgWidth}
-                  height={imgHeight}
-                  alt={`thumb for ${item.title}`}
-                />
+              {item.deck.items[0] ? (
+                <>
+                  <style
+                    dangerouslySetInnerHTML={{
+                      __html: item.deck.css
+                    }}
+                  />
+                  <article id="presentation">
+                    <div className="slides">
+                      <div
+                        className="slide"
+                        dangerouslySetInnerHTML={{
+                          __html: item.deck.items[0].html
+                        }}
+                      />
+                    </div>
+                  </article>
+                </>
               ) : (
                 <Box style={{ height: 180 }}>
                   <Typography variant="body1">NO IMAGE</Typography>

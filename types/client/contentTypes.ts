@@ -6,7 +6,7 @@ type ContentBase = {
   revisedAt?: string; // 古いcontentにはついていないのでオプショナル.
 };
 
-type ContentList<T> = {
+export type ContentList<T> = {
   contents: T[];
   totalCount: number;
   offset: number;

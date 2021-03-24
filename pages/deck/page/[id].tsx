@@ -4,13 +4,12 @@ import ErrorPage from 'next/error';
 import Layout from '../../../components/Layout';
 // import Link from '../../../components/Link';
 import List from '../../../components/List';
-import { PageData } from '../../../types/pageTypes';
+import { PageData, IndexList } from '../../../types/pageTypes';
 import {
   getPagesData,
-  getSortedPagesData,
+  getSortedIndexData,
   getAllPaginationIds
 } from '../../../lib/pages';
-import { PagesList } from '../../../types/client/contentTypes';
 import NavPagination from '../../../components/NavPagination';
 import { GetQuery } from '../../../types/client/queryTypes';
 // import classes from '*.module.css';
@@ -22,7 +21,7 @@ const pagePath: string[] = [];
 
 type Props = {
   pageData: PageData;
-  items: PagesList;
+  items: IndexList;
 };
 
 // このページは /pages/posts/index.tsx とほぼ同じ.
@@ -94,6 +93,6 @@ export const getStaticProps: GetStaticProps = async (context) => {
   if (curCategory) {
     q.filters = `category[contains]${curCategory}`;
   }
-  const items = await getSortedPagesData('deck', q);
+  const items = await getSortedIndexData('deck', q);
   return { props: { pageData, items } };
 };
