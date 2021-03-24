@@ -35,7 +35,7 @@ import {
   paginationIdsFromPageCount,
   pageCountFromTotalCount
 } from '../utils/pagination';
-import { getSlideData, slideDeck } from './slide';
+import { getSlideData, slideDeck, slideDeckRemoveId } from './slide';
 // import { getTextlintKernelOptions } from '../utils/textlint';
 
 // id が 1件で 40byte  と想定、 content-length が 5M 程度とのことなので、1000*1000*5 / 40 で余裕を見て決めた値。
@@ -109,7 +109,12 @@ export async function getSortedIndexData(
           description: res.description || ''
         };
         if (res.source) {
-          ret.deck = await slideDeck(res.source);
+          const d = await slideDeck(res.id, res.source);
+          d.items = d.items.map((v) => ({
+            ...v,
+            html: slideDeckRemoveId(v.html)
+          }));
+          ret.deck = d;
         }
         return ret;
       };
@@ -263,7 +268,7 @@ export async function getPagesData(
       description: res.description || ''
     };
     if (res.source) {
-      ret.deck = await slideDeck(res.source);
+      ret.deck = await slideDeck(res.id, res.source);
     }
     // params.previewDemo は boolean ではない
     if (preview || params.previewDemo === 'true') {

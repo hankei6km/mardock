@@ -1,7 +1,12 @@
 import * as fs from 'fs';
 import * as child_process from 'child_process';
 import { Writable } from 'stream';
-import { slideHtml, getSlideData, writeSlideTitleImage } from './slide';
+import {
+  slideHtml,
+  slideDeckRemoveId,
+  getSlideData,
+  writeSlideTitleImage
+} from './slide';
 jest.mock('fs', () => ({
   ...jest.requireActual('fs'),
   createWriteStream: jest
@@ -91,6 +96,18 @@ describe('writeSlideTitleImage()', () => {
       width: 1280,
       height: 720
     });
+  });
+});
+
+describe('slideDecRemoveId()', () => {
+  it('should removeid from slide html', () => {
+    expect(
+      slideDeckRemoveId(
+        '<svg><foreignObject><section id="test1">page1</section></foreignObject></svg>'
+      )
+    ).toEqual(
+      '<svg><foreignObject><section>page1</section></foreignObject></svg>'
+    );
   });
 });
 

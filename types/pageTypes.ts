@@ -15,6 +15,7 @@ export type DeckItem = {
   html: string;
 };
 export type DeckData = {
+  id: string;
   minX: number;
   minY: number;
   width: number;
@@ -80,6 +81,7 @@ export const blankPageData = (): PageData => ({
   articleTitle: '',
   html: '',
   deck: {
+    id: '',
     minX: 0,
     minY: 0,
     width: 0,
@@ -103,6 +105,7 @@ export const blankIndexData = (): IndexData => ({
   category: [],
   articleTitle: '',
   deck: {
+    id: '',
     minX: 0,
     minY: 0,
     width: 0,
