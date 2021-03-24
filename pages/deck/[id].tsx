@@ -1,51 +1,50 @@
+// import React, { useState, useEffect } from 'react';
 import { GetStaticProps, GetStaticPaths } from 'next';
-import { useRouter } from 'next/router';
-import { join } from 'path';
+// import { useRouter } from 'next/router';
 import ErrorPage from 'next/error';
 // import { makeStyles } from '@material-ui/core';
 import Box from '@material-ui/core/Box';
 import Layout from '../../components/Layout';
 import Link from '../../components/Link';
+import Carousel from 'react-material-ui-carousel';
 import { PageData } from '../../types/pageTypes';
 import { getAllPagesIds, getPagesData } from '../../lib/pages';
 
 type Props = {
   pageData: PageData;
-  slideHtml?: string;
-  slidePdf?: string;
 };
 
 export default function Deck({ pageData }: Props) {
   // const classes = useStyles();
-  const router = useRouter();
+  // const router = useRouter();
   if (pageData === undefined || !pageData.title) {
     return <ErrorPage statusCode={404} />;
   }
-  const mainVisualUrl = pageData.mainVisual.url.startsWith('/')
-    ? join(router.basePath, pageData.mainVisual.url)
-    : pageData.mainVisual.url;
-  const mainVisualWidth =
-    pageData.mainVisual.width > pageData.mainVisual.height
-      ? 500
-      : (pageData.mainVisual.width * 500) / pageData.mainVisual.height;
-  const mainVisualHeight =
-    pageData.mainVisual.height > pageData.mainVisual.width
-      ? 500
-      : (pageData.mainVisual.height * 500) / pageData.mainVisual.width;
   return (
     <Layout apiName={'deck'} {...pageData} notification={pageData.notification}>
       <Box component="section">
+        <style
+          dangerouslySetInnerHTML={{
+            __html: pageData.deck.css
+          }}
+        />
+        <Carousel autoPlay={false} animation={'slide'}
+        // 2.2.x だと NavButton が常に表示か非表示にしかできない?
+        >
+          {pageData.deck.items.map(({ html }, i) => (
+            <article id="presentation" key={i}>
+              <div className="slides">
+                <div
+                  className="slide"
+                  dangerouslySetInnerHTML={{
+                    __html: html
+                  }}
+                />
+              </div>
+            </article>
+          ))}
+        </Carousel>
         <Link href="/slides[id]" as={`/slides/${pageData.id}`}>
-          {mainVisualUrl && (
-            <Box>
-              <img
-                src={mainVisualUrl}
-                width={mainVisualWidth}
-                height={mainVisualHeight}
-                alt="slide thmubnail"
-              />
-            </Box>
-          )}
           {'Open presentation'}
         </Link>
       </Box>
@@ -66,13 +65,9 @@ export const getStaticPaths: GetStaticPaths = async () => {
 
 export const getStaticProps: GetStaticProps = async (context) => {
   const pageData = await getPagesData('deck', context);
-  const slidePath = ''; //slidePathBaseName(pageData.id);
-  const slidePathHtml = `${slidePath}.html`;
   return {
     props: {
-      pageData,
-      slideHtml: slidePathHtml,
-      slidePdf: `${slidePath}.pdf`
+      pageData
     }
   };
 };

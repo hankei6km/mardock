@@ -40,10 +40,16 @@ module.exports = (phase) => {
 
   console.log(`assetPrefix:${assetPrefix}`);
 
+  // className がサーバーとブラウザーでずれる対策?
+  // https://github.com/Learus/react-material-ui-carousel/issues/2
+  const withTM = require('next-transpile-modules')([
+    'react-material-ui-carousel'
+  ]);
   // next.config.js object
   return {
     assetPrefix,
     basePath,
+    ...withTM(),
     env
   };
 };

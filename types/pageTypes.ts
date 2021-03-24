@@ -11,6 +11,18 @@ export type SlideHeadData = {
 // } & SlideHeadData;
 export type SlideBodyData = SlideHeadData;
 
+export type DeckItem = {
+  html: string;
+};
+export type DeckData = {
+  minX: number;
+  minY: number;
+  width: number;
+  height: number;
+  css: string;
+  items: DeckItem[];
+};
+
 type Notification = {
   title: string;
   messageHtml: string;
@@ -29,6 +41,7 @@ export type PageData = {
   title: string;
   articleTitle: string;
   html: string;
+  deck: DeckData;
   mainVisual: {
     url: string;
     width: number;
@@ -54,6 +67,14 @@ export const blankPageData = (): PageData => ({
   curCategory: '',
   articleTitle: '',
   html: '',
+  deck: {
+    minX: 0,
+    minY: 0,
+    width: 0,
+    height: 0,
+    items: [],
+    css: ''
+  },
   mainVisual: { url: '', width: 0, height: 0 },
   description: ''
 });
