@@ -59,10 +59,10 @@ export const mockDataDeckContents: PagesContents['contents'] = [
     updatedAt: '2020-12-26T15:29:14.476Z',
     publishedAt: '2020-12-26T15:29:14.476Z',
     revisedAt: '2020-12-26T15:29:14.476Z',
-    title: 'Slides',
+    title: 'Slide1',
     category: [],
     html: 'test slide page',
-    source: '---\ntitle: slide1\n---\n#test1 \n\n---\n- item1\n- item2'
+    source: '---\ntitle: slide1\n\n---\n\n#test1\n\n---\n\n- item1\n- item2\n'
   }
 ];
 

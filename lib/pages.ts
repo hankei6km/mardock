@@ -27,12 +27,11 @@ import {
   rewriteToc
 } from './rewrite';
 import { ApiNameArticle } from '../types/apiName';
-import { getTextlintKernelOptions } from '../utils/textlint';
 import {
   paginationIdsFromPageCount,
   pageCountFromTotalCount
 } from '../utils/pagination';
-import { getSlideData, writeSlideTitleImage } from './slide';
+import { getSlideData, slideDeck } from './slide';
 // import { getTextlintKernelOptions } from '../utils/textlint';
 
 // id が 1件で 40byte  と想定、 content-length が 5M 程度とのことなので、1000*1000*5 / 40 で余裕を見て決めた値。
@@ -211,8 +210,8 @@ export async function getPagesData(
       },
       description: res.description || ''
     };
-    if (ret.mainVisual.url === '' && res.source) {
-      ret.mainVisual = await writeSlideTitleImage(res.source, res.id);
+    if (res.source) {
+      ret.deck = await slideDeck(res.source);
     }
     // params.previewDemo は boolean ではない
     if (preview || params.previewDemo === 'true') {
@@ -221,26 +220,7 @@ export async function getPagesData(
         messageHtml: '<p><a href="/api/exit-preview">プレビュー終了</a></p>',
         serverity: 'info'
       };
-      const { html, messages, list } = await textLintInHtml(
-        ret.html,
-        params.previewDemo !== 'true'
-          ? undefined
-          : getTextlintKernelOptions({
-              presets: [
-                {
-                  presetId: 'ja-technical-writing',
-                  preset: require('textlint-rule-preset-ja-technical-writing')
-                }
-              ],
-              rules: {
-                ruleId: 'ja-space-between-half-and-full-width',
-                rule: require('textlint-rule-ja-space-between-half-and-full-width'),
-                options: {
-                  space: 'always'
-                }
-              }
-            })
-      );
+      const { html, messages, list } = await textLintInHtml(ret.html);
       if (messages.length > 0) {
         ret.html = html;
         ret.notification.messageHtml = `${ret.notification.messageHtml}${list}`;

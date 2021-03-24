@@ -104,9 +104,37 @@ describe('getPagesData()', () => {
       description: 'description of draftlint',
       articleTitle: 'Home',
       updated: '2020-12-27T04:04:30.107Z',
+      deck: {
+        minX: 0,
+        minY: 0,
+        width: 0,
+        height: 0,
+        items: [],
+        css: ''
+      },
       html: 'home page',
       mainVisual: { url: '', width: 0, height: 0 }
     });
+  });
+  it('should returns pageData contained deckData', async () => {
+    fetchMock.mockResponseOnce(JSON.stringify(mockDataDeckSlide1));
+    const res = await getPagesData('pages', { params: { id: 'home' } });
+    expect({ ...res, deck: undefined }).toStrictEqual({
+      id: 'slide1',
+      title: 'Slide1',
+      pageCount: -1,
+      pageNo: 1,
+      allCategory: [],
+      category: [],
+      curCategory: '',
+      description: '',
+      articleTitle: 'Slide1',
+      updated: '2020-12-26T15:29:14.476Z',
+      deck: undefined,
+      html: 'test slide page',
+      mainVisual: { url: '', width: 0, height: 0 }
+    });
+    expect(res.deck.items[0].html).toContain('test1');
   });
 });
 

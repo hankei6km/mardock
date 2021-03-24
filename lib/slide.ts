@@ -3,9 +3,11 @@ import { createWriteStream } from 'fs';
 import { execFile } from 'child_process';
 import { join } from 'path';
 import { Writable } from 'stream';
+import Marp from '@marp-team/marp-core';
 import cheerio from 'cheerio';
-import { SlideData, blankSlideData } from '../types/pageTypes';
+import { SlideData, blankSlideData, DeckData } from '../types/pageTypes';
 import { PagesImage } from '../types/client/contentTypes';
+const { Element } = require('@marp-team/marpit');
 // temp ファイル、fifo 等も考えたが今回は pipe で楽する。
 // 速度的に不利になったら考える。
 // import { marpCli } from '@marp-team/marp-cli';
@@ -132,6 +134,41 @@ export async function writeSlideTitleImage(
   }
   w.close();
   return ret;
+}
+
+export async function slideDeck(source: string): Promise<DeckData> {
+  const marp = new Marp({
+    container: [
+      new Element('article', { id: 'presentation' }),
+      new Element('div', { class: 'slides' })
+    ],
+    slideContainer: new Element('div', { class: 'slide' })
+  });
+  const { html, css } = marp.render(source, { htmlAsArray: true });
+  let minX = 0;
+  let minY = 0;
+  let width = 0;
+  let height = 0;
+  if (html.length > 0) {
+    const marpItSvg = cheerio.load(html[0])('svg');
+    const a = marpItSvg.attr('viewBox')?.split(' ');
+    if (a && a.length === 4) {
+      minX = parseInt(a[0], 10);
+      minY = parseInt(a[1], 10);
+      width = parseInt(a[2], 10);
+      height = parseInt(a[3], 10);
+    }
+  }
+  return {
+    minX,
+    minY,
+    width,
+    height,
+    css,
+    items: html.map((v) => ({
+      html: v
+    }))
+  };
 }
 
 export async function getSlideData(source: string): Promise<SlideData> {
