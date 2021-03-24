@@ -15,16 +15,18 @@ const useStyles = makeStyles(() => ({
   'List-root': {},
   'List-thumb-outer': {
     width: '100%',
-    height: 180
+    // height: '100%',
+    aspectRatio: '16 / 9' // Props で指定させる?
   },
   'List-thumb': {
-    width: '100%',
-    height: '100%',
-    objectFit: 'cover',
-    opacity: 1,
-    transition: 'opacity .3s',
-    '&:hover': {
-      opacity: 0.8
+    '& .slide': {
+      objectFit: 'cover',
+      objectPosition: '50% 50%',
+      opacity: 1,
+      transition: 'opacity .3s',
+      '&:hover': {
+        opacity: 0.8
+      }
     }
   }
 }));
@@ -33,7 +35,7 @@ const classNames = ['List-thumb'];
 type Props = {
   itemPath: string;
   items: IndexList;
-  cellHeight?: number;
+  cellHeight?: number | 'auto';
   cols?: [number, number];
   imgWidth?: number;
   classes?: { [key: string]: string };
@@ -43,7 +45,7 @@ type Props = {
 const List = ({
   itemPath,
   items,
-  cellHeight = 220,
+  cellHeight = 'auto',
   cols = [1, 1],
   imgWidth = 380,
   classes: inClasses
@@ -83,7 +85,7 @@ const List = ({
                       __html: item.deck.css
                     }}
                   />
-                  <article id={item.deck.id}>
+                  <article id={item.deck.id} className={classes['List-thumb']}>
                     <div className="slides">
                       <div
                         className="slide"
