@@ -4,15 +4,14 @@ import ErrorPage from 'next/error';
 import Layout from '../components/Layout';
 import List from '../components/List';
 // import Typography from '@material-ui/core/Typography';
-import { PagesList } from '../types/client/contentTypes';
-import { PageData } from '../types/pageTypes';
-import { getSortedPagesData, getPagesData } from '../lib/pages';
+import { PageData, IndexList } from '../types/pageTypes';
+import { getPagesData, getSortedIndexData } from '../lib/pages';
 
 const listTitle = 'ドキュメント';
 
 type Props = {
   pageData: PageData;
-  items: PagesList;
+  items: IndexList;
 };
 
 const IndexPage = ({ pageData, items }: Props) => {
@@ -39,7 +38,7 @@ export const getStaticProps: GetStaticProps = async (context) => {
     ...context,
     params: { id: 'home' }
   });
-  const items = await getSortedPagesData('deck', {
+  const items = await getSortedIndexData('deck', {
     // filters: 'displayOnIndexPage[equals]true'
   });
   return { props: { pageData, items } };

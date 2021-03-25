@@ -8,23 +8,26 @@ import GridListTile from '@material-ui/core/GridListTile';
 import GridListTileBar from '@material-ui/core/GridListTileBar';
 import Link from '../components/Link';
 import { join } from 'path';
-import { PagesList } from '../types/client/contentTypes';
 import { pruneClasses } from '../utils/classes';
+import { IndexList, DeckData } from '../types/pageTypes';
+import Carousel from 'react-material-ui-carousel';
 
 const useStyles = makeStyles(() => ({
   'List-root': {},
   'List-thumb-outer': {
     width: '100%',
-    height: 180
+    // height: '100%',
+    aspectRatio: '16 / 9' // Props で指定させる?
   },
   'List-thumb': {
-    width: '100%',
-    height: '100%',
-    objectFit: 'cover',
-    opacity: 1,
-    transition: 'opacity .3s',
-    '&:hover': {
-      opacity: 0.8
+    '& .slide': {
+      objectFit: 'cover',
+      objectPosition: '50% 50%',
+      opacity: 1,
+      transition: 'opacity .3s',
+      '&:hover': {
+        opacity: 0.8
+      }
     }
   }
 }));
@@ -32,29 +35,81 @@ const classNames = ['List-thumb'];
 
 type Props = {
   itemPath: string;
-  items: PagesList;
-  cellHeight?: number;
+  items: IndexList;
+  cellHeight?: number | 'auto';
   cols?: [number, number];
   imgWidth?: number;
   classes?: { [key: string]: string };
 };
 // } & { width: Breakpoint };
+const ListItem = ({
+  itemId,
+  title,
+  itemPath,
+  deck,
+  classes: inClasses
+}: {
+  itemId: string;
+  title: string;
+  itemPath: string;
+  deck: DeckData;
+  classes?: { [key: string]: string };
+}) => {
+  const classes = useStyles({ classes: pruneClasses(inClasses, classNames) });
+  const href = join(itemPath, '[id]');
+  return (
+    <GridListTile cols={1} className={classes['List-thumb-outer']}>
+      <Link href={href} as={join(itemPath, itemId)}>
+        {deck.items[0] ? (
+          <>
+            <style
+              dangerouslySetInnerHTML={{
+                __html: deck.css
+              }}
+            />
+            <Carousel
+              autoPlay={false}
+              indicators={false}
+              animation={'slide'}
+              // 2.2.x だと NavButton が常に表示か非表示にしかできない?
+            >
+              {deck.items.map(({ html }) => (
+                <article
+                  key={deck.id}
+                  id={deck.id}
+                  className={classes['List-thumb']}
+                >
+                  <div className="slides">
+                    <div
+                      className="slide"
+                      dangerouslySetInnerHTML={{
+                        __html: html
+                      }}
+                    />
+                  </div>
+                </article>
+              ))}
+            </Carousel>
+          </>
+        ) : (
+          <Box style={{ height: 180 }}>
+            <Typography variant="body1">NO IMAGE</Typography>
+          </Box>
+        )}
+        <GridListTileBar title={title} titlePosition="bottom" />
+      </Link>
+    </GridListTile>
+  );
+};
 
 const List = ({
   itemPath,
   items,
-  cellHeight = 180,
-  cols = [2, 1],
-  imgWidth = 380,
+  cellHeight = 'auto',
+  cols = [1, 1],
   classes: inClasses
 }: Props) => {
   const classes = useStyles({ classes: pruneClasses(inClasses, classNames) });
-  const href = join(itemPath, '[id]');
-  const imgHeight = imgWidth / 1.6;
-  const q = new URLSearchParams('');
-  q.append('w', `${imgWidth}`);
-  q.append('h', `${imgHeight}`);
-  q.append('fit', 'crop');
   return (
     <GridList
       cellHeight={cellHeight}
@@ -65,34 +120,19 @@ const List = ({
       cols={cols[0]}
       className={classes['List-root']}
     >
-      {items.contents.map((item, idx) => {
-        let src = '';
-        if (item.mainVisual) {
-          src = `${item.mainVisual.url}?${q.toString()}`;
-        }
+      {items.contents.map((item) => {
+        // if (item.mainVisual) {
+        //   src = `${item.mainVisual.url}?${q.toString()}`;
+        // }
         return (
-          <GridListTile
+          <ListItem
+            itemId={item.id}
+            title={item.title}
             key={item.id}
-            cols={cols[0] === 2 && idx === 0 ? 2 : 1}
-            className={classes['List-thumb-outer']}
-          >
-            <Link href={href} as={join(itemPath, item.id)}>
-              {src !== '' ? (
-                <img
-                  src={src}
-                  className={classes['List-thumb']}
-                  width={imgWidth}
-                  height={imgHeight}
-                  alt={`thumb for ${item.title}`}
-                />
-              ) : (
-                <Box style={{ height: 180 }}>
-                  <Typography variant="body1">NO IMAGE</Typography>
-                </Box>
-              )}
-              <GridListTileBar title={item.title} titlePosition="bottom" />
-            </Link>
-          </GridListTile>
+            itemPath={itemPath}
+            deck={item.deck}
+            classes={classes}
+          />
         );
       })}
     </GridList>

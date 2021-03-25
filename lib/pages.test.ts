@@ -105,6 +105,7 @@ describe('getPagesData()', () => {
       articleTitle: 'Home',
       updated: '2020-12-27T04:04:30.107Z',
       deck: {
+        id: '',
         minX: 0,
         minY: 0,
         width: 0,

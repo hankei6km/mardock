@@ -1,4 +1,4 @@
-import { PagesCategory } from './client/contentTypes';
+import { ContentList, PagesCategory } from './client/contentTypes';
 
 export type SlideHeadData = {
   tagName: string;
@@ -15,6 +15,7 @@ export type DeckItem = {
   html: string;
 };
 export type DeckData = {
+  id: string;
   minX: number;
   minY: number;
   width: number;
@@ -56,6 +57,18 @@ export type SlideData = {
   body: SlideBodyData[];
 };
 
+// リストの項目用. この辺はもう少しきちんと作り直す/
+export type IndexData = Omit<
+  PageData,
+  | 'notification'
+  | 'pageNo'
+  | 'pageCount'
+  | 'allCategory'
+  | 'curCategory'
+  | 'html'
+>;
+export type IndexList = ContentList<IndexData>;
+
 export const blankPageData = (): PageData => ({
   id: '',
   updated: '',
@@ -68,6 +81,7 @@ export const blankPageData = (): PageData => ({
   articleTitle: '',
   html: '',
   deck: {
+    id: '',
     minX: 0,
     minY: 0,
     width: 0,
@@ -82,4 +96,30 @@ export const blankPageData = (): PageData => ({
 export const blankSlideData = (): SlideData => ({
   head: [],
   body: []
+});
+
+export const blankIndexData = (): IndexData => ({
+  id: '',
+  updated: '',
+  title: '',
+  category: [],
+  articleTitle: '',
+  deck: {
+    id: '',
+    minX: 0,
+    minY: 0,
+    width: 0,
+    height: 0,
+    items: [],
+    css: ''
+  },
+  mainVisual: { url: '', width: 0, height: 0 },
+  description: ''
+});
+
+export const blankIndexList = (): IndexList => ({
+  contents: [],
+  totalCount: 0,
+  limit: 0,
+  offset: 0
 });

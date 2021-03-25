@@ -14,7 +14,11 @@ import {
   PageData,
   blankPageData,
   SlideData,
-  blankSlideData
+  blankSlideData,
+  IndexData,
+  blankIndexData,
+  IndexList,
+  blankIndexList
 } from '../types/pageTypes';
 import { applyPreviewDataToIdQuery } from './preview';
 import { getTitleAndContent } from './html';
@@ -31,7 +35,7 @@ import {
   paginationIdsFromPageCount,
   pageCountFromTotalCount
 } from '../utils/pagination';
-import { getSlideData, slideDeck } from './slide';
+import { getSlideData, slideDeck, slideDeckRemoveId } from './slide';
 // import { getTextlintKernelOptions } from '../utils/textlint';
 
 // id が 1件で 40byte  と想定、 content-length が 5M 程度とのことなので、1000*1000*5 / 40 で余裕を見て決めた値。
@@ -72,6 +76,59 @@ export async function getSortedPagesData(
     console.error(`getSortedPagesData error: ${err.name}`);
   }
   return blankPagesList();
+}
+
+export async function getSortedIndexData(
+  apiName: ApiNameArticle,
+  query: GetQuery = {}
+): Promise<IndexList> {
+  try {
+    const res = await client[apiName].get({
+      query: {
+        ...query,
+        fields:
+          'id,createdAt,updatedAt,publishedAt,revisedAt,title,html,source,category,mainVisual'
+      },
+      config: fetchConfig
+    });
+    const p = res.body.contents.map((res) => {
+      return async (): Promise<IndexData> => {
+        const { articleTitle } = getTitleAndContent(res.title, res.html || '');
+        const ret = {
+          ...blankIndexData(),
+          id: res.id,
+          updated: res.updatedAt,
+          title: res.title,
+          category: apiName !== 'pages' ? res.category || [] : [],
+          articleTitle,
+          mainVisual: {
+            url: res.mainVisual?.url || '',
+            width: res.mainVisual?.width || 0,
+            height: res.mainVisual?.height || 0
+          },
+          description: res.description || ''
+        };
+        if (res.source) {
+          const d = await slideDeck(res.id, res.source);
+          d.items = d.items.map((v) => ({
+            ...v,
+            html: slideDeckRemoveId(v.html)
+          }));
+          ret.deck = d;
+        }
+        return ret;
+      };
+    });
+    return {
+      ...res.body,
+      contents: await Promise.all(p.map((p) => p()))
+    };
+  } catch (err) {
+    // res.status = 404 などでも throw される(試した限りでは)
+    // res.status を知る方法は?
+    console.error(`getSortedPagesData error: ${err.name}`);
+  }
+  return blankIndexList();
 }
 
 export async function getPagesIdsList(
@@ -211,7 +268,7 @@ export async function getPagesData(
       description: res.description || ''
     };
     if (res.source) {
-      ret.deck = await slideDeck(res.source);
+      ret.deck = await slideDeck(res.id, res.source);
     }
     // params.previewDemo は boolean ではない
     if (preview || params.previewDemo === 'true') {

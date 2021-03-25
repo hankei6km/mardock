@@ -136,10 +136,19 @@ export async function writeSlideTitleImage(
   return ret;
 }
 
-export async function slideDeck(source: string): Promise<DeckData> {
+export function slideDeckRemoveId(html: string): string {
+  const $ = cheerio.load(html);
+  // $('svg > foreignObject > section').removeAttr('id');
+  $('svg > * > section').removeAttr('id');
+  return $('body').html() || '';
+}
+
+export async function slideDeck(id: string, source: string): Promise<DeckData> {
+  const containerId = `slide-${id}`;
   const marp = new Marp({
+    inlineSVG: true,
     container: [
-      new Element('article', { id: 'presentation' }),
+      new Element('article', { id: containerId }),
       new Element('div', { class: 'slides' })
     ],
     slideContainer: new Element('div', { class: 'slide' })
@@ -160,6 +169,7 @@ export async function slideDeck(source: string): Promise<DeckData> {
     }
   }
   return {
+    id: containerId,
     minX,
     minY,
     width,

@@ -4,9 +4,8 @@ import { makeStyles } from '@material-ui/core';
 import Layout from '../../components/Layout';
 import List from '../../components/List';
 // import Typography from '@material-ui/core/Typography';
-import { PagesList } from '../../types/client/contentTypes';
-import { PageData } from '../../types/pageTypes';
-import { getSortedPagesData, getPagesData } from '../../lib/pages';
+import { PageData, IndexList } from '../../types/pageTypes';
+import { getPagesData, getSortedIndexData } from '../../lib/pages';
 import NavPagination from '../../components/NavPagination';
 import { GetQuery } from '../../types/client/queryTypes';
 import NavCategory from '../../components/NavCategory';
@@ -26,7 +25,7 @@ const pagePath: string[] = [];
 
 type Props = {
   pageData: PageData;
-  items: PagesList;
+  items: IndexList;
 };
 
 const DeckPage = ({ pageData, items }: Props) => {
@@ -90,7 +89,7 @@ export const getStaticProps: GetStaticProps = async (context) => {
   if (curCategory) {
     q.filters = `category[contains]${curCategory}`;
   }
-  const items = await getSortedPagesData('deck', q);
+  const items = await getSortedIndexData('deck', q);
   return { props: { pageData, items } };
 };
 

@@ -28,11 +28,13 @@ export default function Deck({ pageData }: Props) {
             __html: pageData.deck.css
           }}
         />
-        <Carousel autoPlay={false} animation={'slide'}
-        // 2.2.x だと NavButton が常に表示か非表示にしかできない?
+        <Carousel
+          autoPlay={false}
+          animation={'slide'}
+          // 2.2.x だと NavButton が常に表示か非表示にしかできない?
         >
           {pageData.deck.items.map(({ html }, i) => (
-            <article id="presentation" key={i}>
+            <article id={pageData.deck.id} key={i}>
               <div className="slides">
                 <div
                   className="slide"
