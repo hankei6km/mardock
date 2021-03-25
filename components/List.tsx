@@ -9,7 +9,8 @@ import GridListTileBar from '@material-ui/core/GridListTileBar';
 import Link from '../components/Link';
 import { join } from 'path';
 import { pruneClasses } from '../utils/classes';
-import { IndexList } from '../types/pageTypes';
+import { IndexList, DeckData } from '../types/pageTypes';
+import Carousel from 'react-material-ui-carousel';
 
 const useStyles = makeStyles(() => ({
   'List-root': {},
@@ -41,22 +42,74 @@ type Props = {
   classes?: { [key: string]: string };
 };
 // } & { width: Breakpoint };
+const ListItem = ({
+  itemId,
+  title,
+  itemPath,
+  deck,
+  classes: inClasses
+}: {
+  itemId: string;
+  title: string;
+  itemPath: string;
+  deck: DeckData;
+  classes?: { [key: string]: string };
+}) => {
+  const classes = useStyles({ classes: pruneClasses(inClasses, classNames) });
+  const href = join(itemPath, '[id]');
+  return (
+    <GridListTile cols={1} className={classes['List-thumb-outer']}>
+      <Link href={href} as={join(itemPath, itemId)}>
+        {deck.items[0] ? (
+          <>
+            <style
+              dangerouslySetInnerHTML={{
+                __html: deck.css
+              }}
+            />
+            <Carousel
+              autoPlay={false}
+              indicators={false}
+              animation={'slide'}
+              // 2.2.x だと NavButton が常に表示か非表示にしかできない?
+            >
+              {deck.items.map(({ html }) => (
+                <article
+                  key={deck.id}
+                  id={deck.id}
+                  className={classes['List-thumb']}
+                >
+                  <div className="slides">
+                    <div
+                      className="slide"
+                      dangerouslySetInnerHTML={{
+                        __html: html
+                      }}
+                    />
+                  </div>
+                </article>
+              ))}
+            </Carousel>
+          </>
+        ) : (
+          <Box style={{ height: 180 }}>
+            <Typography variant="body1">NO IMAGE</Typography>
+          </Box>
+        )}
+        <GridListTileBar title={title} titlePosition="bottom" />
+      </Link>
+    </GridListTile>
+  );
+};
 
 const List = ({
   itemPath,
   items,
   cellHeight = 'auto',
   cols = [1, 1],
-  imgWidth = 380,
   classes: inClasses
 }: Props) => {
   const classes = useStyles({ classes: pruneClasses(inClasses, classNames) });
-  const href = join(itemPath, '[id]');
-  const imgHeight = imgWidth / 1.6;
-  const q = new URLSearchParams('');
-  q.append('w', `${imgWidth}`);
-  q.append('h', `${imgHeight}`);
-  q.append('fit', 'crop');
   return (
     <GridList
       cellHeight={cellHeight}
@@ -72,38 +125,14 @@ const List = ({
         //   src = `${item.mainVisual.url}?${q.toString()}`;
         // }
         return (
-          <GridListTile
+          <ListItem
+            itemId={item.id}
+            title={item.title}
             key={item.id}
-            cols={1}
-            className={classes['List-thumb-outer']}
-          >
-            <Link href={href} as={join(itemPath, item.id)}>
-              {item.deck.items[0] ? (
-                <>
-                  <style
-                    dangerouslySetInnerHTML={{
-                      __html: item.deck.css
-                    }}
-                  />
-                  <article id={item.deck.id} className={classes['List-thumb']}>
-                    <div className="slides">
-                      <div
-                        className="slide"
-                        dangerouslySetInnerHTML={{
-                          __html: item.deck.items[0].html
-                        }}
-                      />
-                    </div>
-                  </article>
-                </>
-              ) : (
-                <Box style={{ height: 180 }}>
-                  <Typography variant="body1">NO IMAGE</Typography>
-                </Box>
-              )}
-              <GridListTileBar title={item.title} titlePosition="bottom" />
-            </Link>
-          </GridListTile>
+            itemPath={itemPath}
+            deck={item.deck}
+            classes={classes}
+          />
         );
       })}
     </GridList>
