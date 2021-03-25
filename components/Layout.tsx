@@ -6,7 +6,6 @@ import Head from 'next/head';
 import Container from '@material-ui/core/Container';
 import Avatar from '@material-ui/core/Avatar';
 import Box from '@material-ui/core/Box';
-import Divider from '@material-ui/core/Divider';
 import IconButton from '@material-ui/core/IconButton';
 import Typography from '@material-ui/core/Typography';
 import GitHubIcon from '@material-ui/icons/GitHub';
@@ -62,6 +61,9 @@ const useStyles = makeStyles((theme) => ({
     display: 'flex',
     flexDirection: 'column',
     alignItems: 'center',
+    padding: theme.spacing(1, 0),
+    paddingBottom: theme.spacing(0.5),
+    backgroundColor: theme.palette.grey[300],
     [theme.breakpoints.up('md')]: {
       flexDirection: 'row',
       justifyContent: 'center',
@@ -81,11 +83,12 @@ const useStyles = makeStyles((theme) => ({
     paddingLeft: theme.spacing(1),
     paddingRight: theme.spacing(1),
     '&  h2': {
-      ...theme.typography.h4
+      ...theme.typography.h4,
+      marginBottom: theme.spacing(1)
     },
     '& article > h3': {
       ...theme.typography.h6,
-      marginTop: theme.spacing(1),
+      marginBottom: theme.spacing(1),
       paddingTop: theme.spacing(0.5),
       paddingBottom: theme.spacing(0.5),
       paddingLeft: theme.spacing(1),
@@ -97,7 +100,7 @@ const useStyles = makeStyles((theme) => ({
     '& article > h4': {
       ...theme.typography.h6,
       display: 'inline',
-      marginTop: theme.spacing(1),
+      marginBottom: theme.spacing(1),
       paddingLeft: theme.spacing(1),
       paddingRight: theme.spacing(1),
       // color: theme.palette.primary.contrastText,
@@ -181,6 +184,7 @@ const useStyles = makeStyles((theme) => ({
     },
     '& > section': {
       // children のセクション
+      marginBottom: theme.spacing(0.5),
       '& h3': {
         ...theme.typography.h6,
         marginTop: theme.spacing(1),
@@ -205,7 +209,6 @@ const useStyles = makeStyles((theme) => ({
     }
   },
   footer: {
-    marginTop: theme.spacing(1),
     padding: theme.spacing(1),
     minHeight: 200,
     backgroundColor: theme.palette.primary.main,
@@ -336,11 +339,14 @@ const Layout = ({
         </Container>
       </header>
       <Box className={classes['Layout-section-root']}>
-        <Box component="section" className={classes['Layout-section-top']}>
-          {topSection}
-        </Box>
+        {topSection && (
+          <Box component="section" className={classes['Layout-section-top']}>
+            {topSection}
+          </Box>
+        )}
         <Container
           component="section"
+          maxWidth={maxWidth}
           disableGutters
           className={classes['Layout-section']}
         >
@@ -349,7 +355,6 @@ const Layout = ({
             {apiName === 'deck' && (
               <DateUpdated updated={updated} classes={classes} />
             )}
-            <Divider />
             <article
               dangerouslySetInnerHTML={{
                 __html: html
@@ -358,9 +363,11 @@ const Layout = ({
             {children}
           </>
         </Container>
-        <Box component="section" className={classes['Layout-section-bottom']}>
-          {bottomSection}
-        </Box>
+        {bottomSection && (
+          <Box component="section" className={classes['Layout-section-bottom']}>
+            {bottomSection}
+          </Box>
+        )}
       </Box>
       <footer className={classes.footer}>
         <Container maxWidth={maxWidth} disableGutters>

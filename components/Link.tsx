@@ -1,11 +1,11 @@
 /* eslint-disable jsx-a11y/anchor-has-content */
-import React from "react";
+import React from 'react';
 // import PropTypes from 'prop-types';
-import clsx from "clsx";
-import { useRouter } from "next/router";
-import NextLink, { LinkProps } from "next/link";
-import MuiLink, { LinkProps as MuiLinkProps } from "@material-ui/core/Link";
-import { UrlObject } from "url";
+import clsx from 'clsx';
+import { useRouter } from 'next/router';
+import NextLink, { LinkProps } from 'next/link';
+import MuiLink, { LinkProps as MuiLinkProps } from '@material-ui/core/Link';
+import { UrlObject } from 'url';
 
 const NextComposed = React.forwardRef<
   typeof NextLink & HTMLAnchorElement,
@@ -46,29 +46,29 @@ type Props = {
   innerRef?: any; // 降参。(node:any)=>void でもダメなの?
   naked?: boolean;
   variant?:
-    | "button"
-    | "caption"
-    | "h1"
-    | "h2"
-    | "h3"
-    | "h4"
-    | "h5"
-    | "h6"
-    | "inherit"
-    | "subtitle1"
-    | "subtitle2"
-    | "body1"
-    | "body2"
-    | "overline"
-    | "srOnly";
+    | 'button'
+    | 'caption'
+    | 'h1'
+    | 'h2'
+    | 'h3'
+    | 'h4'
+    | 'h5'
+    | 'h6'
+    | 'inherit'
+    | 'subtitle1'
+    | 'subtitle2'
+    | 'body1'
+    | 'body2'
+    | 'overline'
+    | 'srOnly';
   color?:
-    | "inherit"
-    | "initial"
-    | "primary"
-    | "secondary"
-    | "textPrimary"
-    | "textSecondary"
-    | "error";
+    | 'inherit'
+    | 'initial'
+    | 'primary'
+    | 'secondary'
+    | 'textPrimary'
+    | 'textSecondary'
+    | 'error';
   onClick?: () => void;
   prefetch?: boolean;
 };
@@ -77,7 +77,7 @@ type Props = {
 function Link(props: LinkProps & MuiLinkProps & Props) {
   const {
     href,
-    activeClassName = "active",
+    activeClassName = 'active',
     className: classNameProps,
     innerRef,
     naked,
@@ -87,7 +87,7 @@ function Link(props: LinkProps & MuiLinkProps & Props) {
   } = props;
 
   const router = useRouter();
-  const pathname = typeof href === "string" ? href : href.pathname;
+  const pathname = typeof href === 'string' ? href : href.pathname;
   const className = clsx(classNameProps, {
     [activeClassName]: router.pathname === pathname && activeClassName
   });
