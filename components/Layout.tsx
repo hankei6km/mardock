@@ -60,14 +60,20 @@ const useStyles = makeStyles((theme) => ({
   },
   'Layout-section-root': {
     display: 'flex',
-    justifyContent: 'center',
+    flexDirection: 'column',
+    alignItems: 'center',
+    [theme.breakpoints.up('md')]: {
+      flexDirection: 'row',
+      justifyContent: 'center',
+      alignItems: 'start'
+    },
     width: '100%'
   },
   'Layout-section-top': {
-    width: 300
+    width: 200
   },
   'Layout-section-bottom': {
-    width: 300
+    width: 200
   },
   'Layout-section': {
     flexGrow: 1,
@@ -244,6 +250,7 @@ const Layout = ({
   notification
 }: Props) => {
   const classes = useStyles({ apiName, id });
+  const maxWidth = 'lg';
   // const router = useRouter();
   const avatarSrc =
     'https://images.microcms-assets.io/assets/cc433627f35c4232b7cb97e0376507a7/d106c1f3df9849e58cbd5264c3abd841/mardock-site-icon.png?fit64=Y3JvcA&h64=MTIw&w64=MTIw';
@@ -297,7 +304,7 @@ const Layout = ({
         <meta name="viewport" content="initial-scale=1.0, width=device-width" />
       </Head>
       <header className={classes.header}>
-        <Container maxWidth="sm" disableGutters>
+        <Container maxWidth={maxWidth} disableGutters>
           <Box className={classes['Header-content']}>
             <Box className={classes['Siteicon-root']}>
               <a href="/">
@@ -334,7 +341,6 @@ const Layout = ({
         </Box>
         <Container
           component="section"
-          maxWidth="sm"
           disableGutters
           className={classes['Layout-section']}
         >
@@ -352,12 +358,12 @@ const Layout = ({
             {children}
           </>
         </Container>
-        <Box component="section" className={classes['Layout-section-top']}>
+        <Box component="section" className={classes['Layout-section-bottom']}>
           {bottomSection}
         </Box>
       </Box>
       <footer className={classes.footer}>
-        <Container maxWidth="sm" disableGutters>
+        <Container maxWidth={maxWidth} disableGutters>
           <Typography variant="body1">Copyright (c) 2021 hankei6km</Typography>
           <IconButton
             aria-label="link to GitHub account"

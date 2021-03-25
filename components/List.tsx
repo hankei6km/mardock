@@ -5,19 +5,22 @@ import { makeStyles, Typography } from '@material-ui/core';
 import Box from '@material-ui/core/Box';
 import GridList from '@material-ui/core/GridList';
 import GridListTile from '@material-ui/core/GridListTile';
-import GridListTileBar from '@material-ui/core/GridListTileBar';
+// import GridListTileBar from '@material-ui/core/GridListTileBar';
 import Link from '../components/Link';
 import { join } from 'path';
 import { pruneClasses } from '../utils/classes';
 import { IndexList, DeckData } from '../types/pageTypes';
 import Carousel from 'react-material-ui-carousel';
 
-const useStyles = makeStyles(() => ({
-  'List-root': {},
+const useStyles = makeStyles((theme) => ({
+  'List-root': {
+    justifyContent: 'space-between',
+    gridRowGap: theme.spacing(1)
+  },
   'List-thumb-outer': {
-    width: '100%',
+    width: '49%'
     // height: '100%',
-    aspectRatio: '16 / 9' // Props で指定させる?
+    // aspectRatio: '16 / 9' // Props で指定させる?
   },
   'List-thumb': {
     '& .slide': {
@@ -96,8 +99,10 @@ const ListItem = ({
             <Typography variant="body1">NO IMAGE</Typography>
           </Box>
         )}
-        <GridListTileBar title={title} titlePosition="bottom" />
       </Link>
+      <Box height="50px" zIndex={2000}>
+        {title}
+      </Box>
     </GridListTile>
   );
 };
@@ -106,7 +111,7 @@ const List = ({
   itemPath,
   items,
   cellHeight = 'auto',
-  cols = [1, 1],
+  cols = [2, 1],
   classes: inClasses
 }: Props) => {
   const classes = useStyles({ classes: pruneClasses(inClasses, classNames) });
