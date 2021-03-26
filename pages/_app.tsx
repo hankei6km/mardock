@@ -12,6 +12,8 @@ import { join } from 'path';
 import 'highlight.js/styles/hybrid.css';
 import 'lite-youtube-embed/src/lite-yt-embed.css';
 import { SnackbarProvider } from 'notistack';
+import SiteContext from '../components/SiteContext';
+import siteConfig from '../src/site.config';
 
 const useStyles = makeStyles((theme) => ({
   containerRoot: {
@@ -58,9 +60,11 @@ export default function MyApp({ Component, pageProps }: AppProps) {
           hideIconVariant
           classes={{ containerRoot: classes.containerRoot }}
         >
-          {/* CssBaseline kickstart an elegant, consistent, and simple baseline to build upon. */}
-          <CssBaseline />
-          <Component {...pageProps} />
+          <SiteContext.Provider value={siteConfig}>
+            {/* CssBaseline kickstart an elegant, consistent, and simple baseline to build upon. */}
+            <CssBaseline />
+            <Component {...pageProps} />
+          </SiteContext.Provider>
         </SnackbarProvider>
       </ThemeProvider>
     </React.Fragment>

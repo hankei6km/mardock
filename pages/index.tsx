@@ -7,8 +7,6 @@ import List from '../components/List';
 import { PageData, IndexList } from '../types/pageTypes';
 import { getPagesData, getSortedIndexData } from '../lib/pages';
 
-const listTitle = 'ドキュメント';
-
 type Props = {
   pageData: PageData;
   items: IndexList;
@@ -26,7 +24,6 @@ const IndexPage = ({ pageData, items }: Props) => {
       notification={pageData.notification}
     >
       <section>
-        <h3>{listTitle}</h3>
         <List itemPath={'/deck'} items={items} />
       </section>
     </Layout>

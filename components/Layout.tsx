@@ -1,4 +1,4 @@
-import React, { ReactNode, useEffect } from 'react';
+import React, { ReactNode, useContext, useEffect } from 'react';
 // import { useRouter } from 'next/router';
 import { makeStyles } from '@material-ui/core';
 // import NoSsr from '@material-ui/core/NoSsr';
@@ -13,12 +13,11 @@ import TwitterIcon from '@material-ui/icons/Twitter';
 import Notification from './Notification';
 import { PageData } from '../types/pageTypes';
 import { ApiNameArticle } from '../types/apiName';
+import SiteContext from './SiteContext';
 import Link from './Link';
 import NavMain from './NavMain';
 import NavBreadcrumbs from './NavBreadcrumbs';
 import DateUpdated from './DateUpdated';
-
-const siteName = 'mardock';
 
 const useStyles = makeStyles((theme) => ({
   header: {},
@@ -253,10 +252,10 @@ const Layout = ({
   notification
 }: Props) => {
   const classes = useStyles({ apiName, id });
+  const { siteName, siteIcon } = useContext(SiteContext);
   const maxWidth = 'lg';
   // const router = useRouter();
-  const avatarSrc =
-    'https://images.microcms-assets.io/assets/cc433627f35c4232b7cb97e0376507a7/d106c1f3df9849e58cbd5264c3abd841/mardock-site-icon.png?fit64=Y3JvcA&h64=MTIw&w64=MTIw';
+  const avatarSrc = siteIcon;
   const avatarSrcSet = getAvatarSrcSet(avatarSrc);
   const _title =
     apiName === 'pages' && id === 'home'

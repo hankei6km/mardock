@@ -1,4 +1,4 @@
-import React, { useCallback } from 'react';
+import React, { useCallback, useContext } from 'react';
 import { useRouter } from 'next/router';
 import { makeStyles } from '@material-ui/core/styles';
 import Breadcrumbs from '@material-ui/core/Breadcrumbs';
@@ -6,6 +6,7 @@ import Typography from '@material-ui/core/Typography';
 //:import SectionContext from '../SectionContext';
 import Link from './Link';
 import { pruneClasses } from '../utils/classes';
+import SiteContext from './SiteContext';
 // import SiteContext from '../SiteContext';
 
 const useStyles = makeStyles(() => ({
@@ -29,23 +30,7 @@ type Props = {
 const NavBreadcrumbs = ({ lastBreadcrumb, classes: inClasses }: Props) => {
   const classes = useStyles({ classes: pruneClasses(inClasses, classNames) });
   const router = useRouter();
-  // const { nav } = useContext(SiteContext);
-  const nav: {
-    // main: { label: string; href: string }[];
-    breadcrumbs: { [key: string]: { label: string; href: string }[] };
-  } = {
-    breadcrumbs: {
-      '/': [{ label: 'Home', href: '/' }],
-      '/deck': [
-        { label: 'Home', href: '/' },
-        { label: 'Slides', href: '/deck' }
-      ],
-      '/about': [
-        { label: 'Home', href: '/' },
-        { label: 'About', href: '/about' }
-      ]
-    }
-  };
+  const { nav } = useContext(SiteContext);
   const depthFromPath = useCallback(() => {
     const rref = `/${router.pathname.split('/', 2)[1]}`;
     return nav.breadcrumbs[rref].slice(0, lastBreadcrumb ? undefined : -1);
