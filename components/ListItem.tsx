@@ -3,7 +3,7 @@ import { makeStyles } from '@material-ui/core';
 // import { Breakpoint } from '@material-ui/core/styles/createBreakpoints';
 // import withWidth, { isWidthUp } from '@material-ui/core/withWidth';
 import Box from '@material-ui/core/Box';
-import Button from '@material-ui/core/Button';
+import Chip from '@material-ui/core/Chip';
 import Card from '@material-ui/core/Card';
 import CardActionArea from '@material-ui/core/CardActionArea';
 import CardActions from '@material-ui/core/CardActions';
@@ -38,14 +38,9 @@ const useStyles = makeStyles((theme) => ({
       padding: theme.spacing(0.5, 1),
       marginBottom: theme.spacing(0.5)
     },
-    '& .MuiButton-root': {
-      padding: theme.spacing(0.5, 1),
-      marginRight: theme.spacing(1),
-      minWidth: 0,
-      minHeight: 0,
-      '& .MuiButton-label': {
-        textTransform: 'none'
-      }
+    '& .MuiChip-root': {
+      // padding: theme.spacing(0.5, 1),
+      marginRight: theme.spacing(1)
     }
   },
   'ListItem-thumb': {
@@ -139,17 +134,17 @@ const ListItem = ({
         </CardActionArea>
         <CardActions disableSpacing={true}>
           {category.map((c) => (
-            <Button
+            <Chip
               key={c.id}
+              label={c.title}
+              color={'primary'}
               // variant="outlined"
               // variant="contained"
               component={Link}
-              className={'MuiButton-outlined'}
+              // className={'MuiChip-outlined'}
               href={join(itemPath, 'category', '[id]')}
               as={join(itemPath, 'category', c.id)}
-            >
-              <Typography>{c.title}</Typography>
-            </Button>
+            />
           ))}
         </CardActions>
       </Card>
