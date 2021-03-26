@@ -20,6 +20,7 @@ import {
   IndexList,
   blankIndexList
 } from '../types/pageTypes';
+import siteServerSideConfig from '../src/site.server-side-config';
 import { applyPreviewDataToIdQuery } from './preview';
 import { getTitleAndContent } from './html';
 import { textLintInHtml } from './draftlint';
@@ -38,8 +39,6 @@ import {
 import { getSlideData, slideDeck, slideDeckRemoveId } from './slide';
 // import { getTextlintKernelOptions } from '../utils/textlint';
 
-// id が 1件で 40byte  と想定、 content-length が 5M 程度とのことなので、1000*1000*5 / 40 で余裕を見て決めた値。
-const allIdsLimit = 120000;
 // const itemsPerPage = 10;
 
 export type PageDataGetOptions = {
@@ -53,8 +52,6 @@ export type PageDataGetOptions = {
   itemsPerPage?: number;
   pageNo?: number;
 };
-
-const tocTitleLabel = '目次';
 
 export async function getSortedPagesData(
   apiName: ApiNameArticle,
@@ -158,7 +155,10 @@ export async function getAllPagesIds(
     return (
       await getPagesIdsList(apiName, {
         ...query,
-        limit: query.limit !== undefined ? query.limit : allIdsLimit
+        limit:
+          query.limit !== undefined
+            ? query.limit
+            : siteServerSideConfig.allIdsLimit
       })
     ).contents.map(({ id }) => id);
   } catch (err) {
@@ -256,7 +256,7 @@ export async function getPagesData(
       articleTitle,
       html: await rewrite(html)
         .use(rewriteImg())
-        .use(rewriteToc(tocTitleLabel))
+        .use(rewriteToc(siteServerSideConfig.tocTitleLabel))
         .use(rewriteEmbed())
         .use(rewriteCode())
         .run(),
@@ -273,9 +273,7 @@ export async function getPagesData(
     // params.previewDemo は boolean ではない
     if (preview || params.previewDemo === 'true') {
       ret.notification = {
-        title: '[DRAFT]',
-        messageHtml: '<p><a href="/api/exit-preview">プレビュー終了</a></p>',
-        serverity: 'info'
+        ...siteServerSideConfig.draft
       };
       const { html, messages, list } = await textLintInHtml(ret.html);
       if (messages.length > 0) {
