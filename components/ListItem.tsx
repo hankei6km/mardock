@@ -35,6 +35,7 @@ const useStyles = makeStyles((theme) => ({
       padding: theme.spacing(0.5, 1)
     },
     '& .MuiCardActions-root': {
+      minHeight: 40,
       padding: theme.spacing(0.5, 1),
       marginBottom: theme.spacing(0.5)
     },
