@@ -1,37 +1,27 @@
 import React from 'react';
-import { makeStyles, Typography } from '@material-ui/core';
-// import { Breakpoint } from '@material-ui/core/styles/createBreakpoints';
-// import withWidth, { isWidthUp } from '@material-ui/core/withWidth';
-import Box from '@material-ui/core/Box';
+import { makeStyles } from '@material-ui/core';
 import GridList from '@material-ui/core/GridList';
-import GridListTile from '@material-ui/core/GridListTile';
-import GridListTileBar from '@material-ui/core/GridListTileBar';
-import Link from '../components/Link';
-import { join } from 'path';
 import { pruneClasses } from '../utils/classes';
-import { IndexList, DeckData } from '../types/pageTypes';
-import Carousel from 'react-material-ui-carousel';
+import { IndexList } from '../types/pageTypes';
+import ListItem from './ListItem';
 
-const useStyles = makeStyles(() => ({
-  'List-root': {},
+const useStyles = makeStyles((theme) => ({
+  'List-root': {
+    justifyContent: 'space-between',
+    gridRowGap: theme.spacing(1)
+  },
   'List-thumb-outer': {
     width: '100%',
-    // height: '100%',
-    aspectRatio: '16 / 9' // Props で指定させる?
-  },
-  'List-thumb': {
-    '& .slide': {
-      objectFit: 'cover',
-      objectPosition: '50% 50%',
-      opacity: 1,
-      transition: 'opacity .3s',
-      '&:hover': {
-        opacity: 0.8
-      }
+    [theme.breakpoints.up('sm')]: {
+      width: '49%'
+    },
+    [theme.breakpoints.up('md')]: {
+      width: '32%'
     }
+    // aspectRatio: '16 / 9' // Props で指定させる?
   }
 }));
-const classNames = ['List-thumb'];
+const classNames = ['List-root'];
 
 type Props = {
   itemPath: string;
@@ -41,72 +31,11 @@ type Props = {
   imgWidth?: number;
   classes?: { [key: string]: string };
 };
-// } & { width: Breakpoint };
-const ListItem = ({
-  itemId,
-  title,
-  itemPath,
-  deck,
-  classes: inClasses
-}: {
-  itemId: string;
-  title: string;
-  itemPath: string;
-  deck: DeckData;
-  classes?: { [key: string]: string };
-}) => {
-  const classes = useStyles({ classes: pruneClasses(inClasses, classNames) });
-  const href = join(itemPath, '[id]');
-  return (
-    <GridListTile cols={1} className={classes['List-thumb-outer']}>
-      <Link href={href} as={join(itemPath, itemId)}>
-        {deck.items[0] ? (
-          <>
-            <style
-              dangerouslySetInnerHTML={{
-                __html: deck.css
-              }}
-            />
-            <Carousel
-              autoPlay={false}
-              indicators={false}
-              animation={'slide'}
-              // 2.2.x だと NavButton が常に表示か非表示にしかできない?
-            >
-              {deck.items.map(({ html }) => (
-                <article
-                  key={deck.id}
-                  id={deck.id}
-                  className={classes['List-thumb']}
-                >
-                  <div className="slides">
-                    <div
-                      className="slide"
-                      dangerouslySetInnerHTML={{
-                        __html: html
-                      }}
-                    />
-                  </div>
-                </article>
-              ))}
-            </Carousel>
-          </>
-        ) : (
-          <Box style={{ height: 180 }}>
-            <Typography variant="body1">NO IMAGE</Typography>
-          </Box>
-        )}
-        <GridListTileBar title={title} titlePosition="bottom" />
-      </Link>
-    </GridListTile>
-  );
-};
-
 const List = ({
   itemPath,
   items,
   cellHeight = 'auto',
-  cols = [1, 1],
+  cols = [2, 1],
   classes: inClasses
 }: Props) => {
   const classes = useStyles({ classes: pruneClasses(inClasses, classNames) });
@@ -130,6 +59,7 @@ const List = ({
             title={item.title}
             key={item.id}
             itemPath={itemPath}
+            category={item.category}
             deck={item.deck}
             classes={classes}
           />
