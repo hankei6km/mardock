@@ -51,17 +51,17 @@ const useStyles = makeStyles((theme) => ({
     //paddingLeft: theme.spacing(1),
     //paddingRight: theme.spacing(1)
   },
-  'Siteicon-root': {
+  'Header-site-title-root': {
     flexGrow: 1,
     display: 'flex',
     alignItems: 'center'
   },
-  'Siteicon-image': () => ({
+  'Header-site-title-image': () => ({
     // width: theme.typography.h3.fontSize,
     marginRight: theme.spacing(2)
     // marginBottom: theme.spacing(2)
   }),
-  SiteTitle: {
+  'Header-site-title-text': {
     flexGrow: 1,
     ...theme.typography.h4
     // padding: 0
@@ -77,14 +77,23 @@ const useStyles = makeStyles((theme) => ({
       display: 'none'
     }
   },
-  'NavMain-outer': ({ navOpen }: { navOpen: boolean }) => ({
-    display: navOpen ? 'block' : 'none',
+  'NavMain-outer': {
+    overflow: 'hidden',
+    transition: 'max-height .3s',
+    maxHeight: 200,
+    '&:not(.Header-content-NavOpen)': {
+      maxHeight: 0
+    },
     [theme.breakpoints.up('md')]: {
       display: 'flex',
       alignItems: 'center',
-      borderLeft: `1px solid ${theme.palette.divider}`
+      borderLeft: `1px solid ${theme.palette.divider}`,
+      maxHeight: 200,
+      '&:not(.Header-content-NavOpen)': {
+        maxHeight: 200
+      }
     }
-  }),
+  },
   'NavMain-root': {
     paddingLeft: theme.spacing(1),
     paddingRight: theme.spacing(1),
@@ -301,9 +310,9 @@ const Layout = ({
   mainVisual = { url: '', width: 0, height: 0 },
   notification
 }: Props) => {
-  const [navOpen, setNavOpen] = useState(false);
-  const classes = useStyles({ navOpen });
+  const classes = useStyles();
   const { siteName, siteIcon } = useContext(SiteContext);
+  const [navOpen, setNavOpen] = useState(false);
   const maxWidth = 'lg';
   // const router = useRouter();
   const avatarSrc = siteIcon.url;
@@ -365,17 +374,20 @@ const Layout = ({
           <Toolbar disableGutters className={classes['Header-toolbar']}>
             <Box className={classes['Header-content']}>
               <Box className={classes['Header-title']}>
-                <Box className={classes['Siteicon-root']}>
+                <Box className={classes['Header-site-title-root']}>
                   <Avatar
                     component={Link}
                     href={'/'}
-                    className={classes['Siteicon-image']}
+                    className={classes['Header-site-title-image']}
                     alt="Site icon"
                     imgProps={{ width: 120, height: 120 }}
                     src={avatarSrc}
                     srcSet={avatarSrcSet}
                   />
-                  <Typography component="h1" className={classes['SiteTitle']}>
+                  <Typography
+                    component="h1"
+                    className={classes['Header-site-title-text']}
+                  >
                     <Link href="/" underline="none" color="textPrimary">
                       {siteName}
                     </Link>
@@ -391,7 +403,13 @@ const Layout = ({
                   </IconButton>
                 </Box>
               </Box>
-              <Box className={classes['NavMain-outer']}>
+              <Box
+                className={
+                  navOpen
+                    ? `${classes['NavMain-outer']} Header-content-NavOpen`
+                    : classes['NavMain-outer']
+                }
+              >
                 <NavMain
                   classes={{ 'NavMain-root': classes['NavMain-root'] }}
                 />
