@@ -1,6 +1,11 @@
+export type ConfigImageSource = {
+  url: string;
+  width: number;
+  height: number;
+};
 type SiteConfig = {
   siteName: string;
-  siteIcon: string;
+  siteIcon: ConfigImageSource;
   nav: {
     main: { label: string; href: string }[];
     breadcrumbs: { [key: string]: { label: string; href: string }[] };
@@ -9,8 +14,12 @@ type SiteConfig = {
 
 const siteConfig: SiteConfig = {
   siteName: 'mardock',
-  siteIcon:
-    'https://images.microcms-assets.io/assets/cc433627f35c4232b7cb97e0376507a7/d106c1f3df9849e58cbd5264c3abd841/mardock-site-icon.png?fit64=Y3JvcA&h64=MTIw&w64=MTIw',
+  siteIcon: {
+    url:
+      'https://images.microcms-assets.io/assets/cc433627f35c4232b7cb97e0376507a7/d106c1f3df9849e58cbd5264c3abd841/mardock-site-icon.png',
+    width: 640,
+    height: 640
+  },
   nav: {
     main: [
       { label: 'Home', href: '/' },

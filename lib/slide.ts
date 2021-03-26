@@ -5,6 +5,7 @@ import { join } from 'path';
 import { Writable } from 'stream';
 import Marp from '@marp-team/marp-core';
 import cheerio from 'cheerio';
+import siteServerSideConfig from '../src/site.server-side-config';
 import { SlideData, blankSlideData, DeckData } from '../types/pageTypes';
 import { PagesImage } from '../types/client/contentTypes';
 const { Element } = require('@marp-team/marpit');
@@ -21,10 +22,10 @@ const { Element } = require('@marp-team/marpit');
 // TODO: 絶対パスで取得
 const basePath = '.';
 export function getSlideImagePath(name: string): string {
-  return join(basePath, 'public', 'assets', 'images', name);
+  return join(basePath, siteServerSideConfig.assets.imagesPath, name);
 }
-export function getSlideImageAbsPath(name: string): string {
-  return join('/', 'assets', 'images', name);
+export function getSlidePublicImagePath(name: string): string {
+  return join(siteServerSideConfig.public.imagesPath, name);
 }
 
 // console.log(basePath);
@@ -115,7 +116,7 @@ export async function writeSlideTitleImage(
   id: string
 ): Promise<PagesImage> {
   const ret: PagesImage = {
-    url: getSlideImageAbsPath(`${id}.png`),
+    url: getSlidePublicImagePath(`${id}.png`),
     width: 1280,
     height: 720
   };
@@ -127,10 +128,9 @@ export async function writeSlideTitleImage(
   const res = await slideImage(source, w).catch(() => {});
   if (res !== 0) {
     // コマンド実行が失敗したのでテンポラリ画像(chrome が無い環境だと失敗する)
-    ret.url =
-      'https://images.microcms-assets.io/assets/cc433627f35c4232b7cb97e0376507a7/eb84db7f1a7a4409bd20ffc27abe60e4/mardock-temp-image.png';
-    ret.width = 1280;
-    ret.height = 720;
+    ret.url = siteServerSideConfig.slide.fallbackImage.url;
+    ret.width = siteServerSideConfig.slide.fallbackImage.width;
+    ret.height = siteServerSideConfig.slide.fallbackImage.height;
   }
   w.close();
   return ret;
