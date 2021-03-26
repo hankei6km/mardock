@@ -1,4 +1,5 @@
 import { join } from 'path';
+import { ConfigImageSource } from './site.config';
 // サーバー側で使う設定.
 // ブラウザでは使わない or 見せたくない項目(セキュリティ的にの他にサイズ的な等
 type SiteServerSideConfig = {
@@ -16,11 +17,7 @@ type SiteServerSideConfig = {
     imagesPath: string;
   };
   slide: {
-    fallbackImage: {
-      url: string;
-      width: number;
-      height: number;
-    };
+    fallbackImage: ConfigImageSource;
   };
   draft: {
     // types/pageType Notification

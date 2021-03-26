@@ -255,7 +255,7 @@ const Layout = ({
   const { siteName, siteIcon } = useContext(SiteContext);
   const maxWidth = 'lg';
   // const router = useRouter();
-  const avatarSrc = siteIcon;
+  const avatarSrc = siteIcon.url;
   const avatarSrcSet = getAvatarSrcSet(avatarSrc);
   const _title =
     apiName === 'pages' && id === 'home'
