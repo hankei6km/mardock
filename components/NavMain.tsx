@@ -11,6 +11,7 @@ const useStyles = makeStyles((theme) => ({
   'NavMain-root': {},
   'NavMain-group': {},
   'NavMain-item': {
+    ...theme.typography.body1,
     textTransform: 'none',
     opacity: 1,
     color: theme.palette.text.secondary,

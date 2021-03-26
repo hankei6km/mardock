@@ -6,6 +6,8 @@ import Head from 'next/head';
 import Container from '@material-ui/core/Container';
 import Avatar from '@material-ui/core/Avatar';
 import Box from '@material-ui/core/Box';
+import AppBar from '@material-ui/core/AppBar';
+import Toolbar from '@material-ui/core/Toolbar';
 import IconButton from '@material-ui/core/IconButton';
 import Typography from '@material-ui/core/Typography';
 import GitHubIcon from '@material-ui/icons/GitHub';
@@ -23,30 +25,31 @@ const useStyles = makeStyles((theme) => ({
   header: {},
   'Header-content': {
     width: '100%',
+    display: 'flex',
+    justifyContent: 'flex-start',
+    paddingTop: theme.spacing(2),
     paddingLeft: theme.spacing(1),
     paddingRight: theme.spacing(1)
   },
   'Siteicon-root': {
     width: '100%',
     display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginTop: theme.spacing(1),
     marginBottom: theme.spacing(1)
   },
-  'Siteicon-image': ({ apiName, id }: Props) => ({
-    width: theme.spacing(apiName === 'pages' && id === 'home' ? 18 : 12),
-    height: theme.spacing(apiName === 'pages' && id === 'home' ? 18 : 12),
-    marginTop: theme.spacing(2),
+  'Siteicon-image': () => ({
+    width: theme.typography.h3.fontSize,
+    height: theme.typography.h3.fontSize,
+    marginRight: theme.spacing(2),
     marginBottom: theme.spacing(2)
   }),
   SiteTitle: {
-    ...theme.typography.h2
+    flexGrow: 1,
+    ...theme.typography.h4
   },
   'NavMain-outer': {
-    marginTop: theme.spacing(2),
-    marginBottom: theme.spacing(2)
+    display: 'flex',
+    alignItems: 'flex-end',
+    paddingBottom: theme.spacing(1)
   },
   'NavBreadcrumbs-outer': {
     marginTop: theme.spacing(2),
@@ -305,38 +308,45 @@ const Layout = ({
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="viewport" content="initial-scale=1.0, width=device-width" />
       </Head>
-      <header className={classes.header}>
+      <AppBar
+        component="header"
+        color="default"
+        position="sticky"
+        className={classes.header}
+      >
         <Container maxWidth={maxWidth} disableGutters>
-          <Box className={classes['Header-content']}>
-            <Box className={classes['Siteicon-root']}>
-              <a href="/">
-                <Avatar
-                  className={classes['Siteicon-image']}
-                  alt="Site icon"
-                  imgProps={{ width: 120, height: 120 }}
-                  src={avatarSrc}
-                  srcSet={avatarSrcSet}
-                />
-              </a>
-              <Typography component="h1" className={classes['SiteTitle']}>
-                <Link href="/" underline="none" color="textPrimary">
-                  {siteName}
-                </Link>
-              </Typography>
+          <Toolbar disableGutters>
+            <Box className={classes['Header-content']}>
+              <Box className={classes['Siteicon-root']}>
+                <a href="/">
+                  <Avatar
+                    className={classes['Siteicon-image']}
+                    alt="Site icon"
+                    imgProps={{ width: 120, height: 120 }}
+                    src={avatarSrc}
+                    srcSet={avatarSrcSet}
+                  />
+                </a>
+                <Typography component="h1" className={classes['SiteTitle']}>
+                  <Link href="/" underline="none" color="textPrimary">
+                    {siteName}
+                  </Link>
+                </Typography>
+              </Box>
+              {apiName === 'pages' && (
+                <Box className={classes['NavMain-outer']}>
+                  <NavMain classes={classes} />
+                </Box>
+              )}
+              {apiName === 'deck' && (
+                <Box className={classes['NavBreadcrumbs-outer']}>
+                  <NavBreadcrumbs lastBreadcrumb={title} classes={classes} />
+                </Box>
+              )}
             </Box>
-            {apiName === 'pages' && (
-              <Box className={classes['NavMain-outer']}>
-                <NavMain classes={classes} />
-              </Box>
-            )}
-            {apiName === 'deck' && (
-              <Box className={classes['NavBreadcrumbs-outer']}>
-                <NavBreadcrumbs lastBreadcrumb={title} classes={classes} />
-              </Box>
-            )}
-          </Box>
+          </Toolbar>
         </Container>
-      </header>
+      </AppBar>
       <Box className={classes['Layout-section-root']}>
         {topSection && (
           <Box component="section" className={classes['Layout-section-top']}>
