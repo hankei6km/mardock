@@ -1,4 +1,4 @@
-import React, { ReactNode, useContext, useEffect } from 'react';
+import React, { ReactNode, useContext, useEffect, useState } from 'react';
 // import { useRouter } from 'next/router';
 import { makeStyles } from '@material-ui/core';
 // import NoSsr from '@material-ui/core/NoSsr';
@@ -10,6 +10,7 @@ import AppBar from '@material-ui/core/AppBar';
 import Toolbar from '@material-ui/core/Toolbar';
 import IconButton from '@material-ui/core/IconButton';
 import Typography from '@material-ui/core/Typography';
+import MenuIcon from '@material-ui/icons/Menu';
 import GitHubIcon from '@material-ui/icons/GitHub';
 import TwitterIcon from '@material-ui/icons/Twitter';
 import Notification from './Notification';
@@ -22,38 +23,83 @@ import NavBreadcrumbs from './NavBreadcrumbs';
 import DateUpdated from './DateUpdated';
 
 const useStyles = makeStyles((theme) => ({
-  header: {},
+  'Header-root': {
+    position: 'sticky',
+    top: 0,
+    backgroundColor: theme.palette.background.default
+  },
+  'Header-toolbar': {
+    width: '100%',
+    // alignItems: 'flex-start',
+    justifyContent: 'center',
+    flexDirection: 'column'
+  },
   'Header-content': {
     width: '100%',
     display: 'flex',
     justifyContent: 'flex-start',
-    paddingTop: theme.spacing(2),
-    paddingLeft: theme.spacing(1),
-    paddingRight: theme.spacing(1)
+    flexDirection: 'column',
+    // flexWrap: 'wrap'
+    [theme.breakpoints.up('md')]: {
+      flexDirection: 'row'
+    }
+  },
+  'Header-title': {
+    flexGrow: 1,
+    display: 'flex',
+    padding: theme.spacing(1, 1)
+    //paddingLeft: theme.spacing(1),
+    //paddingRight: theme.spacing(1)
   },
   'Siteicon-root': {
-    width: '100%',
+    flexGrow: 1,
     display: 'flex',
-    marginBottom: theme.spacing(1)
+    alignItems: 'center'
   },
   'Siteicon-image': () => ({
-    width: theme.typography.h3.fontSize,
-    height: theme.typography.h3.fontSize,
-    marginRight: theme.spacing(2),
-    marginBottom: theme.spacing(2)
+    // width: theme.typography.h3.fontSize,
+    marginRight: theme.spacing(2)
+    // marginBottom: theme.spacing(2)
   }),
   SiteTitle: {
     flexGrow: 1,
     ...theme.typography.h4
+    // padding: 0
   },
-  'NavMain-outer': {
+  'NavMain-menu-button-outer': {
     display: 'flex',
-    alignItems: 'flex-end',
-    paddingBottom: theme.spacing(1)
+    flexDirection: 'column',
+    alignItems: 'flex-end'
+  },
+  'NavMain-menu-button': {
+    display: 'block',
+    [theme.breakpoints.up('md')]: {
+      display: 'none'
+    }
+  },
+  'NavMain-outer': ({ navOpen }: { navOpen: boolean }) => ({
+    display: navOpen ? 'block' : 'none',
+    [theme.breakpoints.up('md')]: {
+      display: 'flex',
+      alignItems: 'center',
+      borderLeft: `1px solid ${theme.palette.divider}`
+    }
+  }),
+  'NavMain-root': {
+    paddingLeft: theme.spacing(1),
+    paddingRight: theme.spacing(1),
+    [theme.breakpoints.up('md')]: {
+      paddingLeft: 0,
+      paddingRight: 0
+    }
   },
   'NavBreadcrumbs-outer': {
-    marginTop: theme.spacing(2),
-    marginBottom: theme.spacing(2)
+    width: '100%',
+    padding: theme.spacing(1),
+    display: 'none',
+    [theme.breakpoints.up('md')]: {
+      display: 'block'
+    }
   },
   'DateUpdated-root': {
     marginTop: theme.spacing(1),
@@ -63,6 +109,7 @@ const useStyles = makeStyles((theme) => ({
     display: 'flex',
     flexDirection: 'column',
     alignItems: 'center',
+    height: '100%',
     padding: theme.spacing(1, 0),
     paddingBottom: theme.spacing(0.5),
     backgroundColor: theme.palette.grey[300],
@@ -254,7 +301,8 @@ const Layout = ({
   mainVisual = { url: '', width: 0, height: 0 },
   notification
 }: Props) => {
-  const classes = useStyles({ apiName, id });
+  const [navOpen, setNavOpen] = useState(false);
+  const classes = useStyles({ navOpen });
   const { siteName, siteIcon } = useContext(SiteContext);
   const maxWidth = 'lg';
   // const router = useRouter();
@@ -310,40 +358,50 @@ const Layout = ({
       </Head>
       <AppBar
         component="header"
-        color="default"
-        position="sticky"
-        className={classes.header}
+        // color="default"
+        className={classes['Header-root']}
       >
         <Container maxWidth={maxWidth} disableGutters>
-          <Toolbar disableGutters>
+          <Toolbar disableGutters className={classes['Header-toolbar']}>
             <Box className={classes['Header-content']}>
-              <Box className={classes['Siteicon-root']}>
-                <a href="/">
+              <Box className={classes['Header-title']}>
+                <Box className={classes['Siteicon-root']}>
                   <Avatar
+                    component={Link}
+                    href={'/'}
                     className={classes['Siteicon-image']}
                     alt="Site icon"
                     imgProps={{ width: 120, height: 120 }}
                     src={avatarSrc}
                     srcSet={avatarSrcSet}
                   />
-                </a>
-                <Typography component="h1" className={classes['SiteTitle']}>
-                  <Link href="/" underline="none" color="textPrimary">
-                    {siteName}
-                  </Link>
-                </Typography>
+                  <Typography component="h1" className={classes['SiteTitle']}>
+                    <Link href="/" underline="none" color="textPrimary">
+                      {siteName}
+                    </Link>
+                  </Typography>
+                </Box>
+                <Box className={classes['NavMain-menu-button-outer']}>
+                  <IconButton
+                    aria-label="toggle primary-navigation"
+                    className={classes['NavMain-menu-button']}
+                    onClick={() => setNavOpen(!navOpen)}
+                  >
+                    <MenuIcon />
+                  </IconButton>
+                </Box>
               </Box>
-              {apiName === 'pages' && (
-                <Box className={classes['NavMain-outer']}>
-                  <NavMain classes={classes} />
-                </Box>
-              )}
-              {apiName === 'deck' && (
-                <Box className={classes['NavBreadcrumbs-outer']}>
-                  <NavBreadcrumbs lastBreadcrumb={title} classes={classes} />
-                </Box>
-              )}
+              <Box className={classes['NavMain-outer']}>
+                <NavMain
+                  classes={{ 'NavMain-root': classes['NavMain-root'] }}
+                />
+              </Box>
             </Box>
+            {apiName === 'deck' && (
+              <Box className={classes['NavBreadcrumbs-outer']}>
+                <NavBreadcrumbs lastBreadcrumb={title} classes={classes} />
+              </Box>
+            )}
           </Toolbar>
         </Container>
       </AppBar>
