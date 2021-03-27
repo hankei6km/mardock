@@ -1,11 +1,9 @@
 import React from 'react';
 import { makeStyles } from '@material-ui/core';
-// import { Breakpoint } from '@material-ui/core/styles/createBreakpoints';
-// import withWidth, { isWidthUp } from '@material-ui/core/withWidth';
 import Box from '@material-ui/core/Box';
 import Chip from '@material-ui/core/Chip';
 import Card from '@material-ui/core/Card';
-import CardActionArea from '@material-ui/core/CardActionArea';
+// import CardActionArea from '@material-ui/core/CardActionArea';
 import CardActions from '@material-ui/core/CardActions';
 import CardContent from '@material-ui/core/CardContent';
 import CardMedia from '@material-ui/core/CardMedia';
@@ -86,26 +84,26 @@ const ListItem = ({
     // この方が使いやすいのだが、バグではないよね
     <GridListTile cols={1} className={classes['ListItem-thumb-outer']}>
       <Card className={classes['ListItem-card-root']} raised>
-        <CardActionArea
-          component={Link}
-          href={join(itemPath, '[id]')}
-          as={join(itemPath, itemId)}
-        >
-          <CardMedia>
-            {deck.items[0] ? (
-              <>
-                <style
-                  dangerouslySetInnerHTML={{
-                    __html: deck.css
-                  }}
-                />
-                <Carousel
-                  autoPlay={false}
-                  indicators={false}
-                  animation={'slide'}
-                  // 2.2.x だと NavButton が常に表示か非表示にしかできない?
-                >
-                  {deck.items.map(({ html }) => (
+        <CardMedia>
+          {deck.items[0] ? (
+            <>
+              <style
+                dangerouslySetInnerHTML={{
+                  __html: deck.css
+                }}
+              />
+              <Carousel
+                autoPlay={false}
+                indicators={false}
+                animation={'slide'}
+                // 2.2.x だと NavButton が常に表示か非表示にしかできない?
+              >
+                {deck.items.map(({ html }) => (
+                  <Link
+                    href={join(itemPath, '[id]')}
+                    as={join(itemPath, itemId)}
+                    // article を link でラップはあり?
+                  >
                     <article
                       key={deck.id}
                       id={deck.id}
@@ -120,24 +118,32 @@ const ListItem = ({
                         />
                       </div>
                     </article>
-                  ))}
-                </Carousel>
-              </>
-            ) : (
-              <Box style={{ height: 180 }}>
-                <Typography variant="body1">NO IMAGE</Typography>
-              </Box>
-            )}
-          </CardMedia>
-          <CardContent>
-            <Typography variant="body2">{title}</Typography>
-          </CardContent>
-        </CardActionArea>
+                  </Link>
+                ))}
+              </Carousel>
+            </>
+          ) : (
+            <Box style={{ height: 180 }}>
+              <Typography variant="body1">NO IMAGE</Typography>
+            </Box>
+          )}
+        </CardMedia>
+        <CardContent>
+          <Typography
+            component={Link}
+            href={join(itemPath, '[id]')}
+            as={join(itemPath, itemId)}
+            variant="body2"
+          >
+            {title}
+          </Typography>
+        </CardContent>
         <CardActions disableSpacing={true}>
           {category.map((c) => (
             <Chip
               key={c.id}
               label={c.title}
+              size="small"
               color={'primary'}
               // variant="outlined"
               // variant="contained"
