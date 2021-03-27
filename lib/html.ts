@@ -65,22 +65,30 @@ export function headingToNumber(tagName: string): number {
   return isNaN(n) ? -1 : n;
 }
 
-function _slideHeading($: cheerio.Root, h: number) {
+function _adjustHeading($: cheerio.Root, h: number) {
   const headding = `h${h}`;
   const slided = `h${h + 1}`;
-  $(headding).each((_idx, elm) => {
-    if (elm.type === 'tag' && elm.tagName === headding) {
-      elm.tagName = slided;
+  $(headding).each((_idx, $elm) => {
+    if ($elm.type === 'tag' && $elm.tagName === headding) {
+      $elm.tagName = slided;
+      // とりあえず 空白と tab 改行は - にしておく.
+      // https://developer.mozilla.org/ja/docs/Web/HTML/Global_attributes/id
+      //> この制約は HTML5 で外されましたが、互換性のために ID は文字で始めるようにしましょう。
+      // prefix は sanitize で付加される.
+      // 問題になるようなら hash 化する
+      // (hashs は notification 用があるので、それを util にする).
+      const elm = $($elm);
+      elm.attr('id', getTocLabel(elm.text()));
     }
   });
 }
 
-export function slideHeading($: cheerio.Root) {
-  _slideHeading($, 5);
-  _slideHeading($, 4);
-  _slideHeading($, 3);
-  _slideHeading($, 2);
-  _slideHeading($, 1);
+export function adjustHeading($: cheerio.Root) {
+  _adjustHeading($, 5);
+  _adjustHeading($, 4);
+  _adjustHeading($, 3);
+  _adjustHeading($, 2);
+  _adjustHeading($, 1);
 }
 
 export function getTitleAndContent(
@@ -94,14 +102,14 @@ export function getTitleAndContent(
   // const $ = cheerio.load(html);
   const h1 = $('body h1:first');
   if (h1.length === 0) {
-    slideHeading($);
+    adjustHeading($);
     return {
       articleTitle: title,
       html: $('body').html() || ''
     };
   }
   h1.remove();
-  slideHeading($);
+  adjustHeading($);
   return {
     articleTitle: $(h1[0]).html() || '',
     html: $('body').html() || ''

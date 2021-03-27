@@ -4,7 +4,7 @@ import {
   splitStrToParagraph,
   getTocLabel,
   getTitleAndContent,
-  slideHeading,
+  adjustHeading,
   htmlContent
 } from './html';
 
@@ -82,20 +82,26 @@ describe('getTocLabel()', () => {
   });
 });
 
-describe('slideHeading()', () => {
+describe('adjustHeading()', () => {
   const getSlidedHtml = (html: string): string => {
     const $ = cheerio.load(html);
-    slideHeading($);
+    adjustHeading($);
     return $('body').html() || '';
   };
   it('should slide depth of heding', async () => {
-    expect(getSlidedHtml('<h2>title1</h2>')).toStrictEqual('<h3>title1</h3>');
+    expect(getSlidedHtml('<h2>title1</h2>')).toStrictEqual(
+      '<h3 id="title1">title1</h3>'
+    );
     expect(
       getSlidedHtml('<h2>title1</h2><p>test1</p><h2>title2</h2><p>test2</p>')
-    ).toStrictEqual('<h3>title1</h3><p>test1</p><h3>title2</h3><p>test2</p>');
+    ).toStrictEqual(
+      '<h3 id="title1">title1</h3><p>test1</p><h3 id="title2">title2</h3><p>test2</p>'
+    );
     expect(
       getSlidedHtml('<h2>title1</h2><p>test1</p><h3>title2</h3><p>test2</p>')
-    ).toStrictEqual('<h3>title1</h3><p>test1</p><h4>title2</h4><p>test2</p>');
+    ).toStrictEqual(
+      '<h3 id="title1">title1</h3><p>test1</p><h4 id="title2">title2</h4><p>test2</p>'
+    );
   });
 });
 
@@ -118,7 +124,7 @@ describe('getTitleAndContent()', () => {
       )
     ).toStrictEqual({
       articleTitle: 'article title1',
-      html: '<p>test1</p><h3>title2</h3><p>test2</p>'
+      html: '<p>test1</p><h3 id="title2">title2</h3><p>test2</p>'
     });
     // h1 が複数はないか?
     expect(
@@ -128,7 +134,7 @@ describe('getTitleAndContent()', () => {
       )
     ).toStrictEqual({
       articleTitle: 'article title1',
-      html: '<p>test1</p><h2>title2</h2><p>test2</p>'
+      html: '<p>test1</p><h2 id="title2">title2</h2><p>test2</p>'
     });
   });
 });
