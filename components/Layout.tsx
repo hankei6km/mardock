@@ -293,7 +293,7 @@ type Props = {
 function getAvatarSrcSet(src: string): string {
   const u = src.split('?', 2)[0];
   // return encodeURIComponent(
-  return `${u}?dpr64=Mw&#x26;fit64=Y3JvcA&#x26;h64=MTIw&#x26;w64=MTIw 3x, ${u}?dpr64=Mg&#x26;fit64=Y3JvcA&#x26;h64=MTIw&#x26;w64=MTIw 2x, ${u}?dpr64=&#x26;fit64=Y3JvcA&#x26;h64=MTIw&#x26;w64=MTIw 1x`;
+  return `${u}?dpr64=Mw&fit64=Y3JvcA&h64=MTIw&w64=MTIw 3x, ${u}?dpr64=Mg&fit64=Y3JvcA&h64=MTIw&w64=MTIw 2x, ${u}?dpr64=&fit64=Y3JvcA&h64=MTIw&w64=MTIw 1x`;
 }
 
 const Layout = ({
@@ -379,7 +379,7 @@ const Layout = ({
                     component={Link}
                     href={'/'}
                     className={classes['Header-site-title-image']}
-                    alt="Site icon"
+                    alt={siteIcon.alt}
                     imgProps={{ width: 120, height: 120 }}
                     src={avatarSrc}
                     srcSet={avatarSrcSet}

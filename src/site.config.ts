@@ -2,6 +2,7 @@ export type ConfigImageSource = {
   url: string;
   width: number;
   height: number;
+  alt: string;
 };
 type SiteConfig = {
   siteName: string;
@@ -16,9 +17,10 @@ const siteConfig: SiteConfig = {
   siteName: 'mardock',
   siteIcon: {
     url:
-      'https://images.microcms-assets.io/assets/cc433627f35c4232b7cb97e0376507a7/d106c1f3df9849e58cbd5264c3abd841/mardock-site-icon.png',
+      'https://images.microcms-assets.io/assets/cc433627f35c4232b7cb97e0376507a7/0f8cf6adefbc4830bb9edca781c97ad1/mardock-site-icon-2.png',
     width: 640,
-    height: 640
+    height: 640,
+    alt: 'mardock site icon'
   },
   nav: {
     main: [
