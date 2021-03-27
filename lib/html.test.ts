@@ -2,8 +2,10 @@ import cheerio from 'cheerio';
 import {
   getPageHtml,
   splitStrToParagraph,
+  getTocLabel,
   getTitleAndContent,
-  slideHeading
+  slideHeading,
+  htmlContent
 } from './html';
 
 describe('splitStrToParagraph()', () => {
@@ -64,6 +66,22 @@ describe('getPageHtml()', () => {
   });
 });
 
+describe('getTocLabel()', () => {
+  it('should returns label to using in toc', () => {
+    expect(getTocLabel('test')).toEqual('test');
+    expect(getTocLabel('test1 test2\ttest3')).toEqual('test1-test2-test3');
+    expect(getTocLabel('test1  test2\t\ttest3')).toEqual('test1--test2--test3');
+    expect(getTocLabel('test1\ntest2\n\rtest3')).toEqual('test1-test2--test3');
+    expect(getTocLabel('test1#test2.test3')).toEqual('test1-test2-test3');
+    expect(getTocLabel('test1&test2>test3')).toEqual('test1-test2-test3');
+    expect(getTocLabel('test1[test2]test3')).toEqual('test1-test2-test3');
+    expect(getTocLabel('test1:test2;test3')).toEqual('test1-test2-test3');
+    expect(getTocLabel('#.()[]{}<>@&%$"`=_:;\'\\ \t\n\r')).toEqual(
+      '--------------------------'
+    );
+  });
+});
+
 describe('slideHeading()', () => {
   const getSlidedHtml = (html: string): string => {
     const $ = cheerio.load(html);
@@ -112,5 +130,94 @@ describe('getTitleAndContent()', () => {
       articleTitle: 'article title1',
       html: '<p>test1</p><h2>title2</h2><p>test2</p>'
     });
+  });
+});
+
+describe('htmlContent()', () => {
+  it('should returns toc of html', () => {
+    expect(
+      htmlContent('<h2 id="test1">test1</h2><h2 id="test2">test2</h2>', [
+        { label: 'section title', items: [], depth: 0, id: 'section-title' }
+      ])
+    ).toEqual([
+      {
+        label: 'section title',
+        items: [
+          {
+            label: 'test1',
+            items: [],
+            depth: 1,
+            id: 'test1'
+          },
+          {
+            label: 'test2',
+            items: [],
+            depth: 1,
+            id: 'test2'
+          }
+        ],
+        depth: 0,
+        id: 'section-title'
+      }
+    ]);
+  });
+  it('should returns toc of html(nested)', () => {
+    expect(
+      htmlContent(
+        '<h2 id="test1">test1</h2><p>abc</p><h3 id="test3">test3</h3><p>123</p><h3 id="test4">test4</h3><h2 id="test2">test2</h2>',
+        [{ label: 'section title', items: [], depth: 0, id: 'section-title' }]
+      )
+    ).toEqual([
+      {
+        label: 'section title',
+        items: [
+          {
+            label: 'test1',
+            items: [
+              {
+                label: 'test3',
+                items: [],
+                depth: 2,
+                id: 'test3'
+              },
+              {
+                label: 'test4',
+                items: [],
+                depth: 2,
+                id: 'test4'
+              }
+            ],
+            depth: 1,
+            id: 'test1'
+          },
+          {
+            label: 'test2',
+            items: [],
+            depth: 1,
+            id: 'test2'
+          }
+        ],
+        depth: 0,
+        id: 'section-title'
+      }
+    ]);
+  });
+  it('should returns toc of html(without section title)', () => {
+    expect(
+      htmlContent('<h2 id="test1">test1</h2><h2 id="test2">test2</h2>', [])
+    ).toEqual([
+      {
+        label: 'test1',
+        items: [],
+        depth: 1,
+        id: 'test1'
+      },
+      {
+        label: 'test2',
+        items: [],
+        depth: 1,
+        id: 'test2'
+      }
+    ]);
   });
 });

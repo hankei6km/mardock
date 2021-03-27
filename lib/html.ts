@@ -1,4 +1,5 @@
 import cheerio from 'cheerio';
+import { TocItems } from '../types/pageTypes';
 
 export function splitStrToParagraph(html: string): string {
   const $ = cheerio.load(html);
@@ -50,6 +51,20 @@ export function getPageHtml(title: string, html: string): string {
   return $('body').html() || '';
 }
 
+const textToTocLabelRegExp = /[#.()[\]{}<>@&%$"`=_:;'\\ \t\n\r]/g;
+export function getTocLabel(s: string): string {
+  // selector ではそのままで使えない id になる可能性もある
+  // CSS.escape() は "selector 内で operator? になる文字をエスケープ"するものなので
+  // ちょっと意味合いが違う
+  return s.replace(textToTocLabelRegExp, '-');
+}
+
+const headingToNumberRegExp = /h(\d+)/;
+export function headingToNumber(tagName: string): number {
+  const n = parseInt(tagName.replace(headingToNumberRegExp, '$1'), 10);
+  return isNaN(n) ? -1 : n;
+}
+
 function _slideHeading($: cheerio.Root, h: number) {
   const headding = `h${h}`;
   const slided = `h${h + 1}`;
@@ -91,4 +106,42 @@ export function getTitleAndContent(
     articleTitle: $(h1[0]).html() || '',
     html: $('body').html() || ''
   };
+}
+
+export function htmlContent(
+  html: string,
+  root: TocItems = [],
+  opts: { top: number; depth: number } = { top: 2, depth: 1 }
+): TocItems {
+  const $ = cheerio.load(html);
+  const ret: TocItems = [...root];
+  let items: TocItems = ret;
+  const path: TocItems[] = [items];
+  let prevDepth = ret.length > 0 ? ret[0].depth : 0;
+
+  $(`h${opts.top},h${opts.top + 1}`).each((_idx, $heading) => {
+    const heading = $($heading);
+    const depth =
+      opts.depth +
+      (headingToNumber($heading.type === 'tag' ? $heading.tagName : '') -
+        opts.top);
+    const item = {
+      label: getTocLabel(heading.text()),
+      items: [],
+      depth,
+      id: heading.attr('id') || ''
+    };
+    if (prevDepth < depth) {
+      if (items.length > 0) {
+        path.push(items);
+        items = items[items.length - 1].items;
+      }
+    } else if (depth < prevDepth) {
+      items = path.pop() || [];
+    }
+    items.push(item);
+    prevDepth = depth;
+  });
+
+  return ret;
 }
