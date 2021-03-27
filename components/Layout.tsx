@@ -1,4 +1,4 @@
-import React, { ReactNode, useContext, useEffect } from 'react';
+import React, { ReactNode, useContext, useEffect, useState } from 'react';
 // import { useRouter } from 'next/router';
 import { makeStyles } from '@material-ui/core';
 // import NoSsr from '@material-ui/core/NoSsr';
@@ -6,8 +6,11 @@ import Head from 'next/head';
 import Container from '@material-ui/core/Container';
 import Avatar from '@material-ui/core/Avatar';
 import Box from '@material-ui/core/Box';
+import AppBar from '@material-ui/core/AppBar';
+import Toolbar from '@material-ui/core/Toolbar';
 import IconButton from '@material-ui/core/IconButton';
 import Typography from '@material-ui/core/Typography';
+import MenuIcon from '@material-ui/icons/Menu';
 import GitHubIcon from '@material-ui/icons/GitHub';
 import TwitterIcon from '@material-ui/icons/Twitter';
 import Notification from './Notification';
@@ -20,37 +23,92 @@ import NavBreadcrumbs from './NavBreadcrumbs';
 import DateUpdated from './DateUpdated';
 
 const useStyles = makeStyles((theme) => ({
-  header: {},
+  'Header-root': {
+    position: 'sticky',
+    top: 0,
+    backgroundColor: theme.palette.background.default
+  },
+  'Header-toolbar': {
+    width: '100%',
+    // alignItems: 'flex-start',
+    justifyContent: 'center',
+    flexDirection: 'column'
+  },
   'Header-content': {
     width: '100%',
-    paddingLeft: theme.spacing(1),
-    paddingRight: theme.spacing(1)
+    display: 'flex',
+    justifyContent: 'flex-start',
+    flexDirection: 'column',
+    // flexWrap: 'wrap'
+    [theme.breakpoints.up('md')]: {
+      flexDirection: 'row'
+    }
   },
-  'Siteicon-root': {
-    width: '100%',
+  'Header-title': {
+    flexGrow: 1,
+    display: 'flex',
+    padding: theme.spacing(1, 1)
+    //paddingLeft: theme.spacing(1),
+    //paddingRight: theme.spacing(1)
+  },
+  'Header-site-title-root': {
+    flexGrow: 1,
+    display: 'flex',
+    alignItems: 'center'
+  },
+  'Header-site-title-image': () => ({
+    // width: theme.typography.h3.fontSize,
+    marginRight: theme.spacing(2)
+    // marginBottom: theme.spacing(2)
+  }),
+  'Header-site-title-text': {
+    flexGrow: 1,
+    ...theme.typography.h4
+    // padding: 0
+  },
+  'NavMain-menu-button-outer': {
     display: 'flex',
     flexDirection: 'column',
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginTop: theme.spacing(1),
-    marginBottom: theme.spacing(1)
+    alignItems: 'flex-end'
   },
-  'Siteicon-image': ({ apiName, id }: Props) => ({
-    width: theme.spacing(apiName === 'pages' && id === 'home' ? 18 : 12),
-    height: theme.spacing(apiName === 'pages' && id === 'home' ? 18 : 12),
-    marginTop: theme.spacing(2),
-    marginBottom: theme.spacing(2)
-  }),
-  SiteTitle: {
-    ...theme.typography.h2
+  'NavMain-menu-button': {
+    display: 'block',
+    [theme.breakpoints.up('md')]: {
+      display: 'none'
+    }
   },
   'NavMain-outer': {
-    marginTop: theme.spacing(2),
-    marginBottom: theme.spacing(2)
+    overflow: 'hidden',
+    transition: 'max-height .3s',
+    maxHeight: 200,
+    '&:not(.Header-content-NavOpen)': {
+      maxHeight: 0
+    },
+    [theme.breakpoints.up('md')]: {
+      display: 'flex',
+      alignItems: 'center',
+      borderLeft: `1px solid ${theme.palette.divider}`,
+      maxHeight: 200,
+      '&:not(.Header-content-NavOpen)': {
+        maxHeight: 200
+      }
+    }
+  },
+  'NavMain-root': {
+    paddingLeft: theme.spacing(1),
+    paddingRight: theme.spacing(1),
+    [theme.breakpoints.up('md')]: {
+      paddingLeft: 0,
+      paddingRight: 0
+    }
   },
   'NavBreadcrumbs-outer': {
-    marginTop: theme.spacing(2),
-    marginBottom: theme.spacing(2)
+    width: '100%',
+    padding: theme.spacing(1),
+    display: 'none',
+    [theme.breakpoints.up('md')]: {
+      display: 'block'
+    }
   },
   'DateUpdated-root': {
     marginTop: theme.spacing(1),
@@ -60,6 +118,7 @@ const useStyles = makeStyles((theme) => ({
     display: 'flex',
     flexDirection: 'column',
     alignItems: 'center',
+    height: '100%',
     padding: theme.spacing(1, 0),
     paddingBottom: theme.spacing(0.5),
     backgroundColor: theme.palette.grey[300],
@@ -234,7 +293,7 @@ type Props = {
 function getAvatarSrcSet(src: string): string {
   const u = src.split('?', 2)[0];
   // return encodeURIComponent(
-  return `${u}?dpr64=Mw&#x26;fit64=Y3JvcA&#x26;h64=MTIw&#x26;w64=MTIw 3x, ${u}?dpr64=Mg&#x26;fit64=Y3JvcA&#x26;h64=MTIw&#x26;w64=MTIw 2x, ${u}?dpr64=&#x26;fit64=Y3JvcA&#x26;h64=MTIw&#x26;w64=MTIw 1x`;
+  return `${u}?dpr64=Mw&fit64=Y3JvcA&h64=MTIw&w64=MTIw 3x, ${u}?dpr64=Mg&fit64=Y3JvcA&h64=MTIw&w64=MTIw 2x, ${u}?dpr64=&fit64=Y3JvcA&h64=MTIw&w64=MTIw 1x`;
 }
 
 const Layout = ({
@@ -251,8 +310,9 @@ const Layout = ({
   mainVisual = { url: '', width: 0, height: 0 },
   notification
 }: Props) => {
-  const classes = useStyles({ apiName, id });
+  const classes = useStyles();
   const { siteName, siteIcon } = useContext(SiteContext);
+  const [navOpen, setNavOpen] = useState(false);
   const maxWidth = 'lg';
   // const router = useRouter();
   const avatarSrc = siteIcon.url;
@@ -305,38 +365,64 @@ const Layout = ({
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="viewport" content="initial-scale=1.0, width=device-width" />
       </Head>
-      <header className={classes.header}>
+      <AppBar
+        component="header"
+        // color="default"
+        className={classes['Header-root']}
+      >
         <Container maxWidth={maxWidth} disableGutters>
-          <Box className={classes['Header-content']}>
-            <Box className={classes['Siteicon-root']}>
-              <a href="/">
-                <Avatar
-                  className={classes['Siteicon-image']}
-                  alt="Site icon"
-                  imgProps={{ width: 120, height: 120 }}
-                  src={avatarSrc}
-                  srcSet={avatarSrcSet}
-                />
-              </a>
-              <Typography component="h1" className={classes['SiteTitle']}>
-                <Link href="/" underline="none" color="textPrimary">
-                  {siteName}
-                </Link>
-              </Typography>
-            </Box>
-            {apiName === 'pages' && (
-              <Box className={classes['NavMain-outer']}>
-                <NavMain classes={classes} />
+          <Toolbar disableGutters className={classes['Header-toolbar']}>
+            <Box className={classes['Header-content']}>
+              <Box className={classes['Header-title']}>
+                <Box className={classes['Header-site-title-root']}>
+                  <Avatar
+                    component={Link}
+                    href={'/'}
+                    className={classes['Header-site-title-image']}
+                    alt={siteIcon.alt}
+                    imgProps={{ width: 120, height: 120 }}
+                    src={avatarSrc}
+                    srcSet={avatarSrcSet}
+                  />
+                  <Typography
+                    component="h1"
+                    className={classes['Header-site-title-text']}
+                  >
+                    <Link href="/" underline="none" color="textPrimary">
+                      {siteName}
+                    </Link>
+                  </Typography>
+                </Box>
+                <Box className={classes['NavMain-menu-button-outer']}>
+                  <IconButton
+                    aria-label="toggle primary-navigation"
+                    className={classes['NavMain-menu-button']}
+                    onClick={() => setNavOpen(!navOpen)}
+                  >
+                    <MenuIcon />
+                  </IconButton>
+                </Box>
               </Box>
-            )}
+              <Box
+                className={
+                  navOpen
+                    ? `${classes['NavMain-outer']} Header-content-NavOpen`
+                    : classes['NavMain-outer']
+                }
+              >
+                <NavMain
+                  classes={{ 'NavMain-root': classes['NavMain-root'] }}
+                />
+              </Box>
+            </Box>
             {apiName === 'deck' && (
               <Box className={classes['NavBreadcrumbs-outer']}>
                 <NavBreadcrumbs lastBreadcrumb={title} classes={classes} />
               </Box>
             )}
-          </Box>
+          </Toolbar>
         </Container>
-      </header>
+      </AppBar>
       <Box className={classes['Layout-section-root']}>
         {topSection && (
           <Box component="section" className={classes['Layout-section-top']}>

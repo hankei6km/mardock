@@ -17,7 +17,7 @@ type SiteServerSideConfig = {
     imagesPath: string;
   };
   slide: {
-    fallbackImage: ConfigImageSource;
+    fallbackImage: Omit<ConfigImageSource, 'alt'>;
   };
   draft: {
     // types/pageType Notification

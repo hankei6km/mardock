@@ -16,7 +16,7 @@ describe('NavMain', () => {
     );
     //const navMain = getByText('Home');
     //expect(navMain).toBeInTheDocument();
-    const a = getAllByRole('tab');
+    const a = getAllByRole('link');
     expect(a.length).toEqual(3);
     // expect(a[0].innerText).toEqual('Home');
     expect(a[0]).toContainHTML('Home');
@@ -33,7 +33,7 @@ describe('NavMain', () => {
         <NavMain />
       </RouterContext.Provider>
     );
-    const a = getAllByRole('tab');
+    const a = getAllByRole('link');
     fireEvent.click(a[1]);
     expect(router.push).toHaveBeenCalledWith('/deck', '/deck', {
       locale: undefined,
