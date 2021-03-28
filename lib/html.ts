@@ -1,8 +1,7 @@
 import cheerio from 'cheerio';
 import { TocItems, HtmlToc } from '../types/pageTypes';
 
-export function splitStrToParagraph(html: string): string {
-  const $ = cheerio.load(html);
+export function splitStrToParagraph($: cheerio.Root): string {
   $('body')
     .children()
     .each((_idx, elm) => {
@@ -126,8 +125,8 @@ export function getArticleData(
   htmlToc: HtmlToc;
   html: string;
 } {
-  const $ = cheerio.load(splitStrToParagraph(html));
-  // const $ = cheerio.load(html);
+  const $ = cheerio.load(html);
+  splitStrToParagraph($);
   const h1 = $('body h1:first');
   if (h1.length === 0) {
     adjustHeading($);

@@ -10,40 +10,50 @@ import {
 describe('splitStrToParagraph()', () => {
   it('should splits html string in p tag at multiple br tag.', () => {
     expect(
-      splitStrToParagraph('<p>test1<br>test2</p><p>test3<br><br>test4</p>')
-    ).toStrictEqual('<p>test1<br>test2</p><p>test3</p><p>test4</p>');
-    expect(
       splitStrToParagraph(
-        '<p>test1<br>test2</p><p>test3<br><br><br><br>test4</p>'
+        cheerio.load('<p>test1<br>test2</p><p>test3<br><br>test4</p>')
       )
     ).toStrictEqual('<p>test1<br>test2</p><p>test3</p><p>test4</p>');
     expect(
       splitStrToParagraph(
-        '<p>test1<br/>test2</p><p>test3<br /><br /><br/><br/>test4</p>'
+        cheerio.load('<p>test1<br>test2</p><p>test3<br><br><br><br>test4</p>')
       )
     ).toStrictEqual('<p>test1<br>test2</p><p>test3</p><p>test4</p>');
     expect(
       splitStrToParagraph(
-        '<p>test1<br>test2</p><p>test3<br><br>test4<br><br></p>'
+        cheerio.load(
+          '<p>test1<br/>test2</p><p>test3<br /><br /><br/><br/>test4</p>'
+        )
       )
     ).toStrictEqual('<p>test1<br>test2</p><p>test3</p><p>test4</p>');
     expect(
       splitStrToParagraph(
-        '<h1>title1</h1><p>test1<br>test2</p><h2>title2</h2><p>test3<br><br><br><br>test4</p>'
+        cheerio.load('<p>test1<br>test2</p><p>test3<br><br>test4<br><br></p>')
+      )
+    ).toStrictEqual('<p>test1<br>test2</p><p>test3</p><p>test4</p>');
+    expect(
+      splitStrToParagraph(
+        cheerio.load(
+          '<h1>title1</h1><p>test1<br>test2</p><h2>title2</h2><p>test3<br><br><br><br>test4</p>'
+        )
       )
     ).toStrictEqual(
       '<h1>title1</h1><p>test1<br>test2</p><h2>title2</h2><p>test3</p><p>test4</p>'
     );
     expect(
       splitStrToParagraph(
-        '<h1>title</h1><p>test1<br>test2</p><p>test3<br><br><br><br>test4</p>'
+        cheerio.load(
+          '<h1>title</h1><p>test1<br>test2</p><p>test3<br><br><br><br>test4</p>'
+        )
       )
     ).toStrictEqual(
       '<h1>title</h1><p>test1<br>test2</p><p>test3</p><p>test4</p>'
     );
     expect(
       splitStrToParagraph(
-        '<h1>title</h1><p>test1<br>test2<br>test3<br><br><br><br>test4<br>test5</p>'
+        cheerio.load(
+          '<h1>title</h1><p>test1<br>test2<br>test3<br><br><br><br>test4<br>test5</p>'
+        )
       )
     ).toStrictEqual(
       '<h1>title</h1><p>test1<br>test2<br>test3</p><p>test4<br>test5</p>'
