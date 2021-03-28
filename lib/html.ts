@@ -41,16 +41,6 @@ export function splitStrToParagraph(html: string): string {
   return $('body').html() || '';
 }
 
-export function getPageHtml(title: string, html: string): string {
-  const $ = cheerio.load(splitStrToParagraph(html));
-  // const $ = cheerio.load(html);
-  if ($('h1').length === 0) {
-    $('body').prepend('<h1></h1>');
-    $('h1').text(title);
-  }
-  return $('body').html() || '';
-}
-
 const textToTocLabelRegExp = /[#.()[\]{}<>@&%$"`=_:;'\\ \t\n\r]/g;
 export function getTocLabel(s: string): string {
   // selector ではそのままで使えない id になる可能性もある

@@ -1,6 +1,5 @@
 import cheerio from 'cheerio';
 import {
-  getPageHtml,
   splitStrToParagraph,
   getTocLabel,
   getArticleData,
@@ -49,20 +48,6 @@ describe('splitStrToParagraph()', () => {
     ).toStrictEqual(
       '<h1>title</h1><p>test1<br>test2<br>test3</p><p>test4<br>test5</p>'
     );
-  });
-});
-
-describe('getPageHtml()', () => {
-  it('should returns pageHtml', async () => {
-    expect(getPageHtml('title1', '<p>test1</p>')).toStrictEqual(
-      '<h1>title1</h1><p>test1</p>'
-    );
-    expect(getPageHtml('Home', '<h1>title2</h1><p>test2</p>')).toStrictEqual(
-      '<h1>title2</h1><p>test2</p>'
-    );
-    expect(
-      getPageHtml('Home', '<h1>title2</h1><p>test3<br><br>test4</p>')
-    ).toStrictEqual('<h1>title2</h1><p>test3</p><p>test4</p>');
   });
 });
 
