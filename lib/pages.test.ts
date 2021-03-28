@@ -113,6 +113,9 @@ describe('getPagesData()', () => {
         items: [],
         css: ''
       },
+      htmlToc: {
+        items: []
+      },
       html: 'home page',
       mainVisual: { url: '', width: 0, height: 0 }
     });
@@ -132,6 +135,9 @@ describe('getPagesData()', () => {
       articleTitle: 'Slide1',
       updated: '2020-12-26T15:29:14.476Z',
       deck: undefined,
+      htmlToc: {
+        items: []
+      },
       html: 'test slide page',
       mainVisual: { url: '', width: 0, height: 0 }
     });

@@ -1,7 +1,7 @@
 import cheerio from 'cheerio';
+import { TocItems, HtmlToc } from '../types/pageTypes';
 
-export function splitStrToParagraph(html: string): string {
-  const $ = cheerio.load(html);
+export function splitStrToParagraph($: cheerio.Root): string {
   $('body')
     .children()
     .each((_idx, elm) => {
@@ -40,55 +40,111 @@ export function splitStrToParagraph(html: string): string {
   return $('body').html() || '';
 }
 
-export function getPageHtml(title: string, html: string): string {
-  const $ = cheerio.load(splitStrToParagraph(html));
-  // const $ = cheerio.load(html);
-  if ($('h1').length === 0) {
-    $('body').prepend('<h1></h1>');
-    $('h1').text(title);
-  }
-  return $('body').html() || '';
+const textToTocLabelRegExp = /[#.()[\]{}<>@&%$"`=_:;'\\ \t\n\r]/g;
+export function getTocLabel(s: string): string {
+  // selector ではそのままで使えない id になる可能性もある
+  // CSS.escape() は "selector 内で operator? になる文字をエスケープ"するものなので
+  // ちょっと意味合いが違う
+  return s.replace(textToTocLabelRegExp, '-');
 }
 
-function _slideHeading($: cheerio.Root, h: number) {
+const headingToNumberRegExp = /h(\d+)/;
+export function headingToNumber(tagName: string): number {
+  const n = parseInt(tagName.replace(headingToNumberRegExp, '$1'), 10);
+  return isNaN(n) ? -1 : n;
+}
+
+function _adjustHeading($: cheerio.Root, h: number) {
   const headding = `h${h}`;
   const slided = `h${h + 1}`;
-  $(headding).each((_idx, elm) => {
-    if (elm.type === 'tag' && elm.tagName === headding) {
-      elm.tagName = slided;
+  $(headding).each((_idx, $elm) => {
+    if ($elm.type === 'tag' && $elm.tagName === headding) {
+      $elm.tagName = slided;
+      // とりあえず 空白と tab 改行は - にしておく.
+      // https://developer.mozilla.org/ja/docs/Web/HTML/Global_attributes/id
+      //> この制約は HTML5 で外されましたが、互換性のために ID は文字で始めるようにしましょう。
+      // prefix は sanitize で付加される.
+      // 問題になるようなら hash 化する
+      // (hashs は notification 用があるので、それを util にする).
+      const elm = $($elm);
+      elm.attr('id', getTocLabel(elm.text()));
     }
   });
 }
 
-export function slideHeading($: cheerio.Root) {
-  _slideHeading($, 5);
-  _slideHeading($, 4);
-  _slideHeading($, 3);
-  _slideHeading($, 2);
-  _slideHeading($, 1);
+export function adjustHeading($: cheerio.Root) {
+  _adjustHeading($, 5);
+  _adjustHeading($, 4);
+  _adjustHeading($, 3);
+  _adjustHeading($, 2);
+  _adjustHeading($, 1);
 }
 
-export function getTitleAndContent(
+export function htmlToc(
+  $: cheerio.Root,
+  root: TocItems = [],
+  opts: { top: number; depth: number } = { top: 3, depth: 1 }
+): TocItems {
+  const ret: TocItems = [...root];
+  let items: TocItems = ret;
+  const path: TocItems[] = [items];
+  let prevDepth = ret.length > 0 ? ret[0].depth : 0;
+
+  $(`h${opts.top},h${opts.top + 1}`).each((_idx, $heading) => {
+    const heading = $($heading);
+    const depth =
+      opts.depth +
+      (headingToNumber($heading.type === 'tag' ? $heading.tagName : '') -
+        opts.top);
+    const item = {
+      label: getTocLabel(heading.text()),
+      items: [],
+      depth,
+      id: heading.attr('id') || ''
+    };
+    if (prevDepth < depth) {
+      if (items.length > 0) {
+        path.push(items);
+        items = items[items.length - 1].items;
+      }
+    } else if (depth < prevDepth) {
+      items = path.pop() || [];
+    }
+    items.push(item);
+    prevDepth = depth;
+  });
+
+  return ret;
+}
+
+export function getArticleData(
   title: string,
   html: string
 ): {
   articleTitle: string;
+  htmlToc: HtmlToc;
   html: string;
 } {
-  const $ = cheerio.load(splitStrToParagraph(html));
-  // const $ = cheerio.load(html);
+  const $ = cheerio.load(html);
+  splitStrToParagraph($);
   const h1 = $('body h1:first');
   if (h1.length === 0) {
-    slideHeading($);
+    adjustHeading($);
     return {
       articleTitle: title,
+      htmlToc: {
+        items: htmlToc($)
+      },
       html: $('body').html() || ''
     };
   }
   h1.remove();
-  slideHeading($);
+  adjustHeading($);
   return {
     articleTitle: $(h1[0]).html() || '',
+    htmlToc: {
+      items: htmlToc($)
+    },
     html: $('body').html() || ''
   };
 }

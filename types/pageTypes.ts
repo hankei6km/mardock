@@ -30,6 +30,18 @@ type Notification = {
   serverity: 'info' | 'warning' | 'alert';
 };
 
+export type TocItem = {
+  depth: number;
+  label: string;
+  items: TocItems; // 階層を無限に増やせるが、今回は 2 階層のみ.
+  id: string;
+};
+export type TocItems = TocItem[];
+export type HtmlToc = {
+  // label: string;
+  items: TocItem[];
+};
+
 export type PageData = {
   id: string;
   updated: string; // この段階では Date にはしない
@@ -41,6 +53,7 @@ export type PageData = {
   curCategory: string; //  route 上で選択されているカテゴリ、getStaticProps で付与される.選択されていないときは ''
   title: string;
   articleTitle: string;
+  htmlToc: HtmlToc;
   html: string;
   deck: DeckData;
   mainVisual: {
@@ -65,6 +78,7 @@ export type IndexData = Omit<
   | 'pageCount'
   | 'allCategory'
   | 'curCategory'
+  | 'htmlToc'
   | 'html'
 >;
 export type IndexList = ContentList<IndexData>;
@@ -79,6 +93,9 @@ export const blankPageData = (): PageData => ({
   category: [],
   curCategory: '',
   articleTitle: '',
+  htmlToc: {
+    items: []
+  },
   html: '',
   deck: {
     id: '',

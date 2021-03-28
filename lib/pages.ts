@@ -22,7 +22,7 @@ import {
 } from '../types/pageTypes';
 import siteServerSideConfig from '../src/site.server-side-config';
 import { applyPreviewDataToIdQuery } from './preview';
-import { getTitleAndContent } from './html';
+import { getArticleData } from './html';
 import { textLintInHtml } from './draftlint';
 import {
   rewrite,
@@ -90,7 +90,7 @@ export async function getSortedIndexData(
     });
     const p = res.body.contents.map((res) => {
       return async (): Promise<IndexData> => {
-        const { articleTitle } = getTitleAndContent(res.title, res.html || '');
+        const { articleTitle } = getArticleData(res.title, res.html || '');
         const ret = {
           ...blankIndexData(),
           id: res.id,
@@ -238,7 +238,7 @@ export async function getPagesData(
       query: query,
       config: fetchConfig
     });
-    const { articleTitle, html } = getTitleAndContent(
+    const { articleTitle, html } = getArticleData(
       res.title,
       res.html || ''
     );
