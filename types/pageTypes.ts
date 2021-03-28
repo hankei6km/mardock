@@ -38,7 +38,7 @@ export type TocItem = {
 };
 export type TocItems = TocItem[];
 export type HtmlToc = {
-  label: string;
+  // label: string;
   items: TocItem[];
 };
 
@@ -94,7 +94,6 @@ export const blankPageData = (): PageData => ({
   curCategory: '',
   articleTitle: '',
   htmlToc: {
-    label: '',
     items: []
   },
   html: '',

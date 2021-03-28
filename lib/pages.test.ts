@@ -114,7 +114,6 @@ describe('getPagesData()', () => {
         css: ''
       },
       htmlToc: {
-        label: '',
         items: []
       },
       html: 'home page',
@@ -137,7 +136,6 @@ describe('getPagesData()', () => {
       updated: '2020-12-26T15:29:14.476Z',
       deck: undefined,
       htmlToc: {
-        label: '',
         items: []
       },
       html: 'test slide page',

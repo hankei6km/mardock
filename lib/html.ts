@@ -1,5 +1,5 @@
 import cheerio from 'cheerio';
-import { TocItems } from '../types/pageTypes';
+import { TocItems, HtmlToc } from '../types/pageTypes';
 
 export function splitStrToParagraph(html: string): string {
   const $ = cheerio.load(html);
@@ -91,37 +91,11 @@ export function adjustHeading($: cheerio.Root) {
   _adjustHeading($, 1);
 }
 
-export function getTitleAndContent(
-  title: string,
-  html: string
-): {
-  articleTitle: string;
-  html: string;
-} {
-  const $ = cheerio.load(splitStrToParagraph(html));
-  // const $ = cheerio.load(html);
-  const h1 = $('body h1:first');
-  if (h1.length === 0) {
-    adjustHeading($);
-    return {
-      articleTitle: title,
-      html: $('body').html() || ''
-    };
-  }
-  h1.remove();
-  adjustHeading($);
-  return {
-    articleTitle: $(h1[0]).html() || '',
-    html: $('body').html() || ''
-  };
-}
-
-export function htmlContent(
-  html: string,
+export function htmlToc(
+  $: cheerio.Root,
   root: TocItems = [],
-  opts: { top: number; depth: number } = { top: 2, depth: 1 }
+  opts: { top: number; depth: number } = { top: 3, depth: 1 }
 ): TocItems {
-  const $ = cheerio.load(html);
   const ret: TocItems = [...root];
   let items: TocItems = ret;
   const path: TocItems[] = [items];
@@ -152,4 +126,36 @@ export function htmlContent(
   });
 
   return ret;
+}
+
+export function getArticleData(
+  title: string,
+  html: string
+): {
+  articleTitle: string;
+  htmlToc: HtmlToc;
+  html: string;
+} {
+  const $ = cheerio.load(splitStrToParagraph(html));
+  // const $ = cheerio.load(html);
+  const h1 = $('body h1:first');
+  if (h1.length === 0) {
+    adjustHeading($);
+    return {
+      articleTitle: title,
+      htmlToc: {
+        items: htmlToc($)
+      },
+      html: $('body').html() || ''
+    };
+  }
+  h1.remove();
+  adjustHeading($);
+  return {
+    articleTitle: $(h1[0]).html() || '',
+    htmlToc: {
+      items: htmlToc($)
+    },
+    html: $('body').html() || ''
+  };
 }

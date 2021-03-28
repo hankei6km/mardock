@@ -3,9 +3,9 @@ import {
   getPageHtml,
   splitStrToParagraph,
   getTocLabel,
-  getTitleAndContent,
+  getArticleData,
   adjustHeading,
-  htmlContent
+  htmlToc
 } from './html';
 
 describe('splitStrToParagraph()', () => {
@@ -105,46 +105,13 @@ describe('adjustHeading()', () => {
   });
 });
 
-describe('getTitleAndContent()', () => {
-  it('should returns title and content', async () => {
-    expect(getTitleAndContent('title1', '<p>test1</p>')).toStrictEqual({
-      articleTitle: 'title1',
-      html: '<p>test1</p>'
-    });
-    expect(
-      getTitleAndContent('title1', '<h1>article title1</h1><p>test1</p>')
-    ).toStrictEqual({
-      articleTitle: 'article title1',
-      html: '<p>test1</p>'
-    });
-    expect(
-      getTitleAndContent(
-        'title1',
-        '<h1>article title1</h1><p>test1</p><h2>title2</h2><p>test2</p>'
-      )
-    ).toStrictEqual({
-      articleTitle: 'article title1',
-      html: '<p>test1</p><h3 id="title2">title2</h3><p>test2</p>'
-    });
-    // h1 が複数はないか?
-    expect(
-      getTitleAndContent(
-        'title1',
-        '<h1>article title1</h1><p>test1</p><h1>title2</h1><p>test2</p>'
-      )
-    ).toStrictEqual({
-      articleTitle: 'article title1',
-      html: '<p>test1</p><h2 id="title2">title2</h2><p>test2</p>'
-    });
-  });
-});
-
 describe('htmlContent()', () => {
   it('should returns toc of html', () => {
     expect(
-      htmlContent('<h2 id="test1">test1</h2><h2 id="test2">test2</h2>', [
-        { label: 'section title', items: [], depth: 0, id: 'section-title' }
-      ])
+      htmlToc(
+        cheerio.load('<h3 id="test1">test1</h3><h3 id="test2">test2</h3>'),
+        [{ label: 'section title', items: [], depth: 0, id: 'section-title' }]
+      )
     ).toEqual([
       {
         label: 'section title',
@@ -169,8 +136,10 @@ describe('htmlContent()', () => {
   });
   it('should returns toc of html(nested)', () => {
     expect(
-      htmlContent(
-        '<h2 id="test1">test1</h2><p>abc</p><h3 id="test3">test3</h3><p>123</p><h3 id="test4">test4</h3><h2 id="test2">test2</h2>',
+      htmlToc(
+        cheerio.load(
+          '<h3 id="test1">test1</h3><p>abc</p><h4 id="test3">test3</h4><p>123</p><h4 id="test4">test4</h4><h3 id="test2">test2</h3>'
+        ),
         [{ label: 'section title', items: [], depth: 0, id: 'section-title' }]
       )
     ).toEqual([
@@ -210,7 +179,10 @@ describe('htmlContent()', () => {
   });
   it('should returns toc of html(without section title)', () => {
     expect(
-      htmlContent('<h2 id="test1">test1</h2><h2 id="test2">test2</h2>', [])
+      htmlToc(
+        cheerio.load('<h3 id="test1">test1</h3><h3 id="test2">test2</h3>'),
+        []
+      )
     ).toEqual([
       {
         label: 'test1',
@@ -225,5 +197,55 @@ describe('htmlContent()', () => {
         id: 'test2'
       }
     ]);
+  });
+});
+
+describe('getArticleData()', () => {
+  it('should returns article data', async () => {
+    expect(getArticleData('title1', '<p>test1</p>')).toStrictEqual({
+      articleTitle: 'title1',
+      html: '<p>test1</p>',
+      htmlToc: { items: [] }
+    });
+    expect(
+      getArticleData('title1', '<h1>article title1</h1><p>test1</p>')
+    ).toStrictEqual({
+      articleTitle: 'article title1',
+      html: '<p>test1</p>',
+      htmlToc: { items: [] }
+    });
+    expect(
+      getArticleData(
+        'title1',
+        '<h1>article title1</h1><p>test1</p><h2>title2</h2><p>test2</p>'
+      )
+    ).toStrictEqual({
+      articleTitle: 'article title1',
+      html: '<p>test1</p><h3 id="title2">title2</h3><p>test2</p>',
+      htmlToc: {
+        items: [
+          {
+            depth: 1,
+            items: [],
+            label: 'title2',
+            id: 'title2'
+          }
+        ]
+      }
+    });
+    // TODO: h1 が複数あった場合の対処.
+    // toc の扱いも考える必要がある.
+    expect(
+      getArticleData(
+        'title1',
+        '<h1>article title1</h1><p>test1</p><h1>title2</h1><p>test2</p>'
+      )
+    ).toStrictEqual({
+      articleTitle: 'article title1',
+      html: '<p>test1</p><h2 id="title2">title2</h2><p>test2</p>',
+      htmlToc: {
+        items: []
+      }
+    });
   });
 });
