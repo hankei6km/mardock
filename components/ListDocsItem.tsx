@@ -1,6 +1,5 @@
 import React from 'react';
 import { makeStyles } from '@material-ui/core';
-import Box from '@material-ui/core/Box';
 import Chip from '@material-ui/core/Chip';
 import Card from '@material-ui/core/Card';
 // import CardActionArea from '@material-ui/core/CardActionArea';
@@ -13,11 +12,9 @@ import Link from './Link';
 import { join } from 'path';
 import { pruneClasses } from '../utils/classes';
 import { PagesCategory } from '../types/client/contentTypes';
-import { DeckData } from '../types/pageTypes';
-import Carousel from 'react-material-ui-carousel';
 
 const useStyles = makeStyles((theme) => ({
-  'ListItem-thumb-outer': {
+  'ListDocsItem-thumb-outer': {
     width: '100%',
     [theme.breakpoints.up('sm')]: {
       width: '49%'
@@ -27,7 +24,7 @@ const useStyles = makeStyles((theme) => ({
     }
     // aspectRatio: '16 / 9' // Props で指定させる?
   },
-  'ListItem-card-root': {
+  'ListDocsItem-card-root': {
     marginBottom: theme.spacing(1),
     '& .MuiCardContent-root ': {
       padding: theme.spacing(0.5, 1)
@@ -42,8 +39,12 @@ const useStyles = makeStyles((theme) => ({
       marginRight: theme.spacing(1)
     }
   },
-  'ListItem-thumb': {
-    '& .slide': {
+  'ListDocsItem-thumb': {
+    width: '100%',
+    //aspectRatio: '16 / 9', // Props で指定させる?
+    '& img': {
+      width: '100%',
+      height: '100%',
       objectFit: 'cover',
       objectPosition: '50% 50%',
       opacity: 1,
@@ -55,26 +56,30 @@ const useStyles = makeStyles((theme) => ({
   }
 }));
 const classNames = [
-  'ListItem-thumb-outer',
-  'ListItem-card-root',
-  'ListItem-thumb'
+  'ListDocsItem-thumb-outer',
+  'ListDocsItem-card-root',
+  'ListDocsItem-thumb'
 ];
 
 type Props = {
   itemId: string;
   title: string;
+  mainVisual: {
+    url: string;
+    width: number;
+    height: number;
+  };
   itemPath: string;
   category: PagesCategory[];
-  deck: DeckData;
   classes?: { [key: string]: string };
 };
 // } & { width: Breakpoint };
-const ListItem = ({
+const ListDocsItem = ({
   itemId,
   title,
+  mainVisual,
   itemPath,
   category,
-  deck,
   classes: inClasses
 }: Props) => {
   const classes = useStyles({ classes: pruneClasses(inClasses, classNames) });
@@ -82,52 +87,15 @@ const ListItem = ({
     // GridList と同一の関数でないと(どういう表現が適切?)、cols 関連の設定が無視される.
     // その代わりに GridListTile の幅にあわせて row が break する.
     // この方が使いやすいのだが、バグではないよね
-    <GridListTile cols={1} className={classes['ListItem-thumb-outer']}>
-      <Card className={classes['ListItem-card-root']} raised>
-        <CardMedia>
-          {deck.items[0] ? (
-            <>
-              <style
-                dangerouslySetInnerHTML={{
-                  __html: deck.css
-                }}
-              />
-              <Carousel
-                autoPlay={false}
-                indicators={false}
-                animation={'slide'}
-                // 2.2.x だと NavButton が常に表示か非表示にしかできない?
-              >
-                {deck.items.map(({ html }) => (
-                  <Link
-                    key={itemId}
-                    href={join(itemPath, '[id]')}
-                    as={join(itemPath, itemId)}
-                    // article を link でラップはあり?
-                  >
-                    <article
-                      key={deck.id}
-                      id={deck.id}
-                      className={classes['ListItem-thumb']}
-                    >
-                      <div className="slides">
-                        <div
-                          className="slide"
-                          dangerouslySetInnerHTML={{
-                            __html: html
-                          }}
-                        />
-                      </div>
-                    </article>
-                  </Link>
-                ))}
-              </Carousel>
-            </>
-          ) : (
-            <Box style={{ height: 180 }}>
-              <Typography variant="body1">NO IMAGE</Typography>
-            </Box>
-          )}
+    <GridListTile cols={1} className={classes['ListDocsItem-thumb-outer']}>
+      <Card className={classes['ListDocsItem-card-root']} raised>
+        <CardMedia className={classes['ListDocsItem-thumb']}>
+          <img
+            src={mainVisual.url}
+            width={mainVisual.width}
+            height={mainVisual.height}
+            alt={title}
+          />
         </CardMedia>
         <CardContent>
           <Typography
@@ -160,4 +128,4 @@ const ListItem = ({
   );
 };
 
-export default ListItem;
+export default ListDocsItem;

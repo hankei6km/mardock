@@ -3,7 +3,8 @@ import { makeStyles } from '@material-ui/core';
 import GridList from '@material-ui/core/GridList';
 import { pruneClasses } from '../utils/classes';
 import { IndexList } from '../types/pageTypes';
-import ListItem from './ListItem';
+import ListDeckItem from './ListDeckItem';
+import ListDocsItem from './ListDocsItem';
 
 const useStyles = makeStyles((theme) => ({
   'List-root': {
@@ -24,6 +25,7 @@ const useStyles = makeStyles((theme) => ({
 const classNames = ['List-root'];
 
 type Props = {
+  kind?: 'deck' | 'docs';
   itemPath: string;
   items: IndexList;
   cellHeight?: number | 'auto';
@@ -32,6 +34,7 @@ type Props = {
   classes?: { [key: string]: string };
 };
 const List = ({
+  kind = 'deck',
   itemPath,
   items,
   cellHeight = 'auto',
@@ -53,14 +56,24 @@ const List = ({
         // if (item.mainVisual) {
         //   src = `${item.mainVisual.url}?${q.toString()}`;
         // }
-        return (
-          <ListItem
+        return kind === 'deck' ? (
+          <ListDeckItem
             itemId={item.id}
             title={item.title}
             key={item.id}
             itemPath={itemPath}
             category={item.category}
             deck={item.deck}
+            classes={classes}
+          />
+        ) : (
+          <ListDocsItem
+            itemId={item.id}
+            title={item.title}
+            mainVisual={item.mainVisual}
+            key={item.id}
+            itemPath={itemPath}
+            category={item.category}
             classes={classes}
           />
         );

@@ -27,6 +27,7 @@ const siteConfig: SiteConfig = {
     main: [
       { label: 'Home', href: '/' },
       { label: 'Slides', href: '/deck' },
+      { label: 'Docs', href: '/docs' },
       { label: 'About', href: '/about' }
     ],
     breadcrumbs: {
@@ -34,6 +35,10 @@ const siteConfig: SiteConfig = {
       '/deck': [
         { label: 'Home', href: '/' },
         { label: 'Slides', href: '/deck' }
+      ],
+      '/docs': [
+        { label: 'Home', href: '/' },
+        { label: 'Docs', href: '/doc' }
       ],
       '/about': [
         { label: 'Home', href: '/' },

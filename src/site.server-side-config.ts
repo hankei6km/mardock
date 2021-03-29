@@ -18,6 +18,9 @@ type SiteServerSideConfig = {
   slide: {
     fallbackImage: Omit<ConfigImageSource, 'alt'>;
   };
+  mainVisual: {
+    fallbackImage: Omit<ConfigImageSource, 'alt'>;
+  };
   draft: {
     // types/pageType Notification
     title: string;
@@ -36,6 +39,14 @@ const siteServerSideConfig: SiteServerSideConfig = {
     imagesPath: join('/', 'assets', 'images')
   },
   slide: {
+    fallbackImage: {
+      url:
+        'https://images.microcms-assets.io/assets/cc433627f35c4232b7cb97e0376507a7/eb84db7f1a7a4409bd20ffc27abe60e4/mardock-temp-image.png',
+      width: 1280,
+      height: 720
+    }
+  },
+  mainVisual: {
     fallbackImage: {
       url:
         'https://images.microcms-assets.io/assets/cc433627f35c4232b7cb97e0376507a7/eb84db7f1a7a4409bd20ffc27abe60e4/mardock-temp-image.png',

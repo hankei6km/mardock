@@ -85,6 +85,9 @@ export async function getSortedIndexData(
     const p = res.body.contents.map((res) => {
       return async (): Promise<IndexData> => {
         const { articleTitle } = getArticleData(res.title, res.html || '');
+        const mainVisual = res.mainVisual?.url
+          ? res.mainVisual
+          : siteServerSideConfig.mainVisual.fallbackImage;
         const ret = {
           ...blankIndexData(),
           id: res.id,
@@ -93,9 +96,7 @@ export async function getSortedIndexData(
           category: apiName !== 'pages' ? res.category || [] : [],
           articleTitle,
           mainVisual: {
-            url: res.mainVisual?.url || '',
-            width: res.mainVisual?.width || 0,
-            height: res.mainVisual?.height || 0
+            ...mainVisual
           },
           description: res.description || ''
         };
@@ -236,6 +237,9 @@ export async function getPagesData(
       res.title,
       res.html || ''
     );
+    const mainVisual = res.mainVisual?.url
+      ? res.mainVisual
+      : siteServerSideConfig.mainVisual.fallbackImage;
     const ret: PageData = {
       ...blankPageData(),
       id: res.id,
@@ -255,9 +259,7 @@ export async function getPagesData(
         .use(rewriteCode())
         .run(),
       mainVisual: {
-        url: res.mainVisual?.url || '',
-        width: res.mainVisual?.width || 0,
-        height: res.mainVisual?.height || 0
+        ...mainVisual
       },
       description: res.description || ''
     };

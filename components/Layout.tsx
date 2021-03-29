@@ -383,7 +383,7 @@ const Layout = ({
                 />
               </Box>
             </Box>
-            {apiName === 'deck' && (
+            {(apiName === 'deck' || apiName === 'docs') && (
               <Box className={classes['NavBreadcrumbs-outer']}>
                 <NavBreadcrumbs lastBreadcrumb={title} classes={classes} />
               </Box>

@@ -117,7 +117,12 @@ describe('getPagesData()', () => {
         items: []
       },
       html: 'home page',
-      mainVisual: { url: '', width: 0, height: 0 }
+      mainVisual: {
+        url:
+          'https://images.microcms-assets.io/assets/cc433627f35c4232b7cb97e0376507a7/eb84db7f1a7a4409bd20ffc27abe60e4/mardock-temp-image.png',
+        width: 1280,
+        height: 720
+      }
     });
   });
   it('should returns pageData contained deckData', async () => {
@@ -139,7 +144,12 @@ describe('getPagesData()', () => {
         items: []
       },
       html: 'test slide page',
-      mainVisual: { url: '', width: 0, height: 0 }
+      mainVisual: {
+        url:
+          'https://images.microcms-assets.io/assets/cc433627f35c4232b7cb97e0376507a7/eb84db7f1a7a4409bd20ffc27abe60e4/mardock-temp-image.png',
+        width: 1280,
+        height: 720
+      }
     });
     expect(res.deck.items[0].html).toContain('test1');
   });

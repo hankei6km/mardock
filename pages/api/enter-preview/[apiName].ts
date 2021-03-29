@@ -22,12 +22,18 @@ const handler = async (
         case 'deck':
           location = `/deck`;
           break;
+        case 'docs':
+          location = `/docs`;
+          break;
         case 'about':
           location = `/about`;
           break;
       }
       break;
     case 'deck':
+      location = `/${req.query.apiName}/${id}`;
+      break;
+    case 'docs':
       location = `/${req.query.apiName}/${id}`;
       break;
   }

@@ -17,14 +17,16 @@ describe('NavMain', () => {
     //const navMain = getByText('Home');
     //expect(navMain).toBeInTheDocument();
     const a = getAllByRole('link');
-    expect(a.length).toEqual(3);
+    expect(a.length).toEqual(4);
     // expect(a[0].innerText).toEqual('Home');
     expect(a[0]).toContainHTML('Home');
     expect(a[1]).toContainHTML('Slides');
-    expect(a[2]).toContainHTML('About');
+    expect(a[2]).toContainHTML('Docs');
+    expect(a[3]).toContainHTML('About');
     expect(a[0].getAttribute('href')).toEqual('/');
     expect(a[1].getAttribute('href')).toEqual('/deck');
-    expect(a[2].getAttribute('href')).toEqual('/about');
+    expect(a[2].getAttribute('href')).toEqual('/docs');
+    expect(a[3].getAttribute('href')).toEqual('/about');
   });
   test('renders nav and click', () => {
     const router = mockRouter();
