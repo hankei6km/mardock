@@ -78,11 +78,13 @@ type Props = {
   classes?: { [key: string]: string };
 };
 const NavHtmlTocItems = ({
+  id,
   items,
   visibleId,
   offset = -80,
   classes: inClasses
 }: {
+  id?: string;
   items: TocItems;
   visibleId: string;
   offset?: number;
@@ -90,7 +92,7 @@ const NavHtmlTocItems = ({
 }) => {
   const classes = useStyles({ classes: pruneClasses(inClasses, classNames) });
   return (
-    <ul className={classes['NavHtmlToc-list']}>
+    <ul id={id} className={classes['NavHtmlToc-list']}>
       {items.map(({ id, label, items }) => (
         <li key={id}>
           <Box display="flex">
@@ -211,6 +213,7 @@ const NavHtmlToc = ({ htmlToc, offset = -80, classes: inClasses }: Props) => {
         </Box>
       </Box>
       <NavHtmlTocItems
+        id="table-of-contens-navigation"
         items={htmlToc.items}
         visibleId={visibleId}
         offset={offset}
