@@ -3,6 +3,7 @@ import ErrorPage from 'next/error';
 // import { makeStyles } from '@material-ui/core';
 import Layout from '../components/Layout';
 import List from '../components/List';
+import NavHtmlToc from '../components/NavHtmlToc';
 // import Typography from '@material-ui/core/Typography';
 import { PageData, IndexList } from '../types/pageTypes';
 import { getPagesData, getSortedIndexData } from '../lib/pages';
@@ -22,6 +23,13 @@ const IndexPage = ({ pageData, items }: Props) => {
       apiName={'pages'}
       {...pageData}
       notification={pageData.notification}
+      topSection={
+        pageData.htmlToc.items.length > 1 ? (
+          <NavHtmlToc htmlToc={pageData.htmlToc} />
+        ) : (
+          ''
+        )
+      }
     >
       <section>
         <List itemPath={'/deck'} items={items} />

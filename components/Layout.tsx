@@ -126,6 +126,7 @@ const useStyles = makeStyles((theme) => ({
   'Layout-body': {
     display: 'flex',
     flexDirection: 'column',
+    flexWrap: 'wrap',
     alignItems: 'center',
     height: '100%',
     [theme.breakpoints.up('md')]: {
@@ -136,13 +137,41 @@ const useStyles = makeStyles((theme) => ({
     width: '100%'
   },
   'Layout-section-top': {
-    width: 300
+    order: 0,
+    paddingLeft: theme.spacing(1),
+    paddingRight: theme.spacing(1),
+    [theme.breakpoints.up('md')]: {
+      position: 'sticky',
+      top: 80,
+      display: 'block',
+      order: 1,
+      flexBasis: '25%'
+    }
+  },
+  'Layout-section-top-persist': {},
+  'Layout-section-top-not-persist': {
+    display: 'none',
+    [theme.breakpoints.up('md')]: {
+      display: 'block'
+    }
   },
   'Layout-section-bottom': {
-    width: 300
+    order: 2,
+    paddingLeft: theme.spacing(1),
+    paddingRight: theme.spacing(1),
+    [theme.breakpoints.up('md')]: {
+      width: '100%',
+      maxWidth: theme.breakpoints.values['lg']
+    }
   },
   'Layout-section': {
     flexGrow: 1,
+    order: 1,
+    width: '100%',
+    [theme.breakpoints.up('md')]: {
+      order: 0,
+      flexBasis: '75%'
+    },
     ...theme.typography.body1,
     paddingLeft: theme.spacing(1),
     paddingRight: theme.spacing(1),
@@ -253,6 +282,7 @@ type Props = {
   apiName: ApiNameArticle;
   children?: ReactNode;
   topSection?: ReactNode;
+  topPersistSection?: ReactNode;
   bottomSection?: ReactNode;
 } & Partial<PageData>;
 
@@ -267,6 +297,7 @@ const Layout = ({
   id,
   children,
   topSection,
+  topPersistSection,
   bottomSection,
   updated,
   title = 'This is the default title',
@@ -366,9 +397,24 @@ const Layout = ({
           disableGutters
           className={classes['Layout-body']}
         >
-          {topSection && (
-            <Box component="section" className={classes['Layout-section-top']}>
-              {topSection}
+          {(topPersistSection || topSection) && (
+            <Box className={classes['Layout-section-top']}>
+              {topPersistSection && (
+                <Box
+                  component="section"
+                  className={classes['Layout-section-top-persist']}
+                >
+                  {topPersistSection}
+                </Box>
+              )}
+              {topSection && (
+                <Box
+                  component="section"
+                  className={classes['Layout-section-top-not-persist']}
+                >
+                  {topSection}
+                </Box>
+              )}
             </Box>
           )}
           <Box component="section" className={classes['Layout-section']}>

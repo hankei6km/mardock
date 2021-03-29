@@ -74,15 +74,18 @@ const classNames = [
 
 type Props = {
   htmlToc: HtmlToc;
+  offset?: number;
   classes?: { [key: string]: string };
 };
 const NavHtmlTocItems = ({
   items,
   visibleId,
+  offset = -80,
   classes: inClasses
 }: {
   items: TocItems;
   visibleId: string;
+  offset?: number;
   classes?: { [key: string]: string };
 }) => {
   const classes = useStyles({ classes: pruneClasses(inClasses, classNames) });
@@ -99,6 +102,7 @@ const NavHtmlTocItems = ({
               <ScrollLink
                 href={`#${id}`}
                 to={`${id}`}
+                offset={offset}
                 smooth={true}
                 duration={500}
                 onClick={(): void => {
@@ -115,6 +119,7 @@ const NavHtmlTocItems = ({
             <NavHtmlTocItems
               items={items}
               visibleId={visibleId}
+              offset={offset}
               classes={classes}
             />
           )}
@@ -124,7 +129,7 @@ const NavHtmlTocItems = ({
   );
 };
 
-const NavHtmlToc = ({ htmlToc, classes: inClasses }: Props) => {
+const NavHtmlToc = ({ htmlToc, offset = -80, classes: inClasses }: Props) => {
   const classes = useStyles({ classes: pruneClasses(inClasses, classNames) });
   const { nav } = useContext(SiteContext);
   const [visibleId, setVisibleId] = useState(
@@ -165,7 +170,7 @@ const NavHtmlToc = ({ htmlToc, classes: inClasses }: Props) => {
           }
         }
         timerId = 0;
-      }, 100);
+      }, 10);
     };
     tocIds.forEach((id) => {
       const e = document.querySelector(`#${id}`);
@@ -208,6 +213,7 @@ const NavHtmlToc = ({ htmlToc, classes: inClasses }: Props) => {
       <NavHtmlTocItems
         items={htmlToc.items}
         visibleId={visibleId}
+        offset={offset}
         classes={classes}
       />
     </nav>
