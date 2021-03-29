@@ -24,9 +24,13 @@ export default function Docs({ pageData }: Props) {
       apiName={'docs'}
       {...pageData}
       notification={pageData.notification}
-      topSection={
+      topPersistSection={
         pageData.htmlToc.items.length > 1 ? (
-          <NavHtmlToc htmlToc={pageData.htmlToc} />
+          <aside>
+            <section>
+              <NavHtmlToc htmlToc={pageData.htmlToc} />
+            </section>
+          </aside>
         ) : (
           ''
         )

@@ -26,13 +26,35 @@ const useStyles = makeStyles((theme) => ({
     alignItems: 'center',
     marginBottom: theme.spacing(0.5)
   },
+  'NavHtmlToc-label': { order: 2 },
   'NavHtmlToc-expand-button': {
     display: 'flex',
+    order: 1,
+    transform: 'rotate(0deg)',
+    padding: theme.spacing(0.5),
+    '&:not(.NavHtmlToc-list-expanded)': {
+      transform: 'rotate(270deg)'
+    },
     [theme.breakpoints.up('md')]: {
       display: 'none'
     }
   },
-  'NavHtmlToc-label': { flexGrow: 1 },
+  'NavHtmlToc-list-outer': {
+    overflow: 'hidden',
+    transition: 'max-height .5s linear',
+    maxHeight: 400, // 目次で必要な高さは?
+    '&:not(.NavHtmlToc-list-expanded)': {
+      maxHeight: 0
+    },
+    paddingLeft: theme.spacing(1),
+    [theme.breakpoints.up('md')]: {
+      maxHeight: 400,
+      '&:not(.NavHtmlToc-list-expanded)': {
+        maxHeight: 400
+      },
+      paddingLeft: theme.spacing(0)
+    }
+  },
   'NavHtmlToc-list': {
     justifyContent: 'space-around',
     '& li': {
@@ -52,7 +74,7 @@ const useStyles = makeStyles((theme) => ({
     }
   },
   'NavHtmlToc-item': {
-    // :marginBottom: theme.spacing(0.5)
+    marginBottom: theme.spacing(0.5)
   },
   'NavHtmlToc-link': {
     color: theme.palette.primary.main,
@@ -65,8 +87,9 @@ const useStyles = makeStyles((theme) => ({
 const classNames = [
   'NavHtmlToc-root',
   'NavHtmlToc-header-outer',
-  'NavHtmlToc-expand-button',
   'NavHtmlToc-label',
+  'NavHtmlToc-expand-button',
+  'NavHtmlToc-list-outer',
   'NavHtmlToc-list',
   'NavHtmlToc-item',
   'NavHtmlToc-link'
@@ -78,13 +101,11 @@ type Props = {
   classes?: { [key: string]: string };
 };
 const NavHtmlTocItems = ({
-  id,
   items,
   visibleId,
   offset = -80,
   classes: inClasses
 }: {
-  id?: string;
   items: TocItems;
   visibleId: string;
   offset?: number;
@@ -92,7 +113,7 @@ const NavHtmlTocItems = ({
 }) => {
   const classes = useStyles({ classes: pruneClasses(inClasses, classNames) });
   return (
-    <ul id={id} className={classes['NavHtmlToc-list']}>
+    <ul className={classes['NavHtmlToc-list']}>
       {items.map(({ id, label, items }) => (
         <li key={id}>
           <Box display="flex">
@@ -134,6 +155,7 @@ const NavHtmlTocItems = ({
 const NavHtmlToc = ({ htmlToc, offset = -80, classes: inClasses }: Props) => {
   const classes = useStyles({ classes: pruneClasses(inClasses, classNames) });
   const { nav } = useContext(SiteContext);
+  const [expanded, setExpanded] = useState(false);
   const [visibleId, setVisibleId] = useState(
     htmlToc.items.length > 0 ? htmlToc.items[0].id : ''
   );
@@ -193,33 +215,38 @@ const NavHtmlToc = ({ htmlToc, offset = -80, classes: inClasses }: Props) => {
     };
   }, [htmlToc.items]);
   return (
-    <nav
-      className={classes['NavHtmlToc-root']}
-      aria-labelledby="table-of-contens-navigation"
-    >
+    <Box className={classes['NavHtmlToc-root']}>
       <Box className={classes['NavHtmlToc-header-outer']}>
+        <Typography component={'h2'} className={classes['NavHtmlToc-label']}>
+          {nav.htmlToc.label}
+        </Typography>
         <IconButton
-          aria-label="Expand"
-          aria-controls="additional-actions-table-of-contents"
-          id="expand-table-of-contents-header"
-          className={classes['NavHtmlToc-expand-button']}
+          aria-label="Expand table of cotents"
+          aria-controls="toc-entries"
+          aria-expanded={expanded}
+          className={`${classes['NavHtmlToc-expand-button']}${
+            expanded ? ' NavHtmlToc-list-expanded' : ''
+          }`}
+          onClick={() => setExpanded(!expanded)}
         >
           <ExpandMoreIcon />
         </IconButton>
+      </Box>
+      <Box
+        className={`${classes['NavHtmlToc-list-outer']}${
+          expanded ? ' NavHtmlToc-list-expanded' : ''
+        }`}
+      >
         <Box>
-          <Typography component={'h3'} className={classes['NavHtmlToc-label']}>
-            {nav.htmlToc.label}
-          </Typography>
+          <NavHtmlTocItems
+            items={htmlToc.items}
+            visibleId={visibleId}
+            offset={offset}
+            classes={classes}
+          />
         </Box>
       </Box>
-      <NavHtmlTocItems
-        id="table-of-contens-navigation"
-        items={htmlToc.items}
-        visibleId={visibleId}
-        offset={offset}
-        classes={classes}
-      />
-    </nav>
+    </Box>
   );
 };
 

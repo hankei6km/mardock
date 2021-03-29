@@ -26,7 +26,9 @@ const DocsPage = ({ pageData, items }: Props) => {
       {...pageData}
       notification={pageData.notification}
       topSection={
-        <ListDocs itemPath={'/docs'} items={items} />
+        <section>
+          <ListDocs itemPath={'/docs'} items={items} />
+        </section>
       }
     >
       <section>

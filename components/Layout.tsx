@@ -153,6 +153,7 @@ const useStyles = makeStyles((theme) => ({
   },
   'Layout-section-top': {
     order: 0,
+    width: '100%',
     paddingLeft: theme.spacing(1),
     paddingRight: theme.spacing(1),
     [theme.breakpoints.up('md')]: {
@@ -172,6 +173,7 @@ const useStyles = makeStyles((theme) => ({
   },
   'Layout-section-bottom': {
     order: 2,
+    width: '100%',
     paddingLeft: theme.spacing(1),
     paddingRight: theme.spacing(1),
     [theme.breakpoints.up('md')]: {
@@ -418,18 +420,12 @@ const Layout = ({
           {(topPersistSection || topSection) && (
             <Box className={classes['Layout-section-top']}>
               {topPersistSection && (
-                <Box
-                  component="section"
-                  className={classes['Layout-section-top-persist']}
-                >
+                <Box className={classes['Layout-section-top-persist']}>
                   {topPersistSection}
                 </Box>
               )}
               {topSection && (
-                <Box
-                  component="section"
-                  className={classes['Layout-section-top-not-persist']}
-                >
+                <Box className={classes['Layout-section-top-not-persist']}>
                   {topSection}
                 </Box>
               )}
@@ -450,10 +446,7 @@ const Layout = ({
             </>
           </Box>
           {bottomSection && (
-            <Box
-              component="section"
-              className={classes['Layout-section-bottom']}
-            >
+            <Box className={classes['Layout-section-bottom']}>
               {bottomSection}
             </Box>
           )}
