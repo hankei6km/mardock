@@ -38,7 +38,7 @@ const siteConfig: SiteConfig = {
       ],
       '/docs': [
         { label: 'Home', href: '/' },
-        { label: 'Docs', href: '/doc' }
+        { label: 'Docs', href: '/docs' }
       ],
       '/about': [
         { label: 'Home', href: '/' },

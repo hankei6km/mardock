@@ -1,7 +1,7 @@
 import { GetStaticProps } from 'next';
 import ErrorPage from 'next/error';
 import Layout from '../../components/Layout';
-import List from '../../components/List';
+import ListDeck from '../../components/ListDeck';
 // import Typography from '@material-ui/core/Typography';
 import { PageData, IndexList } from '../../types/pageTypes';
 import { getPagesData, getSortedIndexData } from '../../lib/pages';
@@ -36,7 +36,12 @@ const DeckPage = ({ pageData, items }: Props) => {
       notification={pageData.notification}
     >
       <section>
-        <List itemPath={'/deck'} items={items} cols={[1, 1]} imgWidth={600} />
+        <ListDeck
+          itemPath={'/deck'}
+          items={items}
+          cols={[1, 1]}
+          imgWidth={600}
+        />
         <NavPagination
           pageNo={pageData.pageNo}
           pageCount={pageData.pageCount}

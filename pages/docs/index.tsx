@@ -1,7 +1,7 @@
 import { GetStaticProps } from 'next';
 import ErrorPage from 'next/error';
 import Layout from '../../components/Layout';
-import List from '../../components/List';
+import ListDocs from '../../components/ListDocs';
 // import Typography from '@material-ui/core/Typography';
 import { PageData, IndexList } from '../../types/pageTypes';
 import { getPagesData, getSortedIndexData } from '../../lib/pages';
@@ -25,9 +25,11 @@ const DocsPage = ({ pageData, items }: Props) => {
       apiName={'pages'}
       {...pageData}
       notification={pageData.notification}
+      topSection={
+        <ListDocs itemPath={'/docs'} items={items} />
+      }
     >
       <section>
-        <List kind={'docs'} itemPath={'/docs'} items={items} />
         <NavPagination
           pageNo={pageData.pageNo}
           pageCount={pageData.pageCount}

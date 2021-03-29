@@ -4,14 +4,13 @@ import GridList from '@material-ui/core/GridList';
 import { pruneClasses } from '../utils/classes';
 import { IndexList } from '../types/pageTypes';
 import ListDeckItem from './ListDeckItem';
-import ListDocsItem from './ListDocsItem';
 
 const useStyles = makeStyles((theme) => ({
-  'List-root': {
+  'ListDeck-root': {
     justifyContent: 'space-between',
     gridRowGap: theme.spacing(1)
   },
-  'List-thumb-outer': {
+  'ListDeck-thumb-outer': {
     width: '100%',
     [theme.breakpoints.up('sm')]: {
       width: '49%'
@@ -22,10 +21,9 @@ const useStyles = makeStyles((theme) => ({
     // aspectRatio: '16 / 9' // Props で指定させる?
   }
 }));
-const classNames = ['List-root'];
+const classNames = ['ListDeck-root'];
 
 type Props = {
-  kind?: 'deck' | 'docs';
   itemPath: string;
   items: IndexList;
   cellHeight?: number | 'auto';
@@ -33,8 +31,7 @@ type Props = {
   imgWidth?: number;
   classes?: { [key: string]: string };
 };
-const List = ({
-  kind = 'deck',
+const ListDeck = ({
   itemPath,
   items,
   cellHeight = 'auto',
@@ -50,34 +47,22 @@ const List = ({
       // style で display none で切り替える?
       // cols={isWidthUp('sm', width) ? cols[0] : cols[1]}
       cols={cols[0]}
-      className={classes['List-root']}
+      className={classes['ListDeck-root']}
     >
-      {items.contents.map((item) => {
+      {items.contents.map((item) => (
         // if (item.mainVisual) {
         //   src = `${item.mainVisual.url}?${q.toString()}`;
         // }
-        return kind === 'deck' ? (
-          <ListDeckItem
-            itemId={item.id}
-            title={item.title}
-            key={item.id}
-            itemPath={itemPath}
-            category={item.category}
-            deck={item.deck}
-            classes={classes}
-          />
-        ) : (
-          <ListDocsItem
-            itemId={item.id}
-            title={item.title}
-            mainVisual={item.mainVisual}
-            key={item.id}
-            itemPath={itemPath}
-            category={item.category}
-            classes={classes}
-          />
-        );
-      })}
+        <ListDeckItem
+          itemId={item.id}
+          title={item.title}
+          key={item.id}
+          itemPath={itemPath}
+          category={item.category}
+          deck={item.deck}
+          classes={classes}
+        />
+      ))}
     </GridList>
   );
 };
@@ -85,4 +70,4 @@ const List = ({
 // サイズを指定しておかないとレイアウトシフトがおきる.
 // 一旦保留.
 // export default withWidth()(List);
-export default List;
+export default ListDeck;
