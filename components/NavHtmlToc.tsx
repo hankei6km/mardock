@@ -42,7 +42,7 @@ const useStyles = makeStyles((theme) => ({
       '& div.indicator:not(.active)': {
         marginBottom: theme.spacing(0.5),
         marginRight: theme.spacing(0.5),
-        borderLeft: `4px solid ${theme.palette.content.background.main}`
+        borderLeft: `4px solid ${theme.palette.content.background.default.main}`
       },
       '& div.indicator': {
         marginBottom: theme.spacing(0.5),

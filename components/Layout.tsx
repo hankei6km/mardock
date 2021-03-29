@@ -114,14 +114,29 @@ const useStyles = makeStyles((theme) => ({
     marginTop: theme.spacing(1),
     marginBottom: theme.spacing(1)
   },
-  'Layout-section-root': {
-    height: '100%',
-    padding: theme.spacing(1, 0),
-    backgroundColor: theme.palette.content.background.main,
-    width: '100%',
-    [theme.breakpoints.up('md')]: {
-      padding: theme.spacing(1, 1)
+  'Layout-section-root': ({
+    apiName,
+    id
+  }: {
+    apiName: ApiNameArticle;
+    id: string;
+  }) => {
+    let backgroundColor = theme.palette.content.background.default.main;
+    if (apiName === 'pages' && id === 'home') {
+      backgroundColor = theme.palette.content.background.home.main;
     }
+    if (apiName === 'pages' && id === 'deck') {
+      backgroundColor = theme.palette.content.background.deck.main;
+    }
+    return {
+      height: '100%',
+      padding: theme.spacing(1, 0),
+      backgroundColor,
+      width: '100%',
+      [theme.breakpoints.up('md')]: {
+        padding: theme.spacing(1, 1)
+      }
+    };
   },
   'Layout-body': {
     display: 'flex',
@@ -307,7 +322,10 @@ const Layout = ({
   mainVisual = { url: '', width: 0, height: 0 },
   notification
 }: Props) => {
-  const classes = useStyles();
+  const classes = useStyles({
+    apiName,
+    id: id || ''
+  });
   const { siteName, siteIcon } = useContext(SiteContext);
   const [navOpen, setNavOpen] = useState(false);
   const maxWidth = 'lg';

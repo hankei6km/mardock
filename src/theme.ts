@@ -13,12 +13,20 @@ import { blueGrey, red } from '@material-ui/core/colors';
 declare module '@material-ui/core/styles/createPalette' {
   export interface Palette {
     content: {
-      background: Palette['primary'];
+      background: {
+        default: Palette['primary'];
+        home: Palette['primary'];
+        deck: Palette['primary'];
+      };
     };
   }
   export interface PaletteOptions {
     content: {
-      background: PaletteOptions['primary'];
+      background: {
+        default: PaletteOptions['primary'];
+        home: PaletteOptions['primary'];
+        deck: PaletteOptions['primary'];
+      };
     };
   }
 }
@@ -74,7 +82,15 @@ const theme = createMuiTheme({
     },
     content: {
       background: {
-        main: blueGrey['50']
+        default: {
+          main: '#fff'
+        },
+        home: {
+          main: blueGrey['50']
+        },
+        deck: {
+          main: blueGrey['50']
+        }
       }
     }
   },
