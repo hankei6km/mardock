@@ -3,6 +3,8 @@ import { render, act } from '@testing-library/react';
 // https://stackoverflow.com/questions/56547215/react-testing-library-why-is-tobeinthedocument-not-a-function
 import '@testing-library/jest-dom';
 import { RouterContext } from 'next/dist/next-server/lib/router-context';
+import { ThemeProvider } from '@material-ui/core/styles';
+import theme from '../src/theme';
 import { mockRouter } from '../test/testUtils';
 import siteConfig from '../src/site.config';
 import SiteContext from './SiteContext';
@@ -54,20 +56,22 @@ describe('NavHtmlToc', () => {
     };
     await act(async () => {
       const { unmount, getByRole, getByText } = render(
-        <RouterContext.Provider value={router}>
-          <SiteContext.Provider value={config}>
-            <NavHtmlToc htmlToc={htmlToc} />
-            <div id="item-1" />
-            <div style={{ minHeight: 500 }} />
-            <div id="item-2" />
-            <div style={{ minHeight: 500 }} />
-            <div id="item-2-1" />
-            <div style={{ minHeight: 500 }} />
-            <div id="item-3" />
-            <div style={{ minHeight: 500 }} />
-            <div id="item-none" />
-          </SiteContext.Provider>
-        </RouterContext.Provider>
+        <ThemeProvider theme={theme}>
+          <RouterContext.Provider value={router}>
+            <SiteContext.Provider value={config}>
+              <NavHtmlToc htmlToc={htmlToc} />
+              <div id="item-1" />
+              <div style={{ minHeight: 500 }} />
+              <div id="item-2" />
+              <div style={{ minHeight: 500 }} />
+              <div id="item-2-1" />
+              <div style={{ minHeight: 500 }} />
+              <div id="item-3" />
+              <div style={{ minHeight: 500 }} />
+              <div id="item-none" />
+            </SiteContext.Provider>
+          </RouterContext.Provider>
+        </ThemeProvider>
       );
       const rootNav = getByRole('navigation');
       expect(rootNav).toBeInTheDocument();

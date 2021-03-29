@@ -117,7 +117,7 @@ const useStyles = makeStyles((theme) => ({
   'Layout-section-root': {
     height: '100%',
     padding: theme.spacing(1, 0),
-    backgroundColor: theme.palette.grey[300],
+    backgroundColor: theme.palette.content.background.main,
     width: '100%',
     [theme.breakpoints.up('md')]: {
       padding: theme.spacing(1, 1)
