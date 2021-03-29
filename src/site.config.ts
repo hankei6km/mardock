@@ -10,6 +10,7 @@ type SiteConfig = {
   nav: {
     main: { label: string; href: string }[];
     breadcrumbs: { [key: string]: { label: string; href: string }[] };
+    htmlToc: { label: string };
   };
 };
 
@@ -38,6 +39,9 @@ const siteConfig: SiteConfig = {
         { label: 'Home', href: '/' },
         { label: 'About', href: '/about' }
       ]
+    },
+    htmlToc: {
+      label: '目次'
     }
   }
 };

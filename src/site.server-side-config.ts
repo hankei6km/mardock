@@ -4,7 +4,6 @@ import { ConfigImageSource } from './site.config';
 // ブラウザでは使わない or 見せたくない項目(セキュリティ的にの他にサイズ的な等
 type SiteServerSideConfig = {
   allIdsLimit: number;
-  tocTitleLabel: string;
   // ビルド時のファイルシステムのパス.
   //  プロジェクトルート起点の相対パスで指定.
   assets: {
@@ -30,7 +29,6 @@ type SiteServerSideConfig = {
 const siteServerSideConfig: SiteServerSideConfig = {
   // id が 1件で 40byte  と想定、 content-length が 5M 程度とのことなので、1000*1000*5 / 40 で余裕を見て決めた値。
   allIdsLimit: 120000,
-  tocTitleLabel: '目次',
   assets: {
     imagesPath: join('public', 'assets', 'images')
   },

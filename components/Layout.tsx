@@ -1,4 +1,4 @@
-import React, { ReactNode, useContext, useEffect, useState } from 'react';
+import React, { ReactNode, useContext, useState } from 'react';
 // import { useRouter } from 'next/router';
 import { makeStyles } from '@material-ui/core';
 // import NoSsr from '@material-ui/core/NoSsr';
@@ -115,13 +115,19 @@ const useStyles = makeStyles((theme) => ({
     marginBottom: theme.spacing(1)
   },
   'Layout-section-root': {
+    height: '100%',
+    padding: theme.spacing(1, 0),
+    backgroundColor: theme.palette.grey[300],
+    width: '100%',
+    [theme.breakpoints.up('md')]: {
+      padding: theme.spacing(1, 1)
+    }
+  },
+  'Layout-body': {
     display: 'flex',
     flexDirection: 'column',
     alignItems: 'center',
     height: '100%',
-    padding: theme.spacing(1, 0),
-    paddingBottom: theme.spacing(0.5),
-    backgroundColor: theme.palette.grey[300],
     [theme.breakpoints.up('md')]: {
       flexDirection: 'row',
       justifyContent: 'center',
@@ -130,10 +136,10 @@ const useStyles = makeStyles((theme) => ({
     width: '100%'
   },
   'Layout-section-top': {
-    width: 200
+    width: 300
   },
   'Layout-section-bottom': {
-    width: 200
+    width: 300
   },
   'Layout-section': {
     flexGrow: 1,
@@ -169,46 +175,6 @@ const useStyles = makeStyles((theme) => ({
       textDecorationLine: 'none',
       '&:hover': {
         textDecorationLine: 'underline'
-      }
-    },
-    '& article > .tocContainer': {
-      padding: theme.spacing(2),
-      // backgroundColor: theme.palette.divider,
-      // backgroundColor: theme.palette.primary.main,
-      border: `1px solid ${theme.palette.primary.main}`,
-      borderRadius: theme.shape.borderRadius,
-      '& .tocTitle': {
-        margin: theme.spacing(0, 0.5),
-        // marginTop: theme.spacing(0.5),
-        // marginBottom: theme.spacing(0.5),
-        // paddingLeft: theme.spacing(1),
-        paddingBottom: theme.spacing(1),
-        borderBottom: `1px solid ${theme.palette.divider}`,
-        ...theme.typography.body1
-      },
-      // '&  ul': {
-      //   listStyle: 'none'
-      // },
-      // '& ul li::before': {
-      //   content: '\u200B'
-      // },
-      '& > nav > ul': {
-        color: theme.palette.primary.main,
-        paddingLeft: theme.spacing(3),
-        paddingRight: theme.spacing(1),
-        '& ul': {
-          paddingLeft: theme.spacing(2)
-        }
-      },
-      '& .tocItem': {
-        marginTop: theme.spacing(1),
-        '& > a': {
-          color: theme.palette.primary.main,
-          textDecorationLine: 'none',
-          '&:hover': {
-            textDecorationLine: 'underline'
-          }
-        }
       }
     },
     '& article > p > img, article > p > a > img': {
@@ -322,35 +288,6 @@ const Layout = ({
       ? `${title} | static slide site`
       : `${title} | mardock | static slide site`;
   const ogImageUrl = mainVisual ? `${mainVisual}?${ogImageParamsStr}` : '';
-  useEffect(() => {
-    const handleClick = (e: Event) => {
-      const a = e.target as HTMLAnchorElement;
-      const to = document.querySelector(`${a.dataset['scrollTo']}`);
-      if (to) {
-        e.preventDefault();
-        window.history.pushState({}, '', `${a.dataset['scrollTo']}`);
-        // router.push(
-        //   {
-        //     path: router.asPath,
-        //     hash: `${a.dataset['scrollTo']}`,
-        //     query: router.query
-        //   },
-        //   undefined,
-        //   { scroll: false, shallow: false }
-        // );
-        to.scrollIntoView({ behavior: 'smooth' });
-      }
-    };
-    const a = document.querySelectorAll('.tocItem > a');
-    a.forEach((v) => {
-      v.addEventListener('click', handleClick, { capture: false });
-    });
-    return () => {
-      a.forEach((v) => {
-        v.removeEventListener('click', handleClick, { capture: false });
-      });
-    };
-  }, []);
   // header footer は https://github.com/hankei6km/my-starter-nextjs-typescript-material-ui-micro-cms-aspida に outer で記述だが、
   // 今回は直接記述.
   return (
@@ -424,35 +361,39 @@ const Layout = ({
         </Container>
       </AppBar>
       <Box className={classes['Layout-section-root']}>
-        {topSection && (
-          <Box component="section" className={classes['Layout-section-top']}>
-            {topSection}
-          </Box>
-        )}
         <Container
-          component="section"
           maxWidth={maxWidth}
           disableGutters
-          className={classes['Layout-section']}
+          className={classes['Layout-body']}
         >
-          <>
-            <Typography component="h2">{articleTitle}</Typography>
-            {apiName === 'deck' && (
-              <DateUpdated updated={updated} classes={classes} />
-            )}
-            <article
-              dangerouslySetInnerHTML={{
-                __html: html
-              }}
-            ></article>
-            {children}
-          </>
-        </Container>
-        {bottomSection && (
-          <Box component="section" className={classes['Layout-section-bottom']}>
-            {bottomSection}
+          {topSection && (
+            <Box component="section" className={classes['Layout-section-top']}>
+              {topSection}
+            </Box>
+          )}
+          <Box component="section" className={classes['Layout-section']}>
+            <>
+              <Typography component="h2">{articleTitle}</Typography>
+              {apiName === 'deck' && (
+                <DateUpdated updated={updated} classes={classes} />
+              )}
+              <article
+                dangerouslySetInnerHTML={{
+                  __html: html
+                }}
+              ></article>
+              {children}
+            </>
           </Box>
-        )}
+          {bottomSection && (
+            <Box
+              component="section"
+              className={classes['Layout-section-bottom']}
+            >
+              {bottomSection}
+            </Box>
+          )}
+        </Container>
       </Box>
       <footer className={classes.footer}>
         <Container maxWidth={maxWidth} disableGutters>
