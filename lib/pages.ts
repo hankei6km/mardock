@@ -24,13 +24,7 @@ import siteServerSideConfig from '../src/site.server-side-config';
 import { applyPreviewDataToIdQuery } from './preview';
 import { getArticleData } from './html';
 import { textLintInHtml } from './draftlint';
-import {
-  rewrite,
-  rewriteEmbed,
-  rewriteCode,
-  rewriteImg,
-  rewriteToc
-} from './rewrite';
+import { rewrite, rewriteEmbed, rewriteCode, rewriteImg } from './rewrite';
 import { ApiNameArticle } from '../types/apiName';
 import {
   paginationIdsFromPageCount,
@@ -238,7 +232,7 @@ export async function getPagesData(
       query: query,
       config: fetchConfig
     });
-    const { articleTitle, html } = getArticleData(
+    const { articleTitle, html, htmlToc } = getArticleData(
       res.title,
       res.html || ''
     );
@@ -254,9 +248,9 @@ export async function getPagesData(
       category: apiName !== 'pages' ? res.category || [] : [],
       curCategory: options.curCategory || '',
       articleTitle,
+      htmlToc: htmlToc,
       html: await rewrite(html)
         .use(rewriteImg())
-        .use(rewriteToc(siteServerSideConfig.tocTitleLabel))
         .use(rewriteEmbed())
         .use(rewriteCode())
         .run(),
