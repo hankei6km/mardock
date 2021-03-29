@@ -100,6 +100,7 @@ const ListItem = ({
               >
                 {deck.items.map(({ html }) => (
                   <Link
+                    key={itemId}
                     href={join(itemPath, '[id]')}
                     as={join(itemPath, itemId)}
                     // article を link でラップはあり?
