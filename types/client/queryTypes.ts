@@ -16,7 +16,7 @@ export type GetQuery = {
 export type GetContentQuery = {
   draftKey?: string;
   fields:
-    | 'id,createdAt,updatedAt,publishedAt,revisedAt,title,html,source,category,mainVisual,description'
+    | 'id,createdAt,updatedAt,publishedAt,revisedAt,title,content,source,category,mainVisual,description'
     | 'id,createdAt,updatedAt,publishedAt,revisedAt,title,source,category,mainVisual,description';
   // fields?: string;
   // depth?: number;
@@ -28,5 +28,5 @@ export type GetFieldsIdQuery = {
 
 export type GetPagesItemQuery = {
   // 今回はリストもすべて受信
-  fields: 'id,createdAt,updatedAt,publishedAt,revisedAt,title,html,source,category,mainVisual';
+  fields: 'id,createdAt,updatedAt,publishedAt,revisedAt,title,content,source,category,mainVisual';
 } & GetQuery;

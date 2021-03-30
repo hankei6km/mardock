@@ -1,5 +1,62 @@
+import unified, { Processor, FrozenProcessor } from 'unified';
+import rehypeParse from 'rehype-parse';
+import rehypeMinifyWhitespace from 'rehype-minify-whitespace';
+import rehypeStringify from 'rehype-stringify';
+import rehypeSanitize from 'rehype-sanitize';
+import merge from 'deepmerge';
+import gh from 'hast-util-sanitize/lib/github.json';
+import { Schema } from 'hast-util-sanitize';
 import cheerio from 'cheerio';
 import { TocItems, HtmlToc } from '../types/pageTypes';
+import { processorMarkdownToHtml } from './markdown';
+
+export function processorHtml() {
+  return unified().use(rehypeParse, { fragment: true });
+}
+
+const schema = merge(gh, {
+  tagNames: ['picture', 'source', 'iframe'],
+  attributes: {
+    source: ['srcSet', 'sizes'],
+    img: ['alt', 'srcSet', 'sizes', 'className'],
+    code: ['className'],
+    span: ['className','style'],
+    iframe: [
+      'height',
+      'style',
+      'scrolling',
+      'title',
+      'src',
+      'frameborder',
+      'loading',
+      'allowtransparency',
+      'allowfullscreen'
+    ]
+  }
+});
+
+function normalizeProcessor(processor: Processor): FrozenProcessor {
+  return processor
+    .use(rehypeMinifyWhitespace)
+    .use(rehypeSanitize, (schema as unknown) as Schema)
+    .use(rehypeStringify)
+    .freeze();
+}
+
+export async function normalizedHtml(
+  processor: Processor,
+  html: string
+): Promise<string> {
+  return await new Promise((resolve, reject) => {
+    normalizeProcessor(processor).process(html, (err, file) => {
+      if (err) {
+        console.error(err);
+        reject(err);
+      }
+      resolve(String(file));
+    });
+  });
+}
 
 export function splitStrToParagraph($: cheerio.Root): string {
   $('body')
@@ -126,6 +183,40 @@ export function getArticleData(
   html: string;
 } {
   const $ = cheerio.load(html);
+  splitStrToParagraph($);
+  const h1 = $('body h1:first');
+  if (h1.length === 0) {
+    adjustHeading($);
+    return {
+      articleTitle: title,
+      htmlToc: {
+        items: htmlToc($)
+      },
+      html: $('body').html() || ''
+    };
+  }
+  h1.remove();
+  adjustHeading($);
+  return {
+    articleTitle: $(h1[0]).html() || '',
+    htmlToc: {
+      items: htmlToc($)
+    },
+    html: $('body').html() || ''
+  };
+}
+
+export async function getArticleDataFromContent(
+  title: string,
+  content: string
+): Promise<{
+  articleTitle: string;
+  htmlToc: HtmlToc;
+  html: string;
+}> {
+  const $ = cheerio.load(
+    await normalizedHtml(processorMarkdownToHtml(), content)
+  );
   splitStrToParagraph($);
   const h1 = $('body h1:first');
   if (h1.length === 0) {

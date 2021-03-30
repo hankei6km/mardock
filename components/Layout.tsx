@@ -236,6 +236,9 @@ const useStyles = makeStyles((theme) => ({
         paddingLeft: theme.spacing(4)
       }
     },
+    '& article pre > code': {
+      fontSize: theme.typography.body1.fontSize,
+    },
     '& article :not(pre) > code': {
       padding: '.2em .4em',
       margin: 0,
