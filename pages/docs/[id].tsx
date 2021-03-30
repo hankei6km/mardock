@@ -4,16 +4,25 @@ import { GetStaticProps, GetStaticPaths } from 'next';
 import ErrorPage from 'next/error';
 // import { makeStyles } from '@material-ui/core';
 import Layout from '../../components/Layout';
+import ListDocs from '../../components/ListDocs';
 import Link from '../../components/Link';
 import NavHtmlToc from '../../components/NavHtmlToc';
-import { PageData } from '../../types/pageTypes';
-import { getAllPagesIds, getPagesData } from '../../lib/pages';
+import { PageData, IndexList } from '../../types/pageTypes';
+import { GetQuery } from '../../types/client/queryTypes';
+import {
+  getSortedIndexData,
+  getAllPagesIds,
+  getPagesData
+} from '../../lib/pages';
+
+const itemsPerPage = 10;
 
 type Props = {
   pageData: PageData;
+  items: IndexList;
 };
 
-export default function Docs({ pageData }: Props) {
+export default function Docs({ pageData, items }: Props) {
   // const classes = useStyles();
   // const router = useRouter();
   if (pageData === undefined || !pageData.title) {
@@ -35,6 +44,11 @@ export default function Docs({ pageData }: Props) {
           ''
         )
       }
+      bottomSection={
+        <section>
+          <ListDocs itemPath={'/docs'} items={items} />
+        </section>
+      }
     >
       <Link href="/docs">{'Back to Docs'}</Link>
     </Layout>
@@ -52,10 +66,19 @@ export const getStaticPaths: GetStaticPaths = async () => {
 };
 
 export const getStaticProps: GetStaticProps = async (context) => {
+  const pageNo = 1;
+  const curCategory = '';
   const pageData = await getPagesData('docs', context);
-  return {
-    props: {
-      pageData
+  const q: GetQuery = {};
+  if (itemsPerPage !== undefined) {
+    q.limit = itemsPerPage;
+    if (pageNo !== undefined) {
+      q.offset = itemsPerPage * (pageNo - 1);
     }
-  };
+  }
+  if (curCategory) {
+    q.filters = `category[contains]${curCategory}`;
+  }
+  const items = await getSortedIndexData('docs', q);
+  return { props: { pageData, items } };
 };

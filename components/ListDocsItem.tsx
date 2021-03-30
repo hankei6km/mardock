@@ -73,7 +73,7 @@ const ListDocsItem = ({
 }: Props) => {
   const classes = useStyles({ classes: pruneClasses(inClasses, classNames) });
   return (
-    <Box className={classes['ListDocsItem-root']}>
+    <Box component="li" className={classes['ListDocsItem-root']}>
       <Box className={classes['ListDocsItem-thumb']}>
         <img
           src={mainVisual.url}

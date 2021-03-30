@@ -7,17 +7,12 @@ import ListDocsItem from './ListDocsItem';
 
 const useStyles = makeStyles((theme) => ({
   'ListDocs-root': {
-    justifyContent: 'space-between'
-  },
-  'ListDocs-thumb-outer': {
-    width: '100%',
-    [theme.breakpoints.up('sm')]: {
-      width: '49%'
-    },
-    [theme.breakpoints.up('md')]: {
-      width: '32%'
+    margin: 0,
+    padding: theme.spacing(0, 1),
+    listStyle: 'none',
+    '& li::before': {
+      content: '\u200B'
     }
-    // aspectRatio: '16 / 9' // Props で指定させる?
   }
 }));
 const classNames = ['ListDocs-root'];
@@ -33,7 +28,7 @@ type Props = {
 const ListDocs = ({ itemPath, items, classes: inClasses }: Props) => {
   const classes = useStyles({ classes: pruneClasses(inClasses, classNames) });
   return (
-    <Box className={classes['ListDocs-root']}>
+    <Box component="ul" className={classes['ListDocs-root']}>
       {items.contents.map((item) => (
         <ListDocsItem
           itemId={item.id}

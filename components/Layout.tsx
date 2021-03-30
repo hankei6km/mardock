@@ -141,27 +141,28 @@ const useStyles = makeStyles((theme) => ({
   'Layout-body': {
     display: 'flex',
     flexDirection: 'column',
-    flexWrap: 'wrap',
-    alignItems: 'center',
-    height: '100%',
     [theme.breakpoints.up('md')]: {
-      flexDirection: 'row',
-      justifyContent: 'center',
-      alignItems: 'start'
-    },
-    width: '100%'
+      display: 'grid',
+      gridGap: theme.spacing(1),
+      gridTemplateColumns: 'repeat(11, 1fr)',
+      gridTemplateRows: 'minmax(200px, auto)',
+      gridTemplateAreas:
+        '"top top main main main main main main bot bot bot"' +
+        '"top top main main main main main main bot bot bot"'
+    }
   },
   'Layout-section-top': {
-    order: 0,
-    width: '100%',
-    paddingLeft: theme.spacing(1),
-    paddingRight: theme.spacing(1),
+    gridArea: 'top',
+    [theme.breakpoints.up('md')]: {
+      zIndex: 2
+      // position: 'fixed',
+      // top: 110
+    }
+  },
+  'Layout-section-top-inner': {
     [theme.breakpoints.up('md')]: {
       position: 'sticky',
-      top: 80,
-      display: 'block',
-      order: 1,
-      flexBasis: '25%'
+      top: 110
     }
   },
   'Layout-section-top-persist': {},
@@ -172,23 +173,21 @@ const useStyles = makeStyles((theme) => ({
     }
   },
   'Layout-section-bottom': {
-    order: 2,
-    width: '100%',
-    paddingLeft: theme.spacing(1),
-    paddingRight: theme.spacing(1),
+    gridArea: 'bot',
     [theme.breakpoints.up('md')]: {
-      width: '100%',
-      maxWidth: theme.breakpoints.values['lg']
+      // maxWidth: theme.breakpoints.values['lg']
+      zIndex: 1,
+      height: '100%',
+      '& section': {
+        position: 'sticky',
+        bottom: 0
+      }
     }
   },
   'Layout-section': {
-    flexGrow: 1,
-    order: 1,
-    width: '100%',
-    [theme.breakpoints.up('md')]: {
-      order: 0,
-      flexBasis: '75%'
-    },
+    gridArea: 'main',
+    // width: '100%',
+    [theme.breakpoints.up('md')]: {},
     ...theme.typography.body1,
     paddingLeft: theme.spacing(1),
     paddingRight: theme.spacing(1),
@@ -419,16 +418,18 @@ const Layout = ({
         >
           {(topPersistSection || topSection) && (
             <Box className={classes['Layout-section-top']}>
-              {topPersistSection && (
-                <Box className={classes['Layout-section-top-persist']}>
-                  {topPersistSection}
-                </Box>
-              )}
-              {topSection && (
-                <Box className={classes['Layout-section-top-not-persist']}>
-                  {topSection}
-                </Box>
-              )}
+              <Box className={classes['Layout-section-top-inner']}>
+                {topPersistSection && (
+                  <Box className={classes['Layout-section-top-persist']}>
+                    {topPersistSection}
+                  </Box>
+                )}
+                {topSection && (
+                  <Box className={classes['Layout-section-top-not-persist']}>
+                    {topSection}
+                  </Box>
+                )}
+              </Box>
             </Box>
           )}
           <Box component="section" className={classes['Layout-section']}>
