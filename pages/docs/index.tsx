@@ -25,7 +25,7 @@ const DocsPage = ({ pageData, items }: Props) => {
       apiName={'pages'}
       {...pageData}
       notification={pageData.notification}
-      topSection={
+      bottomSection={
         <section>
           <ListDocs itemPath={'/docs'} items={items} />
         </section>

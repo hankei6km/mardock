@@ -21,6 +21,7 @@ import Link from './Link';
 import NavMain from './NavMain';
 import NavBreadcrumbs from './NavBreadcrumbs';
 import DateUpdated from './DateUpdated';
+import { gridTempalteAreasFromLayout } from '../utils/grid';
 
 const useStyles = makeStyles((theme) => ({
   'Header-root': {
@@ -114,13 +115,7 @@ const useStyles = makeStyles((theme) => ({
     marginTop: theme.spacing(1),
     marginBottom: theme.spacing(1)
   },
-  'Layout-section-root': ({
-    apiName,
-    id
-  }: {
-    apiName: ApiNameArticle;
-    id: string;
-  }) => {
+  'Layout-section-root': ({ apiName, id }: Props) => {
     let backgroundColor = theme.palette.content.background.default.main;
     if (apiName === 'pages' && id === 'home') {
       backgroundColor = theme.palette.content.background.home.main;
@@ -138,7 +133,7 @@ const useStyles = makeStyles((theme) => ({
       }
     };
   },
-  'Layout-body': {
+  'Layout-body': ({ topPersistSection, topSection, bottomSection }: Props) => ({
     display: 'flex',
     flexDirection: 'column',
     [theme.breakpoints.up('md')]: {
@@ -146,11 +141,18 @@ const useStyles = makeStyles((theme) => ({
       gridGap: theme.spacing(1),
       gridTemplateColumns: 'repeat(11, 1fr)',
       gridTemplateRows: 'minmax(200px, auto)',
-      gridTemplateAreas:
-        '"top top main main main main main main bot bot bot"' +
-        '"top top main main main main main main bot bot bot"'
+      gridTemplateAreas: gridTempalteAreasFromLayout({
+        top: topPersistSection || topSection,
+        main: true,
+        bottom: bottomSection
+      })
+      // '"top main"' +
+      // '"bottom main"'
+      // こうしたかったが、top と bottom をまとめて sticky にする方法が思いつかなかった.:
+      // いまのレイアウトだとここだけ grid にする意味もないが、
+      // 思いついたときように残しておく。
     }
-  },
+  }),
   'Layout-section-top': {
     gridArea: 'top',
     [theme.breakpoints.up('md')]: {
@@ -325,7 +327,10 @@ const Layout = ({
 }: Props) => {
   const classes = useStyles({
     apiName,
-    id: id || ''
+    id: id || '',
+    topSection,
+    topPersistSection,
+    bottomSection
   });
   const { siteName, siteIcon } = useContext(SiteContext);
   const [navOpen, setNavOpen] = useState(false);
