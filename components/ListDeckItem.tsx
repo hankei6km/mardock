@@ -17,7 +17,7 @@ import { DeckData } from '../types/pageTypes';
 import Carousel from 'react-material-ui-carousel';
 
 const useStyles = makeStyles((theme) => ({
-  'ListItem-thumb-outer': {
+  'ListDeckItem-thumb-outer': {
     width: '100%',
     [theme.breakpoints.up('sm')]: {
       width: '49%'
@@ -27,7 +27,7 @@ const useStyles = makeStyles((theme) => ({
     }
     // aspectRatio: '16 / 9' // Props で指定させる?
   },
-  'ListItem-card-root': {
+  'ListDeckItem-card-root': {
     marginBottom: theme.spacing(1),
     '& .MuiCardContent-root ': {
       padding: theme.spacing(0.5, 1)
@@ -42,7 +42,7 @@ const useStyles = makeStyles((theme) => ({
       marginRight: theme.spacing(1)
     }
   },
-  'ListItem-thumb': {
+  'ListDeckItem-thumb': {
     '& .slide': {
       objectFit: 'cover',
       objectPosition: '50% 50%',
@@ -55,9 +55,9 @@ const useStyles = makeStyles((theme) => ({
   }
 }));
 const classNames = [
-  'ListItem-thumb-outer',
-  'ListItem-card-root',
-  'ListItem-thumb'
+  'ListDeckItem-thumb-outer',
+  'ListDeckItem-card-root',
+  'ListDeckItem-thumb'
 ];
 
 type Props = {
@@ -69,7 +69,7 @@ type Props = {
   classes?: { [key: string]: string };
 };
 // } & { width: Breakpoint };
-const ListItem = ({
+const ListDeckItem = ({
   itemId,
   title,
   itemPath,
@@ -82,8 +82,8 @@ const ListItem = ({
     // GridList と同一の関数でないと(どういう表現が適切?)、cols 関連の設定が無視される.
     // その代わりに GridListTile の幅にあわせて row が break する.
     // この方が使いやすいのだが、バグではないよね
-    <GridListTile cols={1} className={classes['ListItem-thumb-outer']}>
-      <Card className={classes['ListItem-card-root']} raised>
+    <GridListTile cols={1} className={classes['ListDeckItem-thumb-outer']}>
+      <Card className={classes['ListDeckItem-card-root']} raised>
         <CardMedia>
           {deck.items[0] ? (
             <>
@@ -108,7 +108,7 @@ const ListItem = ({
                     <article
                       key={deck.id}
                       id={deck.id}
-                      className={classes['ListItem-thumb']}
+                      className={classes['ListDeckItem-thumb']}
                     >
                       <div className="slides">
                         <div
@@ -160,4 +160,4 @@ const ListItem = ({
   );
 };
 
-export default ListItem;
+export default ListDeckItem;

@@ -55,7 +55,7 @@ describe('NavHtmlToc', () => {
       ]
     };
     await act(async () => {
-      const { unmount, getByRole, getByText } = render(
+      const { unmount, getByText } = render(
         <ThemeProvider theme={theme}>
           <RouterContext.Provider value={router}>
             <SiteContext.Provider value={config}>
@@ -73,8 +73,6 @@ describe('NavHtmlToc', () => {
           </RouterContext.Provider>
         </ThemeProvider>
       );
-      const rootNav = getByRole('navigation');
-      expect(rootNav).toBeInTheDocument();
       const label = getByText('目次');
       expect(label).toBeInTheDocument();
       const active = getByText('item-1');

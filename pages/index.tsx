@@ -2,7 +2,7 @@ import { GetStaticProps } from 'next';
 import ErrorPage from 'next/error';
 // import { makeStyles } from '@material-ui/core';
 import Layout from '../components/Layout';
-import List from '../components/List';
+import ListDeck from '../components/ListDeck';
 import NavHtmlToc from '../components/NavHtmlToc';
 // import Typography from '@material-ui/core/Typography';
 import { PageData, IndexList } from '../types/pageTypes';
@@ -23,16 +23,20 @@ const IndexPage = ({ pageData, items }: Props) => {
       apiName={'pages'}
       {...pageData}
       notification={pageData.notification}
-      topSection={
+      topPersistSection={
         pageData.htmlToc.items.length > 1 ? (
-          <NavHtmlToc htmlToc={pageData.htmlToc} />
+          <aside>
+            <section>
+              <NavHtmlToc htmlToc={pageData.htmlToc} />
+            </section>
+          </aside>
         ) : (
           ''
         )
       }
     >
       <section>
-        <List itemPath={'/deck'} items={items} />
+        <ListDeck itemPath={'/deck'} items={items} />
       </section>
     </Layout>
   );

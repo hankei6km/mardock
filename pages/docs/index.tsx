@@ -1,7 +1,7 @@
 import { GetStaticProps } from 'next';
 import ErrorPage from 'next/error';
 import Layout from '../../components/Layout';
-import ListDeck from '../../components/ListDeck';
+import ListDocs from '../../components/ListDocs';
 // import Typography from '@material-ui/core/Typography';
 import { PageData, IndexList } from '../../types/pageTypes';
 import { getPagesData, getSortedIndexData } from '../../lib/pages';
@@ -16,40 +16,30 @@ type Props = {
   items: IndexList;
 };
 
-const DeckPage = ({ pageData, items }: Props) => {
+const DocsPage = ({ pageData, items }: Props) => {
   if (pageData === undefined || !pageData.title) {
     return <ErrorPage statusCode={404} />;
   }
   return (
     <Layout
       apiName={'pages'}
-      // topSection={
-      //   <NavCategory
-      //     all
-      //     categoryPath="/deck/category"
-      //     allCategory={pageData.allCategory}
-      //     category={pageData.category}
-      //     classes={classes}
-      //   />
-      // }
       {...pageData}
       notification={pageData.notification}
+      bottomSection={
+        <section>
+          <ListDocs itemPath={'/docs'} items={items} />
+        </section>
+      }
     >
       <section>
-        <ListDeck
-          itemPath={'/deck'}
-          items={items}
-          cols={[1, 1]}
-          imgWidth={600}
-        />
         <NavPagination
           pageNo={pageData.pageNo}
           pageCount={pageData.pageCount}
           curCategory={pageData.curCategory}
-          paginationHref={'/deck/page/[..id]'}
-          paginationBaseAs={'/deck/page'}
+          paginationHref={'/docs/page/[..id]'}
+          paginationBaseAs={'/docs/page'}
           paginationPagePath={pagePath}
-          paginationFirstPageHref={'/deck'}
+          paginationFirstPageHref={'/docs'}
         />
       </section>
     </Layout>
@@ -63,7 +53,7 @@ export const getStaticProps: GetStaticProps = async (context) => {
     'pages',
     {
       ...context,
-      params: { id: 'deck' }
+      params: { id: 'docs' }
     },
     {
       pageNo,
@@ -81,8 +71,8 @@ export const getStaticProps: GetStaticProps = async (context) => {
   if (curCategory) {
     q.filters = `category[contains]${curCategory}`;
   }
-  const items = await getSortedIndexData('deck', q);
+  const items = await getSortedIndexData('docs', q);
   return { props: { pageData, items } };
 };
 
-export default DeckPage;
+export default DocsPage;

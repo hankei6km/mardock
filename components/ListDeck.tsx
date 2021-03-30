@@ -3,14 +3,14 @@ import { makeStyles } from '@material-ui/core';
 import GridList from '@material-ui/core/GridList';
 import { pruneClasses } from '../utils/classes';
 import { IndexList } from '../types/pageTypes';
-import ListItem from './ListItem';
+import ListDeckItem from './ListDeckItem';
 
 const useStyles = makeStyles((theme) => ({
-  'List-root': {
+  'ListDeck-root': {
     justifyContent: 'space-between',
     gridRowGap: theme.spacing(1)
   },
-  'List-thumb-outer': {
+  'ListDeck-thumb-outer': {
     width: '100%',
     [theme.breakpoints.up('sm')]: {
       width: '49%'
@@ -21,7 +21,7 @@ const useStyles = makeStyles((theme) => ({
     // aspectRatio: '16 / 9' // Props で指定させる?
   }
 }));
-const classNames = ['List-root'];
+const classNames = ['ListDeck-root'];
 
 type Props = {
   itemPath: string;
@@ -31,7 +31,7 @@ type Props = {
   imgWidth?: number;
   classes?: { [key: string]: string };
 };
-const List = ({
+const ListDeck = ({
   itemPath,
   items,
   cellHeight = 'auto',
@@ -47,24 +47,22 @@ const List = ({
       // style で display none で切り替える?
       // cols={isWidthUp('sm', width) ? cols[0] : cols[1]}
       cols={cols[0]}
-      className={classes['List-root']}
+      className={classes['ListDeck-root']}
     >
-      {items.contents.map((item) => {
+      {items.contents.map((item) => (
         // if (item.mainVisual) {
         //   src = `${item.mainVisual.url}?${q.toString()}`;
         // }
-        return (
-          <ListItem
-            itemId={item.id}
-            title={item.title}
-            key={item.id}
-            itemPath={itemPath}
-            category={item.category}
-            deck={item.deck}
-            classes={classes}
-          />
-        );
-      })}
+        <ListDeckItem
+          itemId={item.id}
+          title={item.title}
+          key={item.id}
+          itemPath={itemPath}
+          category={item.category}
+          deck={item.deck}
+          classes={classes}
+        />
+      ))}
     </GridList>
   );
 };
@@ -72,4 +70,4 @@ const List = ({
 // サイズを指定しておかないとレイアウトシフトがおきる.
 // 一旦保留.
 // export default withWidth()(List);
-export default List;
+export default ListDeck;

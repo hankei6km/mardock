@@ -21,6 +21,7 @@ import Link from './Link';
 import NavMain from './NavMain';
 import NavBreadcrumbs from './NavBreadcrumbs';
 import DateUpdated from './DateUpdated';
+import { gridTempalteAreasFromLayout } from '../utils/grid';
 
 const useStyles = makeStyles((theme) => ({
   'Header-root': {
@@ -114,38 +115,56 @@ const useStyles = makeStyles((theme) => ({
     marginTop: theme.spacing(1),
     marginBottom: theme.spacing(1)
   },
-  'Layout-section-root': {
-    height: '100%',
-    padding: theme.spacing(1, 0),
-    backgroundColor: theme.palette.content.background.main,
-    width: '100%',
-    [theme.breakpoints.up('md')]: {
-      padding: theme.spacing(1, 1)
+  'Layout-section-root': ({ apiName, id }: Props) => {
+    let backgroundColor = theme.palette.content.background.default.main;
+    if (apiName === 'pages' && id === 'home') {
+      backgroundColor = theme.palette.content.background.home.main;
     }
+    if (apiName === 'pages' && id === 'deck') {
+      backgroundColor = theme.palette.content.background.deck.main;
+    }
+    return {
+      height: '100%',
+      padding: theme.spacing(1, 0),
+      backgroundColor,
+      width: '100%',
+      [theme.breakpoints.up('md')]: {
+        padding: theme.spacing(1, 1)
+      }
+    };
   },
-  'Layout-body': {
+  'Layout-body': ({ topPersistSection, topSection, bottomSection }: Props) => ({
     display: 'flex',
     flexDirection: 'column',
-    flexWrap: 'wrap',
-    alignItems: 'center',
-    height: '100%',
     [theme.breakpoints.up('md')]: {
-      flexDirection: 'row',
-      justifyContent: 'center',
-      alignItems: 'start'
-    },
-    width: '100%'
-  },
+      display: 'grid',
+      gridGap: theme.spacing(1),
+      gridTemplateColumns: 'repeat(11, 1fr)',
+      gridTemplateRows: 'minmax(200px, auto)',
+      gridTemplateAreas: gridTempalteAreasFromLayout({
+        top: topPersistSection || topSection,
+        main: true,
+        bottom: bottomSection
+      })
+      // '"top main"' +
+      // '"bottom main"'
+      // こうしたかったが、top と bottom をまとめて sticky にする方法が思いつかなかった.:
+      // いまのレイアウトだとここだけ grid にする意味もないが、
+      // 思いついたときように残しておく。
+    }
+  }),
   'Layout-section-top': {
-    order: 0,
-    paddingLeft: theme.spacing(1),
-    paddingRight: theme.spacing(1),
+    gridArea: 'top',
+    [theme.breakpoints.up('md')]: {
+      zIndex: 2
+      // position: 'fixed',
+      // top: 110
+    }
+  },
+  'Layout-section-top-inner': {
     [theme.breakpoints.up('md')]: {
       position: 'sticky',
-      top: 80,
-      display: 'block',
-      order: 1,
-      flexBasis: '25%'
+      top: 110
     }
   },
   'Layout-section-top-persist': {},
@@ -156,22 +175,21 @@ const useStyles = makeStyles((theme) => ({
     }
   },
   'Layout-section-bottom': {
-    order: 2,
-    paddingLeft: theme.spacing(1),
-    paddingRight: theme.spacing(1),
+    gridArea: 'bot',
     [theme.breakpoints.up('md')]: {
-      width: '100%',
-      maxWidth: theme.breakpoints.values['lg']
+      // maxWidth: theme.breakpoints.values['lg']
+      zIndex: 1,
+      height: '100%',
+      '& section': {
+        position: 'sticky',
+        bottom: 0
+      }
     }
   },
   'Layout-section': {
-    flexGrow: 1,
-    order: 1,
-    width: '100%',
-    [theme.breakpoints.up('md')]: {
-      order: 0,
-      flexBasis: '75%'
-    },
+    gridArea: 'main',
+    // width: '100%',
+    [theme.breakpoints.up('md')]: {},
     ...theme.typography.body1,
     paddingLeft: theme.spacing(1),
     paddingRight: theme.spacing(1),
@@ -307,7 +325,13 @@ const Layout = ({
   mainVisual = { url: '', width: 0, height: 0 },
   notification
 }: Props) => {
-  const classes = useStyles();
+  const classes = useStyles({
+    apiName,
+    id: id || '',
+    topSection,
+    topPersistSection,
+    bottomSection
+  });
   const { siteName, siteIcon } = useContext(SiteContext);
   const [navOpen, setNavOpen] = useState(false);
   const maxWidth = 'lg';
@@ -383,7 +407,7 @@ const Layout = ({
                 />
               </Box>
             </Box>
-            {apiName === 'deck' && (
+            {(apiName === 'deck' || apiName === 'docs') && (
               <Box className={classes['NavBreadcrumbs-outer']}>
                 <NavBreadcrumbs lastBreadcrumb={title} classes={classes} />
               </Box>
@@ -399,22 +423,18 @@ const Layout = ({
         >
           {(topPersistSection || topSection) && (
             <Box className={classes['Layout-section-top']}>
-              {topPersistSection && (
-                <Box
-                  component="section"
-                  className={classes['Layout-section-top-persist']}
-                >
-                  {topPersistSection}
-                </Box>
-              )}
-              {topSection && (
-                <Box
-                  component="section"
-                  className={classes['Layout-section-top-not-persist']}
-                >
-                  {topSection}
-                </Box>
-              )}
+              <Box className={classes['Layout-section-top-inner']}>
+                {topPersistSection && (
+                  <Box className={classes['Layout-section-top-persist']}>
+                    {topPersistSection}
+                  </Box>
+                )}
+                {topSection && (
+                  <Box className={classes['Layout-section-top-not-persist']}>
+                    {topSection}
+                  </Box>
+                )}
+              </Box>
             </Box>
           )}
           <Box component="section" className={classes['Layout-section']}>
@@ -432,10 +452,7 @@ const Layout = ({
             </>
           </Box>
           {bottomSection && (
-            <Box
-              component="section"
-              className={classes['Layout-section-bottom']}
-            >
+            <Box className={classes['Layout-section-bottom']}>
               {bottomSection}
             </Box>
           )}
