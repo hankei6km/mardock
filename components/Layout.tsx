@@ -156,8 +156,10 @@ const useStyles = makeStyles((theme) => ({
   }),
   'Layout-section-top': {
     gridArea: 'top',
+    padding: theme.spacing(0, 1),
     [theme.breakpoints.up('md')]: {
-      zIndex: 2
+      zIndex: 2,
+      padding: theme.spacing(0)
       // position: 'fixed',
       // top: 110
     }
@@ -177,14 +179,12 @@ const useStyles = makeStyles((theme) => ({
   },
   'Layout-section-bottom': {
     gridArea: 'bot',
+    padding: theme.spacing(0, 1),
     [theme.breakpoints.up('md')]: {
       // maxWidth: theme.breakpoints.values['lg']
       zIndex: 1,
       height: '100%',
-      '& section': {
-        position: 'sticky',
-        bottom: 0
-      }
+      padding: theme.spacing(0)
     }
   },
   'Layout-section': {
