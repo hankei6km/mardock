@@ -11,6 +11,7 @@ import {
 } from '../types/client/contentTypes';
 import { GetQuery, GetContentQuery } from '../types/client/queryTypes';
 import {
+  Notification,
   PageData,
   blankPageData,
   SlideData,
@@ -23,7 +24,7 @@ import {
 import siteServerSideConfig from '../src/site.server-side-config';
 import { applyPreviewDataToIdQuery } from './preview';
 import { getArticleData, getArticleDataFromContent } from './html';
-import { textLintInHtml } from './draftlint';
+import { draftLint } from './draftlint';
 import { rewrite, rewriteEmbed, rewriteImg } from './rewrite';
 import { ApiNameArticle } from '../types/apiName';
 import {
@@ -233,9 +234,22 @@ export async function getPagesData(
       query: query,
       config: fetchConfig
     });
+    let content = res.content || '';
+    let notification: Notification | undefined = undefined; // スイッチ的に動作するのが面白くない
+    if (preview || params.previewDemo === 'true') {
+      const { result, messages, list } = await draftLint(content, '.md');
+      notification = {
+        ...siteServerSideConfig.draft
+      };
+      if (messages.length > 0) {
+        content = result;
+        notification.messageHtml = `${notification.messageHtml}${list}`;
+        notification.serverity = 'warning';
+      }
+    }
     const { articleTitle, html, htmlToc } = await getArticleDataFromContent(
       res.title,
-      res.content || ''
+      content
     );
     const mainVisual = res.mainVisual?.url
       ? res.mainVisual
@@ -266,17 +280,8 @@ export async function getPagesData(
     if (res.source) {
       ret.deck = await slideDeck(res.id, res.source);
     }
-    // params.previewDemo は boolean ではない
-    if (preview || params.previewDemo === 'true') {
-      ret.notification = {
-        ...siteServerSideConfig.draft
-      };
-      const { html, messages, list } = await textLintInHtml(ret.html);
-      if (messages.length > 0) {
-        ret.html = html;
-        ret.notification.messageHtml = `${ret.notification.messageHtml}${list}`;
-        ret.notification.serverity = 'warning';
-      }
+    if (notification) {
+      ret.notification = notification;
     }
     return ret;
   } catch (err) {

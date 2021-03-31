@@ -23,8 +23,8 @@ type InsInfo = {
 };
 type InsInfos = InsInfo[];
 
-type TextLintInHtmlResult = {
-  html: string;
+type DraftLintResult = {
+  result: string;
   messages: MappedMessages;
   list: string;
 };
@@ -70,26 +70,36 @@ export function getInsInfos(html: string, messages: any[]): InsInfos {
   return ret;
 }
 
-export async function textLintInHtml(
-  html: string,
+export async function draftLint(
+  source: string,
+  ext: string,
   options?: TextlintKernelOptions,
-  messageStyle: { [key: string]: string } = { color: 'red' },
-  idPrefix: string = ''
-): Promise<TextLintInHtmlResult> {
-  let ret: TextLintInHtmlResult = { html: '', messages: [], list: '' };
+  messageStyle: { [key: string]: string } = {
+    color: 'red',
+    // https://stackoverflow.com/questions/10732690/offsetting-an-html-anchor-to-adjust-for-fixed-header
+    // https://css-tricks.com/hash-tag-links-padding/
+    'padding-top': '140px',
+    'margin-top': '-140px',
+    display: 'inline-block'
+  },
+  idPrefix: string = '',
+  // https://github.com/syntax-tree/hast-util-sanitize#clobberprefix
+  clobberPrefix: string = 'user-content-'
+): Promise<DraftLintResult> {
+  let ret: DraftLintResult = { result: '', messages: [], list: '' };
 
   // https://github.com/mobilusoss/textlint-browser-runner/tree/master/packages/textlint-bundler
   const kernel = new TextlintKernel();
 
   const results = [
     await kernel.lintText(
-      html,
+      source,
       // todo: options(presets など)は SiteServerSideConfig で定義できるようにする.
-      options || getTextlintKernelOptions()
+      options || getTextlintKernelOptions({ ext })
     )
   ];
   if (results && results.length > 0 && results[0].messages.length > 0) {
-    const insInfos = getInsInfos(html, results[0].messages);
+    const insInfos = getInsInfos(source, results[0].messages);
     const $wrapper = cheerio.load('<span/>')('span');
     Object.entries(messageStyle).forEach(([k, v]) => {
       $wrapper.css(k, v);
@@ -101,7 +111,7 @@ export async function textLintInHtml(
       const insertHtml = $wrapper.html(m.message).parent().html();
       if (m.message && insertHtml) {
         const index = insInfos[i].insIndex + 1;
-        ret.html = `${ret.html}${html.slice(pos, index)}${insertHtml}`;
+        ret.result = `${ret.result}${source.slice(pos, index)}${insertHtml}`;
         pos = index;
         ret.messages.push({
           ruleId: m.ruleId,
@@ -111,7 +121,7 @@ export async function textLintInHtml(
         });
       }
     });
-    ret.html = `${ret.html}${html.slice(pos)}`;
+    ret.result = `${ret.result}${source.slice(pos)}`;
     const $dl = cheerio.load('<dl/>')('dl');
     ret.messages.forEach((m) => {
       const $d = cheerio.load('<dt></dt><dd><a/></dd>');
@@ -121,7 +131,7 @@ export async function textLintInHtml(
         m.severity === 0 ? 'info' : m.severity === 1 ? 'warning' : 'error'
       );
       const $a = $d('a');
-      $a.attr('href', `#${m.id}`);
+      $a.attr('href', `#${clobberPrefix}${m.id}`);
       $a.text(`${m.message}(${m.ruleId})`);
       $dl.append($d('body').children());
     });
