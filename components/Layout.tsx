@@ -70,7 +70,8 @@ const useStyles = makeStyles((theme) => ({
   'NavMain-menu-button-outer': {
     display: 'flex',
     flexDirection: 'column',
-    alignItems: 'flex-end'
+    alignItems: 'flex-end',
+    widht: '100%'
   },
   'NavMain-menu-button': {
     display: 'block',
@@ -225,6 +226,7 @@ const useStyles = makeStyles((theme) => ({
       }
     },
     '& article > p > img, article > p > a > img': {
+      borderRadius: theme.shape.borderRadius,
       width: '100%',
       height: '100%'
       // objectFit: 'contain'
@@ -234,6 +236,13 @@ const useStyles = makeStyles((theme) => ({
       paddingRight: theme.spacing(1),
       [theme.breakpoints.up('sm')]: {
         paddingLeft: theme.spacing(4)
+      }
+    },
+    '& article pre > code': {
+      borderRadius: theme.shape.borderRadius,
+      fontSize: theme.typography.body2.fontSize,
+      [theme.breakpoints.up('sm')]: {
+        fontSize: theme.typography.body1.fontSize
       }
     },
     '& article :not(pre) > code': {
@@ -246,9 +255,39 @@ const useStyles = makeStyles((theme) => ({
     '& article > blockquote': {
       marginLeft: theme.spacing(1),
       marginRight: theme.spacing(1),
+      borderRadius: theme.shape.borderRadius,
       padding: theme.spacing(1),
       borderLeft: `6px solid ${theme.palette.secondary.main}`,
       backgroundColor: theme.palette.divider
+    },
+    '& article  > table': {
+      display: 'block', // table 自体をスクロールさせるため(thead 等はそのままでもよい?)
+      overflow: 'auto',
+      maxWidth: '100%',
+      width: 'max-content',
+      borderCollapse: 'collapse',
+      border: `solid 1px ${theme.palette.primary.main}`,
+      borderRadius: theme.shape.borderRadius,
+      // borderSpacing: `${theme.spacing(1)}px`,
+      '& > thead': {
+        backgroundColor: theme.palette.primary.main,
+        color: theme.palette.primary.contrastText,
+        '& th': {
+          padding: theme.spacing(1, 2)
+        }
+      },
+      '& > tbody': {
+        // border: `solid 1px ${theme.palette.divider}`,
+        '& tr:nth-child(even)': {
+          backgroundColor: theme.palette.divider
+        },
+        // '& tr + tr': {
+        //   borderTop: `solid 1px ${theme.palette.divider}`
+        // },
+        '& tr > td': {
+          padding: theme.spacing(1, 2)
+        }
+      }
     },
     '& article > .embed.youtube': {
       marginBottom: theme.spacing(1)

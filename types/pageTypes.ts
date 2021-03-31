@@ -54,7 +54,7 @@ export type PageData = {
   title: string;
   articleTitle: string;
   htmlToc: HtmlToc;
-  html: string;
+  html: string; // markdown から変換された html がセットされる.
   deck: DeckData;
   mainVisual: {
     url: string;

@@ -27,7 +27,7 @@ export type PagesImage = {
 type Pages = {
   title: string;
   category: PagesCategory[];
-  html?: string;
+  content?: string;
   source?: string;
   mainVisual?: PagesImage;
   description?: string;
@@ -59,5 +59,5 @@ export const blankPageContent = (): PagesContent => ({
   ...contentBase,
   title: '',
   category: [],
-  html: ''
+  content: ''
 });

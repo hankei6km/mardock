@@ -9,7 +9,7 @@ import { makeStyles } from '@material-ui/core/styles';
 import CssBaseline from '@material-ui/core/CssBaseline';
 import theme from '../src/theme';
 import { join } from 'path';
-import 'highlight.js/styles/hybrid.css';
+import 'highlight.js/styles/magula.css';
 import 'lite-youtube-embed/src/lite-yt-embed.css';
 import { SnackbarProvider } from 'notistack';
 import SiteContext from '../components/SiteContext';

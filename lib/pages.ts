@@ -22,9 +22,9 @@ import {
 } from '../types/pageTypes';
 import siteServerSideConfig from '../src/site.server-side-config';
 import { applyPreviewDataToIdQuery } from './preview';
-import { getArticleData } from './html';
+import { getArticleData, getArticleDataFromContent } from './html';
 import { textLintInHtml } from './draftlint';
-import { rewrite, rewriteEmbed, rewriteCode, rewriteImg } from './rewrite';
+import { rewrite, rewriteEmbed, rewriteImg } from './rewrite';
 import { ApiNameArticle } from '../types/apiName';
 import {
   paginationIdsFromPageCount,
@@ -56,7 +56,7 @@ export async function getSortedPagesData(
       query: {
         ...query,
         fields:
-          'id,createdAt,updatedAt,publishedAt,revisedAt,title,html,source,category,mainVisual'
+          'id,createdAt,updatedAt,publishedAt,revisedAt,title,content,source,category,mainVisual'
       },
       config: fetchConfig
     });
@@ -78,13 +78,13 @@ export async function getSortedIndexData(
       query: {
         ...query,
         fields:
-          'id,createdAt,updatedAt,publishedAt,revisedAt,title,html,source,category,mainVisual'
+          'id,createdAt,updatedAt,publishedAt,revisedAt,title,content,source,category,mainVisual'
       },
       config: fetchConfig
     });
     const p = res.body.contents.map((res) => {
       return async (): Promise<IndexData> => {
-        const { articleTitle } = getArticleData(res.title, res.html || '');
+        const { articleTitle } = getArticleData(res.title, res.content || '');
         const mainVisual = res.mainVisual?.url
           ? res.mainVisual
           : siteServerSideConfig.mainVisual.fallbackImage;
@@ -226,16 +226,16 @@ export async function getPagesData(
       params.id as string,
       {
         fields:
-          'id,createdAt,updatedAt,publishedAt,revisedAt,title,html,source,category,mainVisual,description'
+          'id,createdAt,updatedAt,publishedAt,revisedAt,title,content,source,category,mainVisual,description'
       }
     );
     const res = await client[apiName]._id(id).$get({
       query: query,
       config: fetchConfig
     });
-    const { articleTitle, html, htmlToc } = getArticleData(
+    const { articleTitle, html, htmlToc } = await getArticleDataFromContent(
       res.title,
-      res.html || ''
+      res.content || ''
     );
     const mainVisual = res.mainVisual?.url
       ? res.mainVisual
@@ -256,7 +256,7 @@ export async function getPagesData(
       html: await rewrite(html)
         .use(rewriteImg())
         .use(rewriteEmbed())
-        .use(rewriteCode())
+        // .use(rewriteCode())
         .run(),
       mainVisual: {
         ...mainVisual

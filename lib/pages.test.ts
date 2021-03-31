@@ -26,7 +26,7 @@ describe('getSortedPagesData()', () => {
     expect(fetchMock.mock.calls[0][0]).toContain('/pages?');
     expect(queryParams(String(fetchMock.mock.calls[0][0]))).toStrictEqual({
       fields:
-        'id,createdAt,updatedAt,publishedAt,revisedAt,title,html,source,category,mainVisual'
+        'id,createdAt,updatedAt,publishedAt,revisedAt,title,content,source,category,mainVisual'
     });
     expect(res).toStrictEqual({
       contents: [
@@ -64,7 +64,7 @@ describe('getSortedPagesData()', () => {
     expect(fetchMock.mock.calls[0][0]).toContain('/pages?');
     expect(queryParams(String(fetchMock.mock.calls[0][0]))).toStrictEqual({
       fields:
-        'id,createdAt,updatedAt,publishedAt,revisedAt,title,html,source,category,mainVisual',
+        'id,createdAt,updatedAt,publishedAt,revisedAt,title,content,source,category,mainVisual',
       filters: 'displayOnIndexPage[equals]true'
     });
     // expect(fetchMock.mock.calls[0][1]?.headers) 環境変数の設定とメッセージによっては API キーが漏洩する可能性があるのでとりあえずやめる
@@ -91,7 +91,7 @@ describe('getPagesData()', () => {
     expect(fetchMock.mock.calls[0][0]).toContain('/pages/home');
     expect(queryParams(String(fetchMock.mock.calls[0][0]))).toStrictEqual({
       fields:
-        'id,createdAt,updatedAt,publishedAt,revisedAt,title,html,source,category,mainVisual,description'
+        'id,createdAt,updatedAt,publishedAt,revisedAt,title,content,source,category,mainVisual,description'
     });
     expect(res).toStrictEqual({
       id: 'home',
@@ -116,7 +116,7 @@ describe('getPagesData()', () => {
       htmlToc: {
         items: []
       },
-      html: 'home page',
+      html: '<p>home page</p>',
       mainVisual: {
         url:
           'https://images.microcms-assets.io/assets/cc433627f35c4232b7cb97e0376507a7/eb84db7f1a7a4409bd20ffc27abe60e4/mardock-temp-image.png',
@@ -143,7 +143,7 @@ describe('getPagesData()', () => {
       htmlToc: {
         items: []
       },
-      html: 'test slide page',
+      html: '<p>test slide page</p>',
       mainVisual: {
         url:
           'https://images.microcms-assets.io/assets/cc433627f35c4232b7cb97e0376507a7/eb84db7f1a7a4409bd20ffc27abe60e4/mardock-temp-image.png',
