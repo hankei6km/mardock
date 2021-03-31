@@ -240,7 +240,10 @@ const useStyles = makeStyles((theme) => ({
     },
     '& article pre > code': {
       borderRadius: theme.shape.borderRadius,
-      fontSize: theme.typography.body1.fontSize
+      fontSize: theme.typography.body2.fontSize,
+      [theme.breakpoints.up('sm')]: {
+        fontSize: theme.typography.body1.fontSize
+      }
     },
     '& article :not(pre) > code': {
       padding: '.2em .4em',
