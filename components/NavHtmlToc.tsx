@@ -2,8 +2,8 @@ import React, { useContext, useEffect, useState } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import Box from '@material-ui/core/Box';
 import IconButton from '@material-ui/core/IconButton';
-import Typography from '@material-ui/core/Typography';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
+import Typography from '@material-ui/core/Typography';
 import SiteContext from './SiteContext';
 import { Link as ScrollLink } from 'react-scroll';
 import { pruneClasses } from '../utils/classes';
@@ -24,14 +24,20 @@ const useStyles = makeStyles((theme) => ({
   'NavHtmlToc-header-outer': {
     display: 'flex',
     alignItems: 'center',
-    marginBottom: theme.spacing(0.5)
+    marginBottom: theme.spacing(1)
   },
-  'NavHtmlToc-label': { order: 2 },
+  'NavHtmlToc-label': {
+    ...theme.typography.body1,
+    order: 2
+  },
   'NavHtmlToc-expand-button': {
     display: 'flex',
     order: 1,
+    marginRight: theme.spacing(1),
     transform: 'rotate(0deg)',
-    padding: theme.spacing(0.5),
+    padding: theme.spacing(1, 0),
+    // border: `solid 1px ${theme.palette.primary.main}`,
+    // borderRadius: theme.shape.borderRadius,
     '&:not(.NavHtmlToc-list-expanded)': {
       transform: 'rotate(270deg)'
     },
@@ -52,7 +58,7 @@ const useStyles = makeStyles((theme) => ({
       '&:not(.NavHtmlToc-list-expanded)': {
         maxHeight: 400
       },
-      paddingLeft: theme.spacing(0)
+      paddinLeft: theme.spacing(0)
     }
   },
   'NavHtmlToc-list': {
@@ -217,7 +223,11 @@ const NavHtmlToc = ({ htmlToc, offset = -80, classes: inClasses }: Props) => {
   return (
     <Box className={classes['NavHtmlToc-root']}>
       <Box className={classes['NavHtmlToc-header-outer']}>
-        <Typography component={'h2'} className={classes['NavHtmlToc-label']}>
+        <Typography
+          component={'h2'}
+          className={classes['NavHtmlToc-label']}
+          onClick={() => setExpanded(!expanded)}
+        >
           {nav.htmlToc.label}
         </Typography>
         <IconButton
