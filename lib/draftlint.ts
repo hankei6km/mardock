@@ -14,6 +14,9 @@ type MappedMessage = {
 type MappedMessages = MappedMessage;
 
 type InsInfo = {
+  message: string;
+  ruleId: string;
+  severity: number;
   index: number;
   insIndex: number;
   range: [number, number];
@@ -47,6 +50,9 @@ export function getInsInfos(html: string, messages: any[]): InsInfos {
       const end = m.index - node.range[0];
       // console.log(end, node.value.slice(0, end), node.raw.slice(0, end));
       ret.push({
+        message: m.message,
+        ruleId: m.ruleId,
+        severity: m.severity,
         index: m.index,
         // 末尾 ';' だと欠ける? よって先頭を使う
         // TODO: 末尾の扱いチェック(どこで欠ける?).
@@ -60,7 +66,8 @@ export function getInsInfos(html: string, messages: any[]): InsInfos {
       });
     }
   });
-  return ret.sort((a, b) => a.insIndex - b.insIndex);
+  ret.sort((a, b) => a.insIndex - b.insIndex);
+  return ret;
 }
 
 export async function textLintInHtml(
@@ -88,7 +95,7 @@ export async function textLintInHtml(
       $wrapper.css(k, v);
     });
     let pos = 0;
-    results[0].messages.forEach((m, i) => {
+    insInfos.forEach((m, i) => {
       const id = `${idPrefix}:textLintMessage:${i}`;
       $wrapper.attr('id', id);
       const insertHtml = $wrapper.html(m.message).parent().html();
