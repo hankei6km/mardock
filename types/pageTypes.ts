@@ -24,7 +24,7 @@ export type DeckData = {
   items: DeckItem[];
 };
 
-type Notification = {
+export type Notification = {
   title: string;
   messageHtml: string;
   serverity: 'info' | 'warning' | 'alert';

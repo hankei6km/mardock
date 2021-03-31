@@ -13,6 +13,7 @@ export type Presets = {
 export type RuleOptions = { [key: string]: TextlintKernelRule['options'] };
 
 export type DraftLintOptions = {
+  ext?: string;
   presets?: Presets;
   rules?: TextlintKernelRule;
   ruleOptions?: RuleOptions;
@@ -24,6 +25,7 @@ export function getTextlintKernelOptions(
   draftLintOptions?: DraftLintOptions
 ): TextlintKernelOptions {
   const {
+    ext = '.html',
     presets = undefined,
     rules = undefined,
     ruleOptions = undefined,
@@ -143,14 +145,21 @@ export function getTextlintKernelOptions(
       }
     }
   ];
+
   const options = {
     // filePath: '/path/to/file.md',
-    ext: '.html',
+    ext: ext,
     plugins: [
-      {
-        pluginId: 'html',
-        plugin: require('textlint-plugin-html')
-      }
+      // todo: plugin  もオプションで指定させる.
+      ext === '.html'
+        ? {
+            pluginId: 'html',
+            plugin: require('textlint-plugin-html')
+          }
+        : {
+            pluginId: 'markdown',
+            plugin: require('@textlint/textlint-plugin-markdown').default
+          }
     ],
     rules: _presets
       .map((p) =>
