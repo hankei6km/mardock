@@ -83,6 +83,15 @@ export type IndexData = Omit<
 >;
 export type IndexList = ContentList<IndexData>;
 
+export const blankDeckData = (): DeckData => ({
+  id: '',
+  minX: 0,
+  minY: 0,
+  width: 0,
+  height: 0,
+  items: [],
+  css: ''
+});
 export const blankPageData = (): PageData => ({
   id: '',
   updated: '',
@@ -98,13 +107,7 @@ export const blankPageData = (): PageData => ({
   },
   html: '',
   deck: {
-    id: '',
-    minX: 0,
-    minY: 0,
-    width: 0,
-    height: 0,
-    items: [],
-    css: ''
+    ...blankDeckData()
   },
   mainVisual: { url: '', width: 0, height: 0 },
   description: ''

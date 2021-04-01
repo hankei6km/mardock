@@ -24,10 +24,36 @@ export type PagesImage = {
   height: number;
 };
 
+export type PagesSourcePageMarkdown = {
+  fieldId: 'sourceMarkdown';
+  markdown: string;
+};
+export type PagesSourcePageImage = {
+  fieldId: 'sourceImage';
+  image: PagesImage;
+  directive?: string;
+  transform?: string;
+};
+export type PagesSourcePageComment = {
+  fieldId: 'sourceComment';
+  comment: string;
+};
+export type PagesSourcePageContent =
+  | PagesSourcePageMarkdown
+  | PagesSourcePageImage
+  | PagesSourcePageComment;
+export type PagesSourcePageContents = PagesSourcePageContent[];
+export type PagesSourcePage = {
+  fieldId: 'sourcePages';
+  contents: PagesSourcePageContents;
+};
+export type PagesSourcePages = PagesSourcePage[];
+
 type Pages = {
   title: string;
   category: PagesCategory[];
   content?: string;
+  sourcePages?: PagesSourcePages;
   source?: string;
   mainVisual?: PagesImage;
   description?: string;

@@ -6,7 +6,12 @@ import { Writable } from 'stream';
 import Marp from '@marp-team/marp-core';
 import cheerio from 'cheerio';
 import siteServerSideConfig from '../src/site.server-side-config';
-import { SlideData, blankSlideData, DeckData } from '../types/pageTypes';
+import {
+  SlideData,
+  blankSlideData,
+  DeckData,
+  blankDeckData
+} from '../types/pageTypes';
 import { PagesImage } from '../types/client/contentTypes';
 const { Element } = require('@marp-team/marpit');
 // temp ファイル、fifo 等も考えたが今回は pipe で楽する。
@@ -144,41 +149,44 @@ export function slideDeckRemoveId(html: string): string {
 }
 
 export async function slideDeck(id: string, source: string): Promise<DeckData> {
-  const containerId = `slide-${id}`;
-  const marp = new Marp({
-    inlineSVG: true,
-    container: [
-      new Element('article', { id: containerId }),
-      new Element('div', { class: 'slides' })
-    ],
-    slideContainer: new Element('div', { class: 'slide' })
-  });
-  const { html, css } = marp.render(source, { htmlAsArray: true });
-  let minX = 0;
-  let minY = 0;
-  let width = 0;
-  let height = 0;
-  if (html.length > 0) {
-    const marpItSvg = cheerio.load(html[0])('svg');
-    const a = marpItSvg.attr('viewBox')?.split(' ');
-    if (a && a.length === 4) {
-      minX = parseInt(a[0], 10);
-      minY = parseInt(a[1], 10);
-      width = parseInt(a[2], 10);
-      height = parseInt(a[3], 10);
+  if (source) {
+    const containerId = `slide-${id}`;
+    const marp = new Marp({
+      inlineSVG: true,
+      container: [
+        new Element('article', { id: containerId }),
+        new Element('div', { class: 'slides' })
+      ],
+      slideContainer: new Element('div', { class: 'slide' })
+    });
+    const { html, css } = marp.render(source, { htmlAsArray: true });
+    let minX = 0;
+    let minY = 0;
+    let width = 0;
+    let height = 0;
+    if (html.length > 0) {
+      const marpItSvg = cheerio.load(html[0])('svg');
+      const a = marpItSvg.attr('viewBox')?.split(' ');
+      if (a && a.length === 4) {
+        minX = parseInt(a[0], 10);
+        minY = parseInt(a[1], 10);
+        width = parseInt(a[2], 10);
+        height = parseInt(a[3], 10);
+      }
     }
+    return {
+      id: containerId,
+      minX,
+      minY,
+      width,
+      height,
+      css,
+      items: html.map((v) => ({
+        html: v
+      }))
+    };
   }
-  return {
-    id: containerId,
-    minX,
-    minY,
-    width,
-    height,
-    css,
-    items: html.map((v) => ({
-      html: v
-    }))
-  };
+  return blankDeckData();
 }
 
 export async function getSlideData(source: string): Promise<SlideData> {
