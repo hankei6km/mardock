@@ -32,6 +32,7 @@ import {
   pageCountFromTotalCount
 } from '../utils/pagination';
 import { getSlideData, slideDeck, slideDeckRemoveId } from './slide';
+import { sourceSetMarkdown } from './source';
 // import { getTextlintKernelOptions } from '../utils/textlint';
 
 // const itemsPerPage = 10;
@@ -57,7 +58,7 @@ export async function getSortedPagesData(
       query: {
         ...query,
         fields:
-          'id,createdAt,updatedAt,publishedAt,revisedAt,title,content,source,category,mainVisual'
+          'id,createdAt,updatedAt,publishedAt,revisedAt,title,content,sourcePages,source,category,mainVisual'
       },
       config: fetchConfig
     });
@@ -79,7 +80,7 @@ export async function getSortedIndexData(
       query: {
         ...query,
         fields:
-          'id,createdAt,updatedAt,publishedAt,revisedAt,title,content,source,category,mainVisual'
+          'id,createdAt,updatedAt,publishedAt,revisedAt,title,content,sourcePages,source,category,mainVisual'
       },
       config: fetchConfig
     });
@@ -101,8 +102,14 @@ export async function getSortedIndexData(
           },
           description: res.description || ''
         };
-        if (res.source) {
-          const d = await slideDeck(res.id, res.source);
+        if (res.source || res.sourcePages) {
+          const d = await slideDeck(
+            res.id,
+            await sourceSetMarkdown({
+              sourcePages: res.sourcePages,
+              source: res.source
+            })
+          );
           d.items = d.items.map((v) => ({
             ...v,
             html: slideDeckRemoveId(v.html)
@@ -227,7 +234,7 @@ export async function getPagesData(
       params.id as string,
       {
         fields:
-          'id,createdAt,updatedAt,publishedAt,revisedAt,title,content,source,category,mainVisual,description'
+          'id,createdAt,updatedAt,publishedAt,revisedAt,title,content,sourcePages,source,category,mainVisual,description'
       }
     );
     const res = await client[apiName]._id(id).$get({
@@ -277,9 +284,13 @@ export async function getPagesData(
       },
       description: res.description || ''
     };
-    if (res.source) {
-      ret.deck = await slideDeck(res.id, res.source);
-    }
+    ret.deck = await slideDeck(
+      res.id,
+      await sourceSetMarkdown({
+        sourcePages: res.sourcePages,
+        source: res.source
+      })
+    );
     if (notification) {
       ret.notification = notification;
     }
@@ -310,7 +321,7 @@ export async function getPagesSlideData(
       params.id as string,
       {
         fields:
-          'id,createdAt,updatedAt,publishedAt,revisedAt,title,source,category,mainVisual,description'
+          'id,createdAt,updatedAt,publishedAt,revisedAt,title,sourcePages,source,category,mainVisual,description'
       }
     );
     const res = await client[apiName]._id(id).$get({
@@ -350,7 +361,13 @@ export async function getPagesSlideData(
     //     ret.notification.serverity = 'warning';
     //   }
     // }
-    const ret: SlideData = await getSlideData(res.source || '');
+    let ret = await getSlideData(
+      await sourceSetMarkdown({
+        sourcePages: res.sourcePages,
+        source: res.source
+      })
+    );
+
     return ret;
   } catch (err) {
     // console.error(`getPagesData error: ${err.name}`);

@@ -21,6 +21,11 @@ type SiteServerSideConfig = {
   mainVisual: {
     fallbackImage: Omit<ConfigImageSource, 'alt'>;
   };
+  source: {
+    image: {
+      transformDefault: string;
+    };
+  };
   draft: {
     // types/pageType Notification
     title: string;
@@ -52,6 +57,11 @@ const siteServerSideConfig: SiteServerSideConfig = {
         'https://images.microcms-assets.io/assets/cc433627f35c4232b7cb97e0376507a7/eb84db7f1a7a4409bd20ffc27abe60e4/mardock-temp-image.png',
       width: 1280,
       height: 720
+    }
+  },
+  source: {
+    image: {
+      transformDefault: 'w=600'
     }
   },
   draft: {

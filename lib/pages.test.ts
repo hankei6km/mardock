@@ -26,7 +26,7 @@ describe('getSortedPagesData()', () => {
     expect(fetchMock.mock.calls[0][0]).toContain('/pages?');
     expect(queryParams(String(fetchMock.mock.calls[0][0]))).toStrictEqual({
       fields:
-        'id,createdAt,updatedAt,publishedAt,revisedAt,title,content,source,category,mainVisual'
+        'id,createdAt,updatedAt,publishedAt,revisedAt,title,content,sourcePages,source,category,mainVisual'
     });
     expect(res).toStrictEqual({
       contents: [
@@ -64,7 +64,7 @@ describe('getSortedPagesData()', () => {
     expect(fetchMock.mock.calls[0][0]).toContain('/pages?');
     expect(queryParams(String(fetchMock.mock.calls[0][0]))).toStrictEqual({
       fields:
-        'id,createdAt,updatedAt,publishedAt,revisedAt,title,content,source,category,mainVisual',
+        'id,createdAt,updatedAt,publishedAt,revisedAt,title,content,sourcePages,source,category,mainVisual',
       filters: 'displayOnIndexPage[equals]true'
     });
     // expect(fetchMock.mock.calls[0][1]?.headers) 環境変数の設定とメッセージによっては API キーが漏洩する可能性があるのでとりあえずやめる
@@ -91,7 +91,7 @@ describe('getPagesData()', () => {
     expect(fetchMock.mock.calls[0][0]).toContain('/pages/home');
     expect(queryParams(String(fetchMock.mock.calls[0][0]))).toStrictEqual({
       fields:
-        'id,createdAt,updatedAt,publishedAt,revisedAt,title,content,source,category,mainVisual,description'
+        'id,createdAt,updatedAt,publishedAt,revisedAt,title,content,sourcePages,source,category,mainVisual,description'
     });
     expect(res).toStrictEqual({
       id: 'home',
@@ -162,7 +162,7 @@ describe('getPagesSlideData()', () => {
     expect(fetchMock.mock.calls[0][0]).toContain('/deck/slide1');
     expect(queryParams(String(fetchMock.mock.calls[0][0]))).toStrictEqual({
       fields:
-        'id,createdAt,updatedAt,publishedAt,revisedAt,title,source,category,mainVisual,description'
+        'id,createdAt,updatedAt,publishedAt,revisedAt,title,sourcePages,source,category,mainVisual,description'
     });
     expect(JSON.stringify(res.head)).toContain('slide1');
     expect(JSON.stringify(res.body)).toContain('item1');
