@@ -6,6 +6,7 @@ import Head from 'next/head';
 import Container from '@material-ui/core/Container';
 import Avatar from '@material-ui/core/Avatar';
 import Box from '@material-ui/core/Box';
+import Divider from '@material-ui/core/Divider';
 import AppBar from '@material-ui/core/AppBar';
 import Toolbar from '@material-ui/core/Toolbar';
 import IconButton from '@material-ui/core/IconButton';
@@ -106,10 +107,17 @@ const useStyles = makeStyles((theme) => ({
   },
   'NavBreadcrumbs-outer': {
     width: '100%',
-    padding: theme.spacing(1),
     display: 'none',
     [theme.breakpoints.up('md')]: {
-      display: 'block'
+      display: 'block',
+      padding: theme.spacing(1, 0)
+    }
+  },
+  'NavBreadcrumbs-divider': {
+    width: '100%',
+    [theme.breakpoints.up('md')]: {
+      display: 'block',
+      marginBottom: theme.spacing(1)
     }
   },
   'DateUpdated-root': {
@@ -167,7 +175,7 @@ const useStyles = makeStyles((theme) => ({
   'Layout-section-top-inner': {
     [theme.breakpoints.up('md')]: {
       position: 'sticky',
-      top: 110
+      top: 76
     }
   },
   'Layout-section-top-persist': {},
@@ -446,15 +454,22 @@ const Layout = ({
                 />
               </Box>
             </Box>
-            {(apiName === 'deck' || apiName === 'docs') && (
-              <Box className={classes['NavBreadcrumbs-outer']}>
-                <NavBreadcrumbs lastBreadcrumb={title} classes={classes} />
-              </Box>
-            )}
           </Toolbar>
         </Container>
       </AppBar>
       <Box className={classes['Layout-section-root']}>
+        {(apiName === 'deck' || apiName === 'docs') && (
+          <>
+            <Container
+              maxWidth={maxWidth}
+              disableGutters
+              className={classes['NavBreadcrumbs-outer']}
+            >
+              <NavBreadcrumbs lastBreadcrumb={title} classes={classes} />
+            </Container>
+            <Divider className={classes['NavBreadcrumbs-divider']} />
+          </>
+        )}
         <Container
           maxWidth={maxWidth}
           disableGutters
