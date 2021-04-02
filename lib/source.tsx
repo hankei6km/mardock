@@ -123,11 +123,17 @@ export async function pagesMarkdown(
 }
 
 export async function sourceSetMarkdown(sourceSet: {
+  sourceContents?: PagesSourcePageContents;
   sourcePages?: PagesSourcePages;
   source?: string;
 }): Promise<string> {
+  // 現状の deck API の スキーマだと sourcePages はセットされないが
+  // いちおう残しておく。
+  console.log(sourceSet);
   if (sourceSet.source) {
     return sourceSet.source;
+  } else if (sourceSet.sourceContents && sourceSet.sourceContents.length > 0) {
+    return await pageMarkdown(sourceSet.sourceContents);
   } else if (sourceSet.sourcePages && sourceSet.sourcePages.length > 0) {
     return await pagesMarkdown(sourceSet.sourcePages);
   }

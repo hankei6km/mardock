@@ -58,6 +58,7 @@ type Pages = {
   title: string;
   category: PagesCategory[];
   content?: string;
+  sourceContents?: PagesSourcePageContents;
   sourcePages?: PagesSourcePages;
   source?: string;
   mainVisual?: PagesImage;
