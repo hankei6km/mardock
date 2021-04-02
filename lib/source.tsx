@@ -7,6 +7,7 @@ import stringify from 'remark-stringify';
 import {
   PagesSourcePages,
   PagesSourcePageMarkdown,
+  PagesSourcePageHtml,
   PagesSourcePageImage,
   PagesSourcePageComment,
   PagesSourcePageContent,
@@ -14,7 +15,7 @@ import {
 } from '../types/client/contentTypes';
 import siteServerSideConfig from '../src/site.server-side-config';
 
-const imageProcessor = unified()
+const htmlToMarkdownProcessor = unified()
   .use(rehypeParse)
   .use(rehypeSanitize)
   .use(rehype2Remark)
@@ -32,6 +33,30 @@ export function pageMarkdownMarkdown(
   }
   return `${markdown.markdown}\n`;
 }
+export async function pageHtmlMarkdown(
+  html: PagesSourcePageHtml
+): Promise<string> {
+  return new Promise((resolve, reject) => {
+    if (html.html) {
+      htmlToMarkdownProcessor.process(html.html, function (err, file) {
+        if (err) {
+          console.error(err);
+          reject(err);
+        } else {
+          // const markdown = `${file}`;
+          // とりあえず暫定で改ページさせる
+          const markdown = `${file}`.replace(/\\---/g, '---');
+          if (markdown && markdown[markdown.length - 1] === '\n') {
+            resolve(markdown);
+            return;
+          }
+          resolve(`${markdown}\n`);
+        }
+      });
+    }
+    resolve('');
+  });
+}
 export async function pageImageMarkdown(
   image: PagesSourcePageImage
 ): Promise<string> {
@@ -42,17 +67,17 @@ export async function pageImageMarkdown(
     const q = new URLSearchParams(params).toString();
     const url = q ? `${image.image.url}?${q}` : image.image.url;
     const img = <img src={url} alt={image.directive} />;
-    imageProcessor.process(ReactDomServer.renderToStaticMarkup(img), function (
-      err,
-      file
-    ) {
-      if (err) {
-        console.error(err);
-        reject(err);
-      } else {
-        resolve(`${file}`);
+    htmlToMarkdownProcessor.process(
+      ReactDomServer.renderToStaticMarkup(img),
+      function (err, file) {
+        if (err) {
+          console.error(err);
+          reject(err);
+        } else {
+          resolve(`${file}`);
+        }
       }
-    });
+    );
   });
 }
 export function pageCommentMarkdown(comment: PagesSourcePageComment): string {
@@ -67,6 +92,8 @@ export async function _pageMarkdown(
   switch (content.fieldId) {
     case 'sourceMarkdown':
       return pageMarkdownMarkdown(content);
+    case 'sourceHtml':
+      return await pageHtmlMarkdown(content);
     case 'sourceImage':
       return await pageImageMarkdown(content);
     case 'sourceComment':
@@ -101,7 +128,7 @@ export async function sourceSetMarkdown(sourceSet: {
 }): Promise<string> {
   if (sourceSet.source) {
     return sourceSet.source;
-  } else if (sourceSet.sourcePages && sourceSet.sourcePages.length>0) {
+  } else if (sourceSet.sourcePages && sourceSet.sourcePages.length > 0) {
     return await pagesMarkdown(sourceSet.sourcePages);
   }
   return '';

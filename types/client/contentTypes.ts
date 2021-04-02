@@ -28,6 +28,10 @@ export type PagesSourcePageMarkdown = {
   fieldId: 'sourceMarkdown';
   markdown: string;
 };
+export type PagesSourcePageHtml = {
+  fieldId: 'sourceHtml';
+  html: string;
+};
 export type PagesSourcePageImage = {
   fieldId: 'sourceImage';
   image: PagesImage;
@@ -39,6 +43,7 @@ export type PagesSourcePageComment = {
   comment: string;
 };
 export type PagesSourcePageContent =
+  | PagesSourcePageHtml
   | PagesSourcePageMarkdown
   | PagesSourcePageImage
   | PagesSourcePageComment;
