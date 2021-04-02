@@ -110,14 +110,15 @@ const useStyles = makeStyles((theme) => ({
     display: 'none',
     [theme.breakpoints.up('md')]: {
       display: 'block',
-      padding: theme.spacing(1, 0)
+      // padding: theme.spacing(1, 0)
+      marginBottom: theme.spacing(1)
     }
   },
   'NavBreadcrumbs-divider': {
     width: '100%',
+    display: 'none',
     [theme.breakpoints.up('md')]: {
-      display: 'block',
-      marginBottom: theme.spacing(1)
+      display: 'block'
     }
   },
   'DateUpdated-root': {
@@ -152,6 +153,7 @@ const useStyles = makeStyles((theme) => ({
         display: 'flex',
         flexDirection: 'column',
         [theme.breakpoints.up('md')]: {
+          margin: theme.spacing(2, 0),
           display: 'grid',
           gridGap: theme.spacing(1),
           gridTemplateColumns: 'repeat(11, 1fr)',
@@ -210,8 +212,7 @@ const useStyles = makeStyles((theme) => ({
     // width: '100%',
     [theme.breakpoints.up('md')]: {},
     ...theme.typography.body1,
-    paddingLeft: theme.spacing(1),
-    paddingRight: theme.spacing(1),
+    padding: theme.spacing(0, 1),
     '&  h2': {
       ...theme.typography.h4,
       marginBottom: theme.spacing(1)
