@@ -6,6 +6,7 @@ import Head from 'next/head';
 import Container from '@material-ui/core/Container';
 import Avatar from '@material-ui/core/Avatar';
 import Box from '@material-ui/core/Box';
+import Divider from '@material-ui/core/Divider';
 import AppBar from '@material-ui/core/AppBar';
 import Toolbar from '@material-ui/core/Toolbar';
 import IconButton from '@material-ui/core/IconButton';
@@ -106,7 +107,15 @@ const useStyles = makeStyles((theme) => ({
   },
   'NavBreadcrumbs-outer': {
     width: '100%',
-    padding: theme.spacing(1),
+    display: 'none',
+    [theme.breakpoints.up('md')]: {
+      display: 'block',
+      // padding: theme.spacing(1, 0)
+      marginBottom: theme.spacing(1)
+    }
+  },
+  'NavBreadcrumbs-divider': {
+    width: '100%',
     display: 'none',
     [theme.breakpoints.up('md')]: {
       display: 'block'
@@ -116,7 +125,13 @@ const useStyles = makeStyles((theme) => ({
     marginTop: theme.spacing(1),
     marginBottom: theme.spacing(1)
   },
-  'Layout-section-root': ({ apiName, id }: Props) => {
+  'Layout-section-root': ({
+    topSection,
+    topPersistSection,
+    bottomSection,
+    apiName,
+    id
+  }: Props) => {
     let backgroundColor = theme.palette.content.background.default.main;
     if (apiName === 'pages' && id === 'home') {
       backgroundColor = theme.palette.content.background.home.main;
@@ -131,29 +146,34 @@ const useStyles = makeStyles((theme) => ({
       width: '100%',
       [theme.breakpoints.up('md')]: {
         padding: theme.spacing(1, 1)
+      },
+      '& .Layout-body': {
+        // 子要素に直接 classes から classNAme 指定すると props 変更で更新されない.
+        // props 操作の入れ子がダメ？:
+        display: 'flex',
+        flexDirection: 'column',
+        [theme.breakpoints.up('md')]: {
+          margin: theme.spacing(2, 0),
+          display: 'grid',
+          gridGap: theme.spacing(1),
+          gridTemplateColumns: 'repeat(11, 1fr)',
+          gridTemplateRows: 'minmax(200px, auto)',
+          gridTemplateAreas: gridTempalteAreasFromLayout({
+            top: topPersistSection || topSection,
+            main: true,
+            bottom: bottomSection
+          })
+          // '"top main"' +
+          // '"bottom main"'
+          // こうしたかったが、top と bottom をまとめて sticky にする方法が思いつかなかった.:
+          // いまのレイアウトだとここだけ grid にする意味もないが、
+          // 思いついたときように残しておく。
+        }
       }
     };
   },
-  'Layout-body': ({ topPersistSection, topSection, bottomSection }: Props) => ({
-    display: 'flex',
-    flexDirection: 'column',
-    [theme.breakpoints.up('md')]: {
-      display: 'grid',
-      gridGap: theme.spacing(1),
-      gridTemplateColumns: 'repeat(11, 1fr)',
-      gridTemplateRows: 'minmax(200px, auto)',
-      gridTemplateAreas: gridTempalteAreasFromLayout({
-        top: topPersistSection || topSection,
-        main: true,
-        bottom: bottomSection
-      })
-      // '"top main"' +
-      // '"bottom main"'
-      // こうしたかったが、top と bottom をまとめて sticky にする方法が思いつかなかった.:
-      // いまのレイアウトだとここだけ grid にする意味もないが、
-      // 思いついたときように残しておく。
-    }
-  }),
+  // 'Layout-body': ({ topPersistSection, topSection, bottomSection }: Props) => ({
+  // }),
   'Layout-section-top': {
     gridArea: 'top',
     padding: theme.spacing(0, 1),
@@ -167,7 +187,7 @@ const useStyles = makeStyles((theme) => ({
   'Layout-section-top-inner': {
     [theme.breakpoints.up('md')]: {
       position: 'sticky',
-      top: 110
+      top: 76
     }
   },
   'Layout-section-top-persist': {},
@@ -192,8 +212,7 @@ const useStyles = makeStyles((theme) => ({
     // width: '100%',
     [theme.breakpoints.up('md')]: {},
     ...theme.typography.body1,
-    paddingLeft: theme.spacing(1),
-    paddingRight: theme.spacing(1),
+    padding: theme.spacing(0, 1),
     '&  h2': {
       ...theme.typography.h4,
       marginBottom: theme.spacing(1)
@@ -446,19 +465,27 @@ const Layout = ({
                 />
               </Box>
             </Box>
-            {(apiName === 'deck' || apiName === 'docs') && (
-              <Box className={classes['NavBreadcrumbs-outer']}>
-                <NavBreadcrumbs lastBreadcrumb={title} classes={classes} />
-              </Box>
-            )}
           </Toolbar>
         </Container>
       </AppBar>
       <Box className={classes['Layout-section-root']}>
+        {(apiName === 'deck' || apiName === 'docs') && (
+          <>
+            <Container
+              maxWidth={maxWidth}
+              disableGutters
+              className={classes['NavBreadcrumbs-outer']}
+            >
+              <NavBreadcrumbs lastBreadcrumb={title} classes={classes} />
+            </Container>
+            <Divider className={classes['NavBreadcrumbs-divider']} />
+          </>
+        )}
         <Container
           maxWidth={maxWidth}
           disableGutters
-          className={classes['Layout-body']}
+          // className={classes['Layout-body']}
+          className={'Layout-body'}
         >
           {(topPersistSection || topSection) && (
             <Box className={classes['Layout-section-top']}>
