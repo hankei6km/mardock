@@ -174,6 +174,9 @@ const useStyles = makeStyles((theme) => ({
   },
   // 'Layout-body': ({ topPersistSection, topSection, bottomSection }: Props) => ({
   // }),
+  'Layout-children': {
+    widht: '100%'
+  },
   'Layout-section-top': {
     gridArea: 'top',
     padding: theme.spacing(0, 1),
@@ -514,7 +517,7 @@ const Layout = ({
                   __html: html
                 }}
               ></article>
-              {children}
+              <Box className={classes['Layout-children']}>{children}</Box>
             </>
           </Box>
           {bottomSection && (

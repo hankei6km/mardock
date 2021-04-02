@@ -7,8 +7,9 @@ import ListDeckItem from './ListDeckItem';
 
 const useStyles = makeStyles((theme) => ({
   'ListDeck-root': {
-    justifyContent: 'space-between',
-    gridRowGap: theme.spacing(1)
+    width: '100%',
+    gridGap: theme.spacing(1),
+    justifyContent: 'space-around'
   },
   'ListDeck-thumb-outer': {
     width: '100%',
