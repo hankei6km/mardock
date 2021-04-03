@@ -62,7 +62,8 @@ export const mockDataDeckContents: PagesContents['contents'] = [
     title: 'Slide1',
     category: [],
     content: 'test slide page',
-    source: '---\ntitle: slide1\n\n---\n\n#test1\n\n---\n\n- item1\n- item2\n'
+    source:
+      '<p>---</p><p>title: slide1</p><p>---</p><h1>test1</h1><p>---</p><ul><li>item1</li><li>item2</li></ul>'
   }
 ];
 

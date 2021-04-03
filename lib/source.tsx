@@ -275,7 +275,10 @@ export async function sourceSetMarkdown(sourceSet: {
   // 現状の deck API の スキーマだと sourcePages はセットされないが
   // いちおう残しておく。
   if (sourceSet.source) {
-    return sourceSet.source;
+    return await pageHtmlMarkdown({
+      fieldId: 'sourceHtml',
+      html: sourceSet.source
+    });
   } else if (sourceSet.sourceContents && sourceSet.sourceContents.length > 0) {
     return await pageMarkdown(sourceSet.sourceContents);
   } else if (sourceSet.sourcePages && sourceSet.sourcePages.length > 0) {

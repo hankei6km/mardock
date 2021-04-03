@@ -305,7 +305,9 @@ describe('sourceSetMarkdown()', () => {
         ]
       })
     ).toEqual('test1\n');
-    expect(await sourceSetMarkdown({ source: 'test2' })).toEqual('test2');
+    expect(await sourceSetMarkdown({ source: '<h1>test2</h1>' })).toEqual(
+      '# test2\n'
+    );
     expect(
       await sourceSetMarkdown({
         sourcePages: [
@@ -319,8 +321,8 @@ describe('sourceSetMarkdown()', () => {
             ]
           }
         ],
-        source: 'test4'
+        source: '<h1>test4</h1>'
       })
-    ).toEqual('test4');
+    ).toEqual('# test4\n');
   });
 });
