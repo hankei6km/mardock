@@ -58,7 +58,7 @@ export async function getSortedPagesData(
       query: {
         ...query,
         fields:
-          'id,createdAt,updatedAt,publishedAt,revisedAt,title,content,sourcePages,source,category,mainVisual'
+          'id,createdAt,updatedAt,publishedAt,revisedAt,title,content,sourceContents,sourcePages,source,category,mainVisual'
       },
       config: fetchConfig
     });
@@ -80,7 +80,7 @@ export async function getSortedIndexData(
       query: {
         ...query,
         fields:
-          'id,createdAt,updatedAt,publishedAt,revisedAt,title,content,sourcePages,source,category,mainVisual'
+          'id,createdAt,updatedAt,publishedAt,revisedAt,title,content,sourceContents,sourcePages,source,category,mainVisual'
       },
       config: fetchConfig
     });
@@ -102,10 +102,11 @@ export async function getSortedIndexData(
           },
           description: res.description || ''
         };
-        if (res.source || res.sourcePages) {
+        if (res.source || res.sourceContents || res.sourcePages) {
           const d = await slideDeck(
             res.id,
             await sourceSetMarkdown({
+              sourceContents: res.sourceContents,
               sourcePages: res.sourcePages,
               source: res.source
             })
@@ -234,7 +235,7 @@ export async function getPagesData(
       params.id as string,
       {
         fields:
-          'id,createdAt,updatedAt,publishedAt,revisedAt,title,content,sourcePages,source,category,mainVisual,description'
+          'id,createdAt,updatedAt,publishedAt,revisedAt,title,content,sourceContents,sourcePages,source,category,mainVisual,description'
       }
     );
     const res = await client[apiName]._id(id).$get({
@@ -287,6 +288,7 @@ export async function getPagesData(
     ret.deck = await slideDeck(
       res.id,
       await sourceSetMarkdown({
+        sourceContents: res.sourceContents,
         sourcePages: res.sourcePages,
         source: res.source
       })
@@ -321,7 +323,7 @@ export async function getPagesSlideData(
       params.id as string,
       {
         fields:
-          'id,createdAt,updatedAt,publishedAt,revisedAt,title,sourcePages,source,category,mainVisual,description'
+          'id,createdAt,updatedAt,publishedAt,revisedAt,title,sourceContents,sourcePages,source,category,mainVisual,description'
       }
     );
     const res = await client[apiName]._id(id).$get({
@@ -363,6 +365,7 @@ export async function getPagesSlideData(
     // }
     let ret = await getSlideData(
       await sourceSetMarkdown({
+        sourceContents: res.sourceContents,
         sourcePages: res.sourcePages,
         source: res.source
       })

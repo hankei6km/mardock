@@ -1,4 +1,9 @@
+import unified from 'unified';
+import rehypeParse from 'rehype-parse';
+import stringify from 'rehype-stringify';
 import {
+  splitParagraphTransformer,
+  removeBlankTransformer,
   pageMarkdownMarkdown,
   pageImageMarkdown,
   pageCommentMarkdown,
@@ -6,6 +11,80 @@ import {
   pageMarkdown,
   sourceSetMarkdown
 } from './source';
+
+describe('splitParagraphTransformer()', () => {
+  const f = async (html: string): Promise<string> => {
+    return new Promise((resolve, reject) => {
+      unified()
+        .use(rehypeParse, { fragment: true })
+        .use(splitParagraphTransformer)
+        .use(stringify)
+        .freeze()
+        .process(html, (err, file) => {
+          if (err) {
+            reject(err);
+          }
+          resolve(String(file));
+        });
+    });
+  };
+  it('should split paragraph by br duplicated', async () => {
+    expect(await f('<p>test1</p>')).toEqual('<p>test1</p>');
+    expect(await f('<p>test2<br>tet3</p>')).toEqual('<p>test2<br>tet3</p>');
+    expect(await f('<p>test4<br><br>test5</p>')).toEqual(
+      '<p>test4</p><p>test5</p>'
+    );
+    expect(await f('<p>test6</p><ul><li>test7</li></ul><p>test8</p>')).toEqual(
+      '<p>test6</p><ul><li>test7</li></ul><p>test8</p>'
+    );
+    expect(
+      await f(
+        '<p>test9<br><br>test10</p><ul><li>test11</li></ul><p>test12<br><br>test13</p>'
+      )
+    ).toEqual(
+      '<p>test9</p><p>test10</p><ul><li>test11</li></ul><p>test12</p><p>test13</p>'
+    );
+    expect(await f('<p>test14<br><br><br>test15</p>')).toEqual(
+      '<p>test14</p><p>test15</p>'
+    );
+  });
+});
+
+describe('removeBlankTransformer()', () => {
+  const f = async (html: string): Promise<string> => {
+    return new Promise((resolve, reject) => {
+      unified()
+        .use(rehypeParse, { fragment: true })
+        .use(removeBlankTransformer)
+        .use(stringify)
+        .freeze()
+        .process(html, (err, file) => {
+          if (err) {
+            reject(err);
+          }
+          resolve(String(file));
+        });
+    });
+  };
+  it('should trim leading/trailing <br> element', async () => {
+    expect(await f('<p>test1</p>')).toEqual('<p>test1</p>');
+    expect(await f('<p>test2<br></p>')).toEqual('<p>test2</p>');
+    expect(await f('<p><br>test3</p>')).toEqual('<p>test3</p>');
+    expect(await f('<p><br><br>test4<br>test5<br><br></p>')).toEqual(
+      '<p>test4<br>test5</p>'
+    );
+    expect(
+      await f('<p><br><br>test6<br>test7<br><br></p><p>test8<br><br></p>')
+    ).toEqual('<p>test6<br>test7</p><p>test8</p>');
+  });
+  it('should remove blank paragraph', async () => {
+    expect(await f('<p></p>')).toEqual('');
+    expect(await f('<p><br></p>')).toEqual('');
+    expect(await f('<p>test1</p><p><br></p><p>test2</p>')).toEqual(
+      '<p>test1</p><p>test2</p>'
+    );
+  });
+});
 
 describe('pageMarkdownMarkdown()', () => {
   it('should returns markdown from markdown source', () => {
