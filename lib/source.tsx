@@ -5,7 +5,7 @@ import rehype2Remark from 'rehype-remark';
 import rehypeSanitize from 'rehype-sanitize';
 import stringify from 'remark-stringify';
 import { Transformer } from 'unified';
-import { Node, Element } from 'hast';
+import { Node } from 'hast';
 // import visit from 'unist-util-visit';
 import {
   PagesSourcePages,
@@ -16,39 +16,8 @@ import {
   PagesSourcePageContent,
   PagesSourcePageContents
 } from '../types/client/contentTypes';
+import { codeDockHandler } from './codedock';
 import siteServerSideConfig from '../src/site.server-side-config';
-const preHandler = require('hast-util-to-mdast/lib/handlers').pre;
-var toHtml = require('hast-util-to-html');
-
-export const CodeDockKindValues = ['markdown', 'comment'] as const;
-export type CodeDockKind = typeof CodeDockKindValues[number];
-
-const codeDockRegExp = new RegExp(`^===+(${CodeDockKindValues.join('|')})`);
-const blockRegExp = /^===+(markdown|comment)\n/;
-function isCodeDock(node: Element): boolean {
-  return (
-    Array.isArray(node.children) &&
-    node.children.length === 1 &&
-    node.children[0].type === 'element' &&
-    node.children[0].tagName === 'code' &&
-    Array.isArray(node.children[0].children) &&
-    node.children[0].children.length === 1 &&
-    node.children[0].children[0].type === 'text' &&
-    node.children[0].children[0].value.match(codeDockRegExp) !== null
-  );
-}
-export function codeDockKind(value: string): CodeDockKind | undefined {
-  const m = value.match(codeDockRegExp);
-  if (m) {
-    switch (m[1]) {
-      case 'markdown':
-        return 'markdown';
-      case 'comment':
-        return 'comment';
-    }
-  }
-  return;
-}
 
 export function splitParagraphTransformer(): Transformer {
   return function transformer(tree: Node): void {
@@ -123,30 +92,6 @@ export function removeBlankTransformer(): Transformer {
       });
     }
   };
-}
-
-export function codeDockHandler(
-  h: (
-    // エラーにならない程度に
-    node: Element,
-    type?: string,
-    props?: string,
-    children?: Element[]
-  ) => Element,
-  node: Element
-): Element {
-  if (isCodeDock(node)) {
-    const b = (node.children[0] as Element).children[0] as Element;
-    const kind = codeDockKind(b.value as string);
-    const value = (b.value as string).replace(blockRegExp, '');
-    switch (kind) {
-      case 'markdown':
-        return h(node, 'html', `\n${value}\n\n`);
-      case 'comment':
-        return h(node, 'html', toHtml({ type: 'comment', value }));
-    }
-  }
-  return preHandler(h, node);
 }
 
 const htmlToMarkdownProcessor = unified()
