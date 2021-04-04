@@ -32,7 +32,7 @@ import {
   pageCountFromTotalCount
 } from '../utils/pagination';
 import { getSlideData, slideDeck, slideDeckRemoveId } from './slide';
-import { sourceSetMarkdown } from './source';
+import { htmlToMarkdown, sourceSetMarkdown } from './source';
 // import { getTextlintKernelOptions } from '../utils/textlint';
 
 // const itemsPerPage = 10;
@@ -86,6 +86,7 @@ export async function getSortedIndexData(
     });
     const p = res.body.contents.map((res) => {
       return async (): Promise<IndexData> => {
+        // ここでは res.content は html として扱う
         const { articleTitle } = getArticleData(res.title, res.content || '');
         const mainVisual = res.mainVisual?.url
           ? res.mainVisual
@@ -242,7 +243,7 @@ export async function getPagesData(
       query: query,
       config: fetchConfig
     });
-    let content = res.content || '';
+    let content = await htmlToMarkdown(res.content || '');
     let notification: Notification | undefined = undefined; // スイッチ的に動作するのが面白くない
     if (preview || params.previewDemo === 'true') {
       const { result, messages, list } = await draftLint(content, '.md');

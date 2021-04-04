@@ -212,6 +212,13 @@ export async function pagesMarkdown(
   ).join('\n---\n\n');
 }
 
+export async function htmlToMarkdown(html: string): Promise<string> {
+  return await pageHtmlMarkdown({
+    fieldId: 'sourceHtml',
+    html
+  });
+}
+
 export async function sourceSetMarkdown(sourceSet: {
   sourceContents?: PagesSourcePageContents;
   sourcePages?: PagesSourcePages;
@@ -220,14 +227,11 @@ export async function sourceSetMarkdown(sourceSet: {
   // 現状の deck API の スキーマだと sourcePages はセットされないが
   // いちおう残しておく。
   if (sourceSet.source) {
-    return await pageHtmlMarkdown({
-      fieldId: 'sourceHtml',
-      html: sourceSet.source
-    });
+    return htmlToMarkdown(sourceSet.source);
   } else if (sourceSet.sourceContents && sourceSet.sourceContents.length > 0) {
-    return await pageMarkdown(sourceSet.sourceContents);
+    return pageMarkdown(sourceSet.sourceContents);
   } else if (sourceSet.sourcePages && sourceSet.sourcePages.length > 0) {
-    return await pagesMarkdown(sourceSet.sourcePages);
+    return pagesMarkdown(sourceSet.sourcePages);
   }
   return '';
 }
