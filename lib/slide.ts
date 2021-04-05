@@ -164,13 +164,18 @@ export async function slideDeck(id: string, source: string): Promise<DeckData> {
     // array を指定すると script が取得できない
     // 以下、とりあすの対応.
     // slideData と共通かするか?:
-    const t = marp.render(source);
+    // 一旦停止。
+    // - 同じスクリプトが何度も読み込まれる。
+    // - listner がリークしている可能性(きちんと調べていない)を考慮しなるべく動的には扱わない
+    // Layout の方で observer を読み込んでいる(ダメだったらこちらに戻す:)
+    //const t = marp.render(source);
+    //const script: string[] = [];
+    //const $ = cheerio.load(t.html);
+    //$('script').each((_idx, elm) => {
+    //  script.push($(elm).html() || '');
+    //});
+    // iframe  を使う方がよいか？:
     const script: string[] = [];
-    const $ = cheerio.load(t.html);
-    $('script').each((_idx, elm) => {
-      script.push($(elm).html() || '');
-    });
-
     let minX = 0;
     let minY = 0;
     let width = 0;
@@ -255,14 +260,26 @@ export async function getSlideData(source: string): Promise<SlideData> {
           attribs: attribs,
           html: $(elm).html() || ''
         });
+      } else if ((elm.type as any) === 'script') {
+        // fitting の script は取り込まれない.
+        // Layout の方で observer を読み込んでいる(ダメだった下記のコメントアウトの方に戻す:)
+        if ((elm as any).children) {
+          (elm as any).children.forEach((c: any) => {
+            ret.body.push({
+              tagName: 'script',
+              attribs: {},
+              html: c.data || ''
+            });
+          });
+        }
       }
     });
-  $('script').each((_idx, elm) => {
-    ret.body.push({
-      tagName: 'script',
-      attribs: {},
-      html: $(elm).html() || ''
-    });
-  });
+  // $('script').each((_idx, elm) => {
+  //   ret.body.push({
+  //     tagName: 'script',
+  //     attribs: {},
+  //     html: $(elm).html() || ''
+  //   });
+  // });
   return ret;
 }
