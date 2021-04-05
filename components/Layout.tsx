@@ -14,6 +14,7 @@ import Typography from '@material-ui/core/Typography';
 import MenuIcon from '@material-ui/icons/Menu';
 import GitHubIcon from '@material-ui/icons/GitHub';
 import TwitterIcon from '@material-ui/icons/Twitter';
+import { browser as marpCoreBrowserScript } from '@marp-team/marp-core/browser';
 import Notification from './Notification';
 import { PageData } from '../types/pageTypes';
 import { ApiNameArticle } from '../types/apiName';
@@ -406,6 +407,17 @@ const Layout = ({
   const ogImageUrl = mainVisual ? `${mainVisual}?${ogImageParamsStr}` : '';
   // header footer は https://github.com/hankei6km/my-starter-nextjs-typescript-material-ui-micro-cms-aspida に outer で記述だが、
   // 今回は直接記述.
+  React.useEffect(() => {
+    //https://github.com/marp-team/marp-core/blob/6dbdf266051940b69775139d5a830ea34daf0b1f/src/script/script.ts#L45
+    // setMarpFittingScript(
+    //   `https://cdn.jsdelivr.net/npm/${marpCoreName}@${marpCoreVersion}/lib/browser.js`
+    // );
+    // やってることは上記 CDN で読み込む場合と同じだと思う、たぶん
+    // ページ別に実行(cleanup)した方が良いのか？
+    const cleanup = marpCoreBrowserScript();
+    return () => cleanup();
+  }, []);
+
   return (
     <>
       <Head>
