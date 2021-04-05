@@ -3,7 +3,7 @@ import { GetStaticProps, GetStaticPaths } from 'next';
 // import { useRouter } from 'next/router';
 import ErrorPage from 'next/error';
 // import { makeStyles } from '@material-ui/core';
-import Layout from '../../components/Layout';
+import LayoutDocs from '../../components/LayoutDocs';
 import ListDocs from '../../components/ListDocs';
 import Link from '../../components/Link';
 import NavHtmlToc from '../../components/NavHtmlToc';
@@ -29,7 +29,7 @@ export default function Docs({ pageData, items }: Props) {
     return <ErrorPage statusCode={404} />;
   }
   return (
-    <Layout
+    <LayoutDocs
       apiName={'docs'}
       {...pageData}
       notification={pageData.notification}
@@ -51,7 +51,7 @@ export default function Docs({ pageData, items }: Props) {
       }
     >
       <Link href="/docs">{'Back to Docs'}</Link>
-    </Layout>
+    </LayoutDocs>
   );
 }
 

@@ -4,7 +4,7 @@ import { GetStaticProps, GetStaticPaths } from 'next';
 import ErrorPage from 'next/error';
 // import { makeStyles } from '@material-ui/core';
 import Box from '@material-ui/core/Box';
-import Layout from '../../components/Layout';
+import LayoutDeck from '../../components/LayoutDeck';
 import Link from '../../components/Link';
 import Carousel from 'react-material-ui-carousel';
 import { PageData } from '../../types/pageTypes';
@@ -21,7 +21,11 @@ export default function Deck({ pageData }: Props) {
     return <ErrorPage statusCode={404} />;
   }
   return (
-    <Layout apiName={'deck'} {...pageData} notification={pageData.notification}>
+    <LayoutDeck
+      apiName={'deck'}
+      {...pageData}
+      notification={pageData.notification}
+    >
       <Box component="section">
         <style
           dangerouslySetInnerHTML={{
@@ -51,7 +55,7 @@ export default function Deck({ pageData }: Props) {
         </Link>
       </Box>
       <Link href="/">{'Back to Home'}</Link>
-    </Layout>
+    </LayoutDeck>
   );
 }
 

@@ -21,6 +21,7 @@ export type DeckData = {
   width: number;
   height: number;
   css: string;
+  script: string[];
   items: DeckItem[];
 };
 
@@ -90,7 +91,8 @@ export const blankDeckData = (): DeckData => ({
   width: 0,
   height: 0,
   items: [],
-  css: ''
+  css: '',
+  script: []
 });
 export const blankPageData = (): PageData => ({
   id: '',
@@ -131,7 +133,8 @@ export const blankIndexData = (): IndexData => ({
     width: 0,
     height: 0,
     items: [],
-    css: ''
+    css: '',
+    script: []
   },
   mainVisual: { url: '', width: 0, height: 0 },
   description: ''

@@ -357,7 +357,7 @@ ogImageParams.append('w', '1200');
 ogImageParams.append('h', '630');
 const ogImageParamsStr = ogImageParams.toString();
 
-type Props = {
+export type Props = {
   apiName: ApiNameArticle;
   children?: ReactNode;
   topSection?: ReactNode;

@@ -1,6 +1,6 @@
 import { GetStaticProps } from 'next';
 import ErrorPage from 'next/error';
-import Layout from '../../components/Layout';
+import LayoutDocs from '../../components/LayoutDocs';
 import ListDocs from '../../components/ListDocs';
 // import Typography from '@material-ui/core/Typography';
 import { PageData, IndexList } from '../../types/pageTypes';
@@ -21,7 +21,7 @@ const DocsPage = ({ pageData, items }: Props) => {
     return <ErrorPage statusCode={404} />;
   }
   return (
-    <Layout
+    <LayoutDocs
       apiName={'pages'}
       {...pageData}
       notification={pageData.notification}
@@ -42,7 +42,7 @@ const DocsPage = ({ pageData, items }: Props) => {
           paginationFirstPageHref={'/docs'}
         />
       </section>
-    </Layout>
+    </LayoutDocs>
   );
 };
 
