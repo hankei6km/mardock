@@ -10,7 +10,7 @@ export const mockDataPagesContents: PagesContents['contents'] = [
     title: 'Home',
     category: [],
     description: 'description of draftlint',
-    content: 'home page'
+    content: '<p>home page</p>'
   },
   {
     id: 'deck',
@@ -20,7 +20,7 @@ export const mockDataPagesContents: PagesContents['contents'] = [
     revisedAt: '2020-12-26T15:29:14.476Z',
     title: 'Slides',
     category: [],
-    content: 'documents page'
+    content: '<p>documents page</p>'
   }
 ];
 export const mockDataPages: PagesContents = {
@@ -61,8 +61,9 @@ export const mockDataDeckContents: PagesContents['contents'] = [
     revisedAt: '2020-12-26T15:29:14.476Z',
     title: 'Slide1',
     category: [],
-    content: 'test slide page',
-    source: '---\ntitle: slide1\n\n---\n\n#test1\n\n---\n\n- item1\n- item2\n'
+    content: '<p>test slide page<p/>',
+    source:
+      '<p>---</p><p>title: slide1</p><p>---</p><h1>test1</h1><p>---</p><ul><li>item1</li><li>item2</li></ul>'
   }
 ];
 

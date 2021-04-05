@@ -88,7 +88,7 @@ describe('writeSlideTitleImage()', () => {
       }
     );
     expect(execFile.mock.calls[0][0]).toEqual('node_modules/.bin/marp');
-    expect(execFile.mock.calls[0][1]).toEqual(['--image', 'png']);
+    expect(execFile.mock.calls[0][1]).toEqual(['--image', 'png', '--html']);
     expect(write.mock.calls[0][0].toString('utf8')).toEqual('ok');
     expect(close).toHaveBeenCalledTimes(1);
     expect(res).toEqual({

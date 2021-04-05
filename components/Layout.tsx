@@ -484,47 +484,44 @@ const Layout = ({
             <Divider className={classes['NavBreadcrumbs-divider']} />
           </>
         )}
-        <Container
-          maxWidth={maxWidth}
-          disableGutters
-          // className={classes['Layout-body']}
-          className={'Layout-body'}
-        >
-          {(topPersistSection || topSection) && (
-            <Box className={classes['Layout-section-top']}>
-              <Box className={classes['Layout-section-top-inner']}>
-                {topPersistSection && (
-                  <Box className={classes['Layout-section-top-persist']}>
-                    {topPersistSection}
-                  </Box>
-                )}
-                {topSection && (
-                  <Box className={classes['Layout-section-top-not-persist']}>
-                    {topSection}
-                  </Box>
-                )}
+        <Container maxWidth={maxWidth} disableGutters>
+          <Box className={'Layout-body'}>
+            {(topPersistSection || topSection) && (
+              <Box className={classes['Layout-section-top']}>
+                <Box className={classes['Layout-section-top-inner']}>
+                  {topPersistSection && (
+                    <Box className={classes['Layout-section-top-persist']}>
+                      {topPersistSection}
+                    </Box>
+                  )}
+                  {topSection && (
+                    <Box className={classes['Layout-section-top-not-persist']}>
+                      {topSection}
+                    </Box>
+                  )}
+                </Box>
               </Box>
+            )}
+            <Box component="section" className={classes['Layout-section']}>
+              <>
+                <Typography component="h2">{articleTitle}</Typography>
+                {apiName === 'deck' && (
+                  <DateUpdated updated={updated} classes={classes} />
+                )}
+                <article
+                  dangerouslySetInnerHTML={{
+                    __html: html
+                  }}
+                ></article>
+                <Box className={classes['Layout-children']}>{children}</Box>
+              </>
             </Box>
-          )}
-          <Box component="section" className={classes['Layout-section']}>
-            <>
-              <Typography component="h2">{articleTitle}</Typography>
-              {apiName === 'deck' && (
-                <DateUpdated updated={updated} classes={classes} />
-              )}
-              <article
-                dangerouslySetInnerHTML={{
-                  __html: html
-                }}
-              ></article>
-              <Box className={classes['Layout-children']}>{children}</Box>
-            </>
+            {bottomSection && (
+              <Box className={classes['Layout-section-bottom']}>
+                {bottomSection}
+              </Box>
+            )}
           </Box>
-          {bottomSection && (
-            <Box className={classes['Layout-section-bottom']}>
-              {bottomSection}
-            </Box>
-          )}
         </Container>
       </Box>
       <footer className={classes.footer}>

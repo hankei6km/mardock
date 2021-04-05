@@ -42,7 +42,7 @@ export function slideHtml(markdown: string, w: Writable): Promise<number> {
     // spawn で stdout.pipe を使うと後ろのデータがドロップしてしまう
     // (GitHub Actions のときに 8 割りくらい確率で)
     // しかたないので stdout の内容をべたで扱う.
-    const marpP = execFile(marpPath, [], (err, stdout, _strderr) => {
+    const marpP = execFile(marpPath, ['--html'], (err, stdout, _strderr) => {
       if (err) {
         throw new Error(`slideHtml error: ${err}`);
       }
@@ -74,7 +74,7 @@ export function slideImage(
   return new Promise((resolve) => {
     const marpP = execFile(
       marpPath,
-      ['--image', 'png'],
+      ['--image', 'png', '--html'],
       (err, stdout, _stderr) => {
         if (err) {
           // throw new Error(`slideHtml error: ${err}`);
@@ -153,6 +153,7 @@ export async function slideDeck(id: string, source: string): Promise<DeckData> {
     const containerId = `slide-${id}`;
     const marp = new Marp({
       inlineSVG: true,
+      html: true,
       container: [
         new Element('article', { id: containerId }),
         new Element('div', { class: 'slides' })
