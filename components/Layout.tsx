@@ -27,9 +27,12 @@ import { gridTempalteAreasFromLayout } from '../utils/grid';
 
 const useStyles = makeStyles((theme) => ({
   'Header-root': {
-    position: 'sticky',
-    top: 0,
-    backgroundColor: theme.palette.background.default
+    position: 'unset',
+    backgroundColor: theme.palette.background.default,
+    [theme.breakpoints.up('md')]: {
+      position: 'sticky',
+      top: 0
+    }
   },
   'Header-toolbar': {
     width: '100%',
