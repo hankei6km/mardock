@@ -161,6 +161,16 @@ export async function slideDeck(id: string, source: string): Promise<DeckData> {
       slideContainer: new Element('div', { class: 'slide' })
     });
     const { html, css } = marp.render(source, { htmlAsArray: true });
+    // array を指定すると script が取得できない
+    // 以下、とりあすの対応.
+    // slideData と共通かするか?:
+    const t = marp.render(source);
+    const script: string[] = [];
+    const $ = cheerio.load(t.html);
+    $('script').each((_idx, elm) => {
+      script.push($(elm).html() || '');
+    });
+
     let minX = 0;
     let minY = 0;
     let width = 0;
@@ -182,6 +192,7 @@ export async function slideDeck(id: string, source: string): Promise<DeckData> {
       width,
       height,
       css,
+      script,
       items: html.map((v) => ({
         html: v
       }))

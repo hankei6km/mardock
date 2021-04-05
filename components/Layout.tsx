@@ -23,7 +23,6 @@ import NavMain from './NavMain';
 import NavBreadcrumbs from './NavBreadcrumbs';
 import DateUpdated from './DateUpdated';
 import { gridTempalteAreasFromLayout } from '../utils/grid';
-import 'highlight.js/styles/mono-blue.css';
 
 const useStyles = makeStyles((theme) => ({
   'Header-root': {
@@ -358,7 +357,7 @@ ogImageParams.append('w', '1200');
 ogImageParams.append('h', '630');
 const ogImageParamsStr = ogImageParams.toString();
 
-type Props = {
+export type Props = {
   apiName: ApiNameArticle;
   children?: ReactNode;
   topSection?: ReactNode;
