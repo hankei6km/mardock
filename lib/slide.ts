@@ -244,17 +244,14 @@ export async function getSlideData(source: string): Promise<SlideData> {
           attribs: attribs,
           html: $(elm).html() || ''
         });
-      } else if ((elm.type as any) === 'script') {
-        if ((elm as any).children) {
-          (elm as any).children.forEach((c: any) => {
-            ret.body.push({
-              tagName: 'script',
-              attribs: {},
-              html: c.data || ''
-            });
-          });
-        }
       }
     });
+  $('script').each((_idx, elm) => {
+    ret.body.push({
+      tagName: 'script',
+      attribs: {},
+      html: $(elm).html() || ''
+    });
+  });
   return ret;
 }

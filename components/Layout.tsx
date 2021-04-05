@@ -23,6 +23,7 @@ import NavMain from './NavMain';
 import NavBreadcrumbs from './NavBreadcrumbs';
 import DateUpdated from './DateUpdated';
 import { gridTempalteAreasFromLayout } from '../utils/grid';
+import 'highlight.js/styles/mono-blue.css';
 
 const useStyles = makeStyles((theme) => ({
   'Header-root': {
