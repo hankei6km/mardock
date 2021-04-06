@@ -1,13 +1,15 @@
-import React, { ReactNode, useContext, useState } from 'react';
+import React, { ReactElement, ReactNode, useContext, useState } from 'react';
 // import { useRouter } from 'next/router';
 import { makeStyles } from '@material-ui/core';
 // import NoSsr from '@material-ui/core/NoSsr';
+import useScrollTrigger from '@material-ui/core/useScrollTrigger';
 import Head from 'next/head';
 import Container from '@material-ui/core/Container';
 import Avatar from '@material-ui/core/Avatar';
 import Box from '@material-ui/core/Box';
 import Divider from '@material-ui/core/Divider';
 import AppBar from '@material-ui/core/AppBar';
+import Slide from '@material-ui/core/Slide';
 import Toolbar from '@material-ui/core/Toolbar';
 import IconButton from '@material-ui/core/IconButton';
 import Typography from '@material-ui/core/Typography';
@@ -27,12 +29,9 @@ import { gridTempalteAreasFromLayout } from '../utils/grid';
 
 const useStyles = makeStyles((theme) => ({
   'Header-root': {
-    position: 'unset',
-    backgroundColor: theme.palette.background.default,
-    [theme.breakpoints.up('md')]: {
-      position: 'sticky',
-      top: 0
-    }
+    position: 'sticky',
+    top: 0,
+    backgroundColor: theme.palette.background.default
   },
   'Header-toolbar': {
     width: '100%',
@@ -375,6 +374,17 @@ function getAvatarSrcSet(src: string): string {
   return `${u}?dpr64=Mw&fit64=Y3JvcA&h64=MTIw&w64=MTIw 3x, ${u}?dpr64=Mg&fit64=Y3JvcA&h64=MTIw&w64=MTIw 2x, ${u}?dpr64=&fit64=Y3JvcA&h64=MTIw&w64=MTIw 1x`;
 }
 
+function HideOnScroll({ children }: { children?: ReactElement }) {
+  // https://material-ui.com/components/app-bar/#hide-app-bar
+  const trigger = useScrollTrigger();
+
+  return (
+    <Slide appear={false} direction="down" in={!trigger}>
+      {children}
+    </Slide>
+  );
+}
+
 const Layout = ({
   apiName,
   id,
@@ -433,59 +443,61 @@ const Layout = ({
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="viewport" content="initial-scale=1.0, width=device-width" />
       </Head>
-      <AppBar
-        component="header"
-        // color="default"
-        className={classes['Header-root']}
-      >
-        <Container maxWidth={maxWidth} disableGutters>
-          <Toolbar disableGutters className={classes['Header-toolbar']}>
-            <Box className={classes['Header-content']}>
-              <Box className={classes['Header-title']}>
-                <Box className={classes['Header-site-title-root']}>
-                  <Avatar
-                    component={Link}
-                    href={'/'}
-                    className={classes['Header-site-title-image']}
-                    alt={siteIcon.alt}
-                    imgProps={{ width: 120, height: 120 }}
-                    src={avatarSrc}
-                    srcSet={avatarSrcSet}
+      <HideOnScroll>
+        <AppBar
+          component="header"
+          // color="default"
+          className={classes['Header-root']}
+        >
+          <Container maxWidth={maxWidth} disableGutters>
+            <Toolbar disableGutters className={classes['Header-toolbar']}>
+              <Box className={classes['Header-content']}>
+                <Box className={classes['Header-title']}>
+                  <Box className={classes['Header-site-title-root']}>
+                    <Avatar
+                      component={Link}
+                      href={'/'}
+                      className={classes['Header-site-title-image']}
+                      alt={siteIcon.alt}
+                      imgProps={{ width: 120, height: 120 }}
+                      src={avatarSrc}
+                      srcSet={avatarSrcSet}
+                    />
+                    <Typography
+                      component="h1"
+                      className={classes['Header-site-title-text']}
+                    >
+                      <Link href="/" underline="none" color="textPrimary">
+                        {siteName}
+                      </Link>
+                    </Typography>
+                  </Box>
+                  <Box className={classes['NavMain-menu-button-outer']}>
+                    <IconButton
+                      aria-label="toggle primary-navigation"
+                      className={classes['NavMain-menu-button']}
+                      onClick={() => setNavOpen(!navOpen)}
+                    >
+                      <MenuIcon />
+                    </IconButton>
+                  </Box>
+                </Box>
+                <Box
+                  className={
+                    navOpen
+                      ? `${classes['NavMain-outer']} Header-content-NavOpen`
+                      : classes['NavMain-outer']
+                  }
+                >
+                  <NavMain
+                    classes={{ 'NavMain-root': classes['NavMain-root'] }}
                   />
-                  <Typography
-                    component="h1"
-                    className={classes['Header-site-title-text']}
-                  >
-                    <Link href="/" underline="none" color="textPrimary">
-                      {siteName}
-                    </Link>
-                  </Typography>
-                </Box>
-                <Box className={classes['NavMain-menu-button-outer']}>
-                  <IconButton
-                    aria-label="toggle primary-navigation"
-                    className={classes['NavMain-menu-button']}
-                    onClick={() => setNavOpen(!navOpen)}
-                  >
-                    <MenuIcon />
-                  </IconButton>
                 </Box>
               </Box>
-              <Box
-                className={
-                  navOpen
-                    ? `${classes['NavMain-outer']} Header-content-NavOpen`
-                    : classes['NavMain-outer']
-                }
-              >
-                <NavMain
-                  classes={{ 'NavMain-root': classes['NavMain-root'] }}
-                />
-              </Box>
-            </Box>
-          </Toolbar>
-        </Container>
-      </AppBar>
+            </Toolbar>
+          </Container>
+        </AppBar>
+      </HideOnScroll>
       <Box className={classes['Layout-section-root']}>
         {(apiName === 'deck' || apiName === 'docs') && (
           <>
