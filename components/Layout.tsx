@@ -1,13 +1,22 @@
-import React, { ReactNode, useContext, useState } from 'react';
+import React, {
+  ReactElement,
+  ReactNode,
+  useEffect,
+  useContext,
+  useState
+} from 'react';
 // import { useRouter } from 'next/router';
 import { makeStyles } from '@material-ui/core';
-// import NoSsr from '@material-ui/core/NoSsr';
+import { useTheme } from '@material-ui/core/styles';
+import useMediaQuery from '@material-ui/core/useMediaQuery';
+import useScrollTrigger from '@material-ui/core/useScrollTrigger';
 import Head from 'next/head';
 import Container from '@material-ui/core/Container';
 import Avatar from '@material-ui/core/Avatar';
 import Box from '@material-ui/core/Box';
 import Divider from '@material-ui/core/Divider';
 import AppBar from '@material-ui/core/AppBar';
+import Slide from '@material-ui/core/Slide';
 import Toolbar from '@material-ui/core/Toolbar';
 import IconButton from '@material-ui/core/IconButton';
 import Typography from '@material-ui/core/Typography';
@@ -372,6 +381,28 @@ function getAvatarSrcSet(src: string): string {
   return `${u}?dpr64=Mw&fit64=Y3JvcA&h64=MTIw&w64=MTIw 3x, ${u}?dpr64=Mg&fit64=Y3JvcA&h64=MTIw&w64=MTIw 2x, ${u}?dpr64=&fit64=Y3JvcA&h64=MTIw&w64=MTIw 1x`;
 }
 
+function HideOnScroll({
+  children,
+  alwaysShowing
+}: {
+  children?: ReactElement;
+  alwaysShowing: boolean;
+}) {
+  // https://material-ui.com/components/app-bar/#hide-app-bar
+  const trigger = useScrollTrigger();
+
+  return (
+    <Slide
+      appear={false}
+      direction="down"
+      in={!trigger || alwaysShowing}
+      //style={{ transitionDelay: !trigger ? '500ms' : '0ms' }}
+    >
+      {children}
+    </Slide>
+  );
+}
+
 const Layout = ({
   apiName,
   id,
@@ -397,7 +428,10 @@ const Layout = ({
   const { siteName, siteIcon } = useContext(SiteContext);
   const [navOpen, setNavOpen] = useState(false);
   const maxWidth = 'lg';
-  // const router = useRouter();
+  const theme = useTheme();
+  //最初に false になるが、ロード時の不自然な動作はでないと
+  const downMd = useMediaQuery(theme.breakpoints.down('md'));
+  const [alwaysShowing, setAlwaysShowing] = useState(false);
   const avatarSrc = siteIcon.url;
   const avatarSrcSet = getAvatarSrcSet(avatarSrc);
   const _title =
@@ -407,7 +441,7 @@ const Layout = ({
   const ogImageUrl = mainVisual ? `${mainVisual}?${ogImageParamsStr}` : '';
   // header footer は https://github.com/hankei6km/my-starter-nextjs-typescript-material-ui-micro-cms-aspida に outer で記述だが、
   // 今回は直接記述.
-  React.useEffect(() => {
+  useEffect(() => {
     //https://github.com/marp-team/marp-core/blob/6dbdf266051940b69775139d5a830ea34daf0b1f/src/script/script.ts#L45
     // setMarpFittingScript(
     //   `https://cdn.jsdelivr.net/npm/${marpCoreName}@${marpCoreVersion}/lib/browser.js`
@@ -417,6 +451,22 @@ const Layout = ({
     const cleanup = marpCoreBrowserScript();
     return () => cleanup();
   }, []);
+  useEffect(() => {
+    const a = navOpen || !downMd;
+    if (a) {
+      setAlwaysShowing(true);
+    } else {
+      let id: any = setTimeout(() => {
+        id = 0;
+        setAlwaysShowing(false);
+      }, 400);
+      return () => {
+        if (id !== 0) {
+          clearTimeout(id);
+        }
+      };
+    }
+  }, [navOpen, downMd]);
 
   return (
     <>
@@ -430,59 +480,61 @@ const Layout = ({
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="viewport" content="initial-scale=1.0, width=device-width" />
       </Head>
-      <AppBar
-        component="header"
-        // color="default"
-        className={classes['Header-root']}
-      >
-        <Container maxWidth={maxWidth} disableGutters>
-          <Toolbar disableGutters className={classes['Header-toolbar']}>
-            <Box className={classes['Header-content']}>
-              <Box className={classes['Header-title']}>
-                <Box className={classes['Header-site-title-root']}>
-                  <Avatar
-                    component={Link}
-                    href={'/'}
-                    className={classes['Header-site-title-image']}
-                    alt={siteIcon.alt}
-                    imgProps={{ width: 120, height: 120 }}
-                    src={avatarSrc}
-                    srcSet={avatarSrcSet}
+      <HideOnScroll alwaysShowing={alwaysShowing}>
+        <AppBar
+          component="header"
+          // color="default"
+          className={classes['Header-root']}
+        >
+          <Container maxWidth={maxWidth} disableGutters>
+            <Toolbar disableGutters className={classes['Header-toolbar']}>
+              <Box className={classes['Header-content']}>
+                <Box className={classes['Header-title']}>
+                  <Box className={classes['Header-site-title-root']}>
+                    <Avatar
+                      component={Link}
+                      href={'/'}
+                      className={classes['Header-site-title-image']}
+                      alt={siteIcon.alt}
+                      imgProps={{ width: 120, height: 120 }}
+                      src={avatarSrc}
+                      srcSet={avatarSrcSet}
+                    />
+                    <Typography
+                      component="h1"
+                      className={classes['Header-site-title-text']}
+                    >
+                      <Link href="/" underline="none" color="textPrimary">
+                        {siteName}
+                      </Link>
+                    </Typography>
+                  </Box>
+                  <Box className={classes['NavMain-menu-button-outer']}>
+                    <IconButton
+                      aria-label="toggle primary-navigation"
+                      className={classes['NavMain-menu-button']}
+                      onClick={() => setNavOpen(!navOpen)}
+                    >
+                      <MenuIcon />
+                    </IconButton>
+                  </Box>
+                </Box>
+                <Box
+                  className={
+                    navOpen
+                      ? `${classes['NavMain-outer']} Header-content-NavOpen`
+                      : classes['NavMain-outer']
+                  }
+                >
+                  <NavMain
+                    classes={{ 'NavMain-root': classes['NavMain-root'] }}
                   />
-                  <Typography
-                    component="h1"
-                    className={classes['Header-site-title-text']}
-                  >
-                    <Link href="/" underline="none" color="textPrimary">
-                      {siteName}
-                    </Link>
-                  </Typography>
-                </Box>
-                <Box className={classes['NavMain-menu-button-outer']}>
-                  <IconButton
-                    aria-label="toggle primary-navigation"
-                    className={classes['NavMain-menu-button']}
-                    onClick={() => setNavOpen(!navOpen)}
-                  >
-                    <MenuIcon />
-                  </IconButton>
                 </Box>
               </Box>
-              <Box
-                className={
-                  navOpen
-                    ? `${classes['NavMain-outer']} Header-content-NavOpen`
-                    : classes['NavMain-outer']
-                }
-              >
-                <NavMain
-                  classes={{ 'NavMain-root': classes['NavMain-root'] }}
-                />
-              </Box>
-            </Box>
-          </Toolbar>
-        </Container>
-      </AppBar>
+            </Toolbar>
+          </Container>
+        </AppBar>
+      </HideOnScroll>
       <Box className={classes['Layout-section-root']}>
         {(apiName === 'deck' || apiName === 'docs') && (
           <>
