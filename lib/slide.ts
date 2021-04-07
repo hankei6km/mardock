@@ -13,7 +13,9 @@ import {
   blankDeckData
 } from '../types/pageTypes';
 import { PagesImage } from '../types/client/contentTypes';
+import themes from '../src/marp-theme';
 const { Element } = require('@marp-team/marpit');
+
 // temp ファイル、fifo 等も考えたが今回は pipe で楽する。
 // 速度的に不利になったら考える。
 // import { marpCli } from '@marp-team/marp-cli';
@@ -160,6 +162,7 @@ export async function slideDeck(id: string, source: string): Promise<DeckData> {
       ],
       slideContainer: new Element('div', { class: 'slide' })
     });
+    themes.forEach((t) => marp.themeSet.add(t));
     const { html, css } = marp.render(source, { htmlAsArray: true });
     // array を指定すると script が取得できない
     // 以下、とりあすの対応.
