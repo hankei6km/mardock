@@ -18,6 +18,7 @@ import {
 } from '../types/client/contentTypes';
 import { codeDockHandler } from './codedock';
 import siteServerSideConfig from '../src/site.server-side-config';
+import { qrcodeToDataUrl } from './qrcode';
 
 export function splitParagraphTransformer(): Transformer {
   return function transformer(tree: Node): void {
@@ -213,10 +214,11 @@ export async function pagesMarkdown(
 }
 
 export async function htmlToMarkdown(html: string): Promise<string> {
-  return await pageHtmlMarkdown({
+  const md = await pageHtmlMarkdown({
     fieldId: 'sourceHtml',
     html
   });
+  return await qrcodeToDataUrl(md);
 }
 
 export async function sourceSetMarkdown(sourceSet: {
