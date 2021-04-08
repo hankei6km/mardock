@@ -14,6 +14,7 @@ import {
 } from '../types/pageTypes';
 import { PagesImage } from '../types/client/contentTypes';
 import themes from '../src/marp-theme';
+// import qrcode from '../src/markdown-it-qrcode';
 const { Element } = require('@marp-team/marpit');
 
 // temp ファイル、fifo 等も考えたが今回は pipe で楽する。
