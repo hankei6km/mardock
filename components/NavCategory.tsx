@@ -6,20 +6,30 @@ import Link from './Link';
 import { pruneClasses } from '../utils/classes';
 import { PagesCategory } from '../types/client/contentTypes';
 
-const useStyles = makeStyles(() => ({
+const useStyles = makeStyles((theme) => ({
   'NavCategory-root': {
     width: '100%'
   },
   'NavCategory-list': {
     display: 'flex',
-    justifyContent: 'space-around',
+    // justifyContent: 'space-around',
+    // justifyContent: 'center',
     listStyle: 'none',
+    margin: 0,
+    padding: 0,
     '& li::before': {
       content: '\u200B'
     }
   },
   'NavCategory-link': {
-    width: '100%'
+    //width: '100%'
+    '& a': {
+      color: theme.palette.primary.contrastText
+    },
+    backgroundColor: theme.palette.primary.main,
+    borderRadius: theme.shape.borderRadius,
+    padding: theme.spacing(0.5),
+    marginRight: theme.spacing(1)
   },
   'NavCategory-all-root': {},
   'NavCategory-all-list': {

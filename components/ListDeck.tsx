@@ -10,16 +10,6 @@ const useStyles = makeStyles((theme) => ({
     width: '100%',
     gridGap: theme.spacing(1),
     justifyContent: 'space-around'
-  },
-  'ListDeck-thumb-outer': {
-    width: '100%',
-    [theme.breakpoints.up('sm')]: {
-      width: '49%'
-    },
-    [theme.breakpoints.up('md')]: {
-      width: '32%'
-    }
-    // aspectRatio: '16 / 9' // Props で指定させる?
   }
 }));
 const classNames = ['ListDeck-root'];
@@ -28,18 +18,21 @@ type Props = {
   itemPath: string;
   items: IndexList;
   cellHeight?: number | 'auto';
-  cols?: [number, number];
   imgWidth?: number;
+  variant?: 'thin';
   classes?: { [key: string]: string };
 };
-const ListDeck = ({
-  itemPath,
-  items,
-  cellHeight = 'auto',
-  cols = [2, 1],
-  classes: inClasses
-}: Props) => {
-  const classes = useStyles({ classes: pruneClasses(inClasses, classNames) });
+const ListDeck = (props: Props) => {
+  const {
+    itemPath,
+    items,
+    cellHeight = 'auto',
+    variant,
+    classes: inClasses
+  } = props;
+  const classes = useStyles({
+    classes: pruneClasses(inClasses, classNames)
+  });
   return (
     <GridList
       cellHeight={cellHeight}
@@ -47,7 +40,6 @@ const ListDeck = ({
       // 切り替えはやめる?
       // style で display none で切り替える?
       // cols={isWidthUp('sm', width) ? cols[0] : cols[1]}
-      cols={cols[0]}
       className={classes['ListDeck-root']}
     >
       {items.contents.map((item) => (
@@ -61,6 +53,7 @@ const ListDeck = ({
           itemPath={itemPath}
           category={item.category}
           deck={item.deck}
+          variant={variant}
           classes={classes}
         />
       ))}

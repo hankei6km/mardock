@@ -73,10 +73,16 @@ const useStyles = makeStyles((theme) => ({
     marginRight: theme.spacing(2)
     // marginBottom: theme.spacing(2)
   }),
-  'Header-site-title-text': {
-    flexGrow: 1,
-    ...theme.typography.h4
-    // padding: 0
+  'Header-site-title-text-outer': {
+    flexGrow: 1
+  },
+  'Header-site-title-text-plain': {
+    ...theme.typography.h4,
+    color: theme.palette.text.primary
+  },
+  'Header-site-title-text-strong': {
+    ...theme.typography.h4,
+    color: theme.palette.primary.main
   },
   'NavMain-menu-button-outer': {
     display: 'flex',
@@ -191,7 +197,7 @@ const useStyles = makeStyles((theme) => ({
     gridArea: 'top',
     padding: theme.spacing(0, 1),
     [theme.breakpoints.up('md')]: {
-      zIndex: 2,
+      zIndex: 3,
       padding: theme.spacing(0)
       // position: 'fixed',
       // top: 110
@@ -223,6 +229,7 @@ const useStyles = makeStyles((theme) => ({
   'Layout-section': {
     gridArea: 'main',
     // width: '100%',
+    zIndex: 2,
     [theme.breakpoints.up('md')]: {},
     ...theme.typography.body1,
     padding: theme.spacing(0, 1),
@@ -370,9 +377,11 @@ const ogImageParamsStr = ogImageParams.toString();
 export type Props = {
   apiName: ApiNameArticle;
   children?: ReactNode;
+  section?: ReactNode;
   topSection?: ReactNode;
   topPersistSection?: ReactNode;
   bottomSection?: ReactNode;
+  classes?: { [key: string]: string }; // prune をかけないので注意
 } & Partial<PageData>;
 
 function getAvatarSrcSet(src: string): string {
@@ -407,6 +416,7 @@ const Layout = ({
   apiName,
   id,
   children,
+  section,
   topSection,
   topPersistSection,
   bottomSection,
@@ -416,16 +426,18 @@ const Layout = ({
   articleTitle,
   html: html = '',
   mainVisual = { url: '', width: 0, height: 0 },
-  notification
+  notification,
+  classes: inClasses
 }: Props) => {
   const classes = useStyles({
     apiName,
     id: id || '',
     topSection,
     topPersistSection,
-    bottomSection
+    bottomSection,
+    classes: inClasses
   });
-  const { siteName, siteIcon } = useContext(SiteContext);
+  const { siteNameDecorated, siteIcon } = useContext(SiteContext);
   const [navOpen, setNavOpen] = useState(false);
   const maxWidth = 'lg';
   const theme = useTheme();
@@ -502,10 +514,24 @@ const Layout = ({
                     />
                     <Typography
                       component="h1"
-                      className={classes['Header-site-title-text']}
+                      className={classes['Header-site-title-text-outer']}
                     >
                       <Link href="/" underline="none" color="textPrimary">
-                        {siteName}
+                        {siteNameDecorated.map((t, i) => (
+                          <Typography
+                            key={`site-title:${i}`}
+                            component="span"
+                            className={
+                              classes[
+                                t.strong
+                                  ? 'Header-site-title-text-strong'
+                                  : 'Header-site-title-text-plain'
+                              ]
+                            }
+                          >
+                            {t.label}
+                          </Typography>
+                        ))}
                       </Link>
                     </Typography>
                   </Box>
@@ -567,18 +593,22 @@ const Layout = ({
               </Box>
             )}
             <Box component="section" className={classes['Layout-section']}>
-              <>
-                <Typography component="h2">{articleTitle}</Typography>
-                {apiName === 'deck' && (
-                  <DateUpdated updated={updated} classes={classes} />
-                )}
-                <article
-                  dangerouslySetInnerHTML={{
-                    __html: html
-                  }}
-                ></article>
-                <Box className={classes['Layout-children']}>{children}</Box>
-              </>
+              {section ? (
+                <>{section}</>
+              ) : (
+                <>
+                  <Typography component="h2">{articleTitle}</Typography>
+                  {apiName === 'deck' && (
+                    <DateUpdated updated={updated} classes={classes} />
+                  )}
+                  <article
+                    dangerouslySetInnerHTML={{
+                      __html: html
+                    }}
+                  ></article>
+                  <Box className={classes['Layout-children']}>{children}</Box>
+                </>
+              )}
             </Box>
             {bottomSection && (
               <Box className={classes['Layout-section-bottom']}>

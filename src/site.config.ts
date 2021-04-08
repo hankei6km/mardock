@@ -6,6 +6,7 @@ export type ConfigImageSource = {
 };
 type SiteConfig = {
   siteName: string;
+  siteNameDecorated: { label: string; strong?: boolean }[];
   siteIcon: ConfigImageSource;
   nav: {
     main: { label: string; href: string }[];
@@ -16,11 +17,16 @@ type SiteConfig = {
 
 const siteConfig: SiteConfig = {
   siteName: 'mardock',
+  siteNameDecorated: [
+    { label: 'mar' },
+    { label: 'doc', strong: true },
+    { label: 'k' }
+  ],
   siteIcon: {
     url:
-      'https://images.microcms-assets.io/assets/cc433627f35c4232b7cb97e0376507a7/0f8cf6adefbc4830bb9edca781c97ad1/mardock-site-icon-2.png',
-    width: 640,
-    height: 640,
+      'https://images.microcms-assets.io/assets/cc433627f35c4232b7cb97e0376507a7/da27ed4e87794f41af0f5bfdf79391f1/mardock-site-icon-3.png',
+    width: 800,
+    height: 800,
     alt: 'mardock site icon'
   },
   nav: {

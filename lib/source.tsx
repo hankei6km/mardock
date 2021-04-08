@@ -325,7 +325,7 @@ export async function htmlToMarkdown(html: string): Promise<string> {
   });
   // console.log(md);
   // return md;
-  // console.log(await qrcodeToDataUrl(md));
+   // console.log(await qrcodeToDataUrl(md));
   return await qrcodeToDataUrl(md);
 }
 

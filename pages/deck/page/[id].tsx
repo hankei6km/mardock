@@ -37,12 +37,7 @@ export default function Page({ pageData, items }: Props) {
       notification={pageData.notification}
     >
       <section>
-        <ListDeck
-          itemPath={'/deck'}
-          items={items}
-          cols={[1, 1]}
-          imgWidth={600}
-        />
+        <ListDeck itemPath={'/deck'} items={items} imgWidth={600} />
         <NavPagination
           pageNo={pageData.pageNo}
           pageCount={pageData.pageCount}

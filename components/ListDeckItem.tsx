@@ -17,16 +17,21 @@ import { DeckData } from '../types/pageTypes';
 import Carousel from 'react-material-ui-carousel';
 
 const useStyles = makeStyles((theme) => ({
-  'ListDeckItem-thumb-outer': {
-    width: '100%',
-    [theme.breakpoints.up('sm')]: {
-      width: '49%'
-    },
-    [theme.breakpoints.up('md')]: {
-      width: '32%'
-    }
-    // aspectRatio: '16 / 9' // Props で指定させる?
-  },
+  'ListDeckItem-thumb-outer': (props: Props) =>
+    props.variant === 'thin'
+      ? {
+          width: '100%'
+        }
+      : {
+          width: '100%',
+          [theme.breakpoints.up('sm')]: {
+            width: '49%'
+          },
+          [theme.breakpoints.up('md')]: {
+            width: '32%'
+          }
+          // aspectRatio: '16 / 9' // Props で指定させる?
+        },
   'ListDeckItem-card-root': {
     marginBottom: theme.spacing(1),
     '& .MuiCardContent-root ': {
@@ -66,18 +71,16 @@ type Props = {
   itemPath: string;
   category: PagesCategory[];
   deck: DeckData;
+  variant?: 'thin';
   classes?: { [key: string]: string };
 };
 // } & { width: Breakpoint };
-const ListDeckItem = ({
-  itemId,
-  title,
-  itemPath,
-  category,
-  deck,
-  classes: inClasses
-}: Props) => {
-  const classes = useStyles({ classes: pruneClasses(inClasses, classNames) });
+const ListDeckItem = (props: Props) => {
+  const { itemId, title, itemPath, category, deck, classes: inClasses } = props;
+  const classes = useStyles({
+    ...props,
+    classes: pruneClasses(inClasses, classNames)
+  });
   return (
     // GridList と同一の関数でないと(どういう表現が適切?)、cols 関連の設定が無視される.
     // その代わりに GridListTile の幅にあわせて row が break する.

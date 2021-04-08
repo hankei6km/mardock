@@ -2,7 +2,6 @@ import { GetStaticProps, GetStaticPaths } from 'next';
 import ErrorPage from 'next/error';
 // import { makeStyles } from '@material-ui/core';
 import LayoutSlide from '../../components/LayoutSlide';
-import Link from '../../components/Link';
 import { SlideData } from '../../types/pageTypes';
 import { getAllPagesIds, getPagesSlideData } from '../../lib/pages';
 
@@ -16,9 +15,10 @@ export default function Deck({ slideData }: Props) {
     return <ErrorPage statusCode={404} />;
   }
   return (
-    <LayoutSlide {...slideData} notification={slideData.notification}>
-      <Link href="/">{'Back to Home'}</Link>
-    </LayoutSlide>
+    <LayoutSlide
+      {...slideData}
+      notification={slideData.notification}
+    ></LayoutSlide>
   );
 }
 
