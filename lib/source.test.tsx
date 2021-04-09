@@ -52,6 +52,20 @@ describe('splitParagraphTransformer()', () => {
       '<p>test16<br>test17<br>test18<br>test19</p>'
     );
   });
+  it('should split paragraph by br+img or img+br ', async () => {
+    expect(await f('<p>test1<img src="image1">test2</p>')).toEqual(
+      '<p>test1<img src="image1">test2</p>'
+    );
+    expect(await f('<p>test3<br><img src="image2">test4</p>')).toEqual(
+      '<p>test3<br></p><p><img src="image2">test4</p>'
+    );
+    expect(await f('<p>test5<img src="image3"><br>test6</p>')).toEqual(
+      '<p>test5<img src="image3"></p><p><br>test6</p>'
+    );
+    expect(await f('<p>test7<br><img src="image4"><br>test8</p>')).toEqual(
+      '<p>test7<br></p><p><img src="image4"></p><p><br>test8</p>'
+    );
+  });
 });
 
 describe('removeBlankTransformer()', () => {
