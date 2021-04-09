@@ -20,10 +20,11 @@ import { codeDockHandler } from './codedock';
 import siteServerSideConfig from '../src/site.server-side-config';
 import { qrcodeToDataUrl } from './qrcode';
 var toText = require('hast-util-to-text');
-var toHtml = require('hast-util-to-html');
 
 export function splitParagraphTransformer(): Transformer {
+  // 最上位の paragraph のみ対象。リストや引用、ネストは扱わない。
   return function transformer(tree: Node): void {
+    // 連続 br
     if (tree.type === 'root' && Array.isArray(tree.children)) {
       const children: Node[] = [];
       tree.children.forEach((c: Node) => {
@@ -50,6 +51,52 @@ export function splitParagraphTransformer(): Transformer {
                 pool.push(cc);
                 brCnt = 0;
               }
+            }
+          });
+          children.push({ ...c, children: pool });
+        } else {
+          children.push(c);
+        }
+      });
+      tree.children = children;
+    }
+    // img
+    if (tree.type === 'root' && Array.isArray(tree.children)) {
+      const children: Node[] = [];
+      tree.children.forEach((c: Node) => {
+        if (
+          c.type === 'element' &&
+          c.tagName === 'p' &&
+          Array.isArray(c.children)
+        ) {
+          let pool: Node[] = [];
+          c.children.forEach((cc: Node, i) => {
+            if (
+              cc.type === 'element' &&
+              cc.tagName === 'img' &&
+              Array.isArray(c.children)
+            ) {
+              if (
+                c.children[i - 1] &&
+                c.children[i - 1].type === 'element' &&
+                c.children[i - 1].tagName === 'br'
+              ) {
+                children.push({ ...c, children: pool }); // <br> が残るが他の transformer で除去している
+                pool = [];
+                pool.push(cc);
+              } else if (
+                c.children[i + 1] &&
+                c.children[i + 1].type === 'element' &&
+                c.children[i + 1].tagName === 'br'
+              ) {
+                pool.push(cc);
+                children.push({ ...c, children: pool }); // <br> が残るが他の transformer で除去している
+                pool = [];
+              } else {
+                pool.push(cc);
+              }
+            } else {
+              pool.push(cc);
             }
           });
           children.push({ ...c, children: pool });
