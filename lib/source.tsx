@@ -19,9 +19,12 @@ import {
 import { codeDockHandler } from './codedock';
 import siteServerSideConfig from '../src/site.server-side-config';
 import { qrcodeToDataUrl } from './qrcode';
+var toText = require('hast-util-to-text');
 
 export function splitParagraphTransformer(): Transformer {
+  // 最上位の paragraph のみ対象。リストや引用、ネストは扱わない。
   return function transformer(tree: Node): void {
+    // 連続 br
     if (tree.type === 'root' && Array.isArray(tree.children)) {
       const children: Node[] = [];
       tree.children.forEach((c: Node) => {
@@ -41,11 +44,67 @@ export function splitParagraphTransformer(): Transformer {
               } else if (brCnt === 1) {
                 pool.push((c.children as Node[])[i - 1]);
                 pool.push(cc);
+                brCnt = 0;
               } else {
                 children.push({ ...c, children: pool });
                 pool = [];
                 pool.push(cc);
+                brCnt = 0;
               }
+            }
+          });
+          children.push({ ...c, children: pool });
+        } else {
+          children.push(c);
+        }
+      });
+      tree.children = children;
+    }
+    // img
+    if (tree.type === 'root' && Array.isArray(tree.children)) {
+      const children: Node[] = [];
+      tree.children.forEach((c: Node) => {
+        if (
+          c.type === 'element' &&
+          c.tagName === 'p' &&
+          Array.isArray(c.children)
+        ) {
+          let pool: Node[] = [];
+          c.children.forEach((cc: Node, i) => {
+            if (
+              cc.type === 'element' &&
+              cc.tagName === 'img' &&
+              Array.isArray(c.children)
+            ) {
+              if (
+                c.children[i - 1] &&
+                c.children[i - 1].type === 'element' &&
+                c.children[i - 1].tagName === 'br'
+              ) {
+                children.push({ ...c, children: pool }); // <br> が残るが他の transformer で除去している
+                pool = [];
+                pool.push(cc);
+              } else {
+                pool.push(cc);
+              }
+            }else if (
+              cc.type === 'element' &&
+              cc.tagName === 'br' &&
+              Array.isArray(c.children)
+            ) {
+              if (
+                c.children[i - 1] &&
+                c.children[i - 1].type === 'element' &&
+                c.children[i - 1].tagName === 'img'
+              ) {
+                children.push({ ...c, children: pool }); // <br> が残るが他の transformer で除去している
+                pool = [];
+                pool.push(cc);
+              } else {
+                pool.push(cc);
+              }
+            } else {
+              pool.push(cc);
             }
           });
           children.push({ ...c, children: pool });
@@ -85,23 +144,69 @@ export function removeBlankTransformer(): Transformer {
             top >= 0 ? top : 0,
             bottom >= 0 ? bottom + 1 : c.children.length - 1
           );
-          // console.log(c.children);
         }
       });
       tree.children = tree.children.filter((c: Node) => {
-        return Array.isArray(c.children) && c.children.length > 0;
+        return (
+          Array.isArray(c.children) &&
+          c.children.length > 0 &&
+          !(c.type === 'element' && c.tagName === 'br')
+        );
       });
+    }
+  };
+}
+
+const fenceToFrontMatterRegExp = /^---\n(.+)\n---\n*$/s;
+export function firstParagraphAsCodeDockTransformer(): Transformer {
+  return function transformer(tree: Node): void {
+    if (tree.type === 'root' && Array.isArray(tree.children)) {
+      const idx = tree.children.findIndex(
+        (c: Node) => c.type === 'element' && c.tagName === 'p'
+      );
+      if (idx >= 0) {
+        const text = toText(tree.children[idx]);
+        // console.log(text);
+        const m = text.match(fenceToFrontMatterRegExp);
+        if (m) {
+          tree.children[idx].tagName = 'pre';
+          tree.children[idx].children = [
+            {
+              type: 'element',
+              tagName: 'code',
+              children: [
+                {
+                  type: 'text',
+                  // value: text
+                  // ---\nfoo:bar\n--- だと qrcode 変換でつかっている
+                  // mdast-util-from-markdown で heading として扱われる。
+                  // この辺がうまくいかない場合、mdast-util-frontmattera も検討
+                  value: `===md\n---\n\n${m[1]}\n\n---\n`
+                }
+              ]
+            }
+          ];
+        }
+      }
     }
   };
 }
 
 const htmlToMarkdownProcessor = unified()
   .use(rehypeParse, { fragment: true })
+  .use(firstParagraphAsCodeDockTransformer)
   .use(splitParagraphTransformer)
   .use(removeBlankTransformer)
   .use(rehypeSanitize, { allowComments: true })
   .use(rehype2Remark, {
-    handlers: { pre: codeDockHandler }
+    //newlines: false,
+    handlers: {
+      pre: codeDockHandler,
+      br: (h: any, node: any) => {
+        // <br> が `/` になってしまうので暫定対応
+        return h(node, 'text', ' ');
+      }
+    }
   })
   .use(stringify)
   .freeze();
@@ -218,6 +323,9 @@ export async function htmlToMarkdown(html: string): Promise<string> {
     fieldId: 'sourceHtml',
     html
   });
+  // console.log(md);
+  // return md;
+  // console.log(await qrcodeToDataUrl(md));
   return await qrcodeToDataUrl(md);
 }
 

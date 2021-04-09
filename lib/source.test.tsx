@@ -9,7 +9,8 @@ import {
   pageCommentMarkdown,
   pagesMarkdown,
   pageMarkdown,
-  sourceSetMarkdown
+  sourceSetMarkdown,
+  firstParagraphAsCodeDockTransformer
 } from './source';
 
 describe('splitParagraphTransformer()', () => {
@@ -47,6 +48,23 @@ describe('splitParagraphTransformer()', () => {
     expect(await f('<p>test14<br><br><br>test15</p>')).toEqual(
       '<p>test14</p><p>test15</p>'
     );
+    expect(await f('<p>test16<br>test17<br>test18<br>test19</p>')).toEqual(
+      '<p>test16<br>test17<br>test18<br>test19</p>'
+    );
+  });
+  it('should split paragraph by br+img or img+br ', async () => {
+    expect(await f('<p>test1<img src="image1">test2</p>')).toEqual(
+      '<p>test1<img src="image1">test2</p>'
+    );
+    expect(await f('<p>test3<br><img src="image2">test4</p>')).toEqual(
+      '<p>test3<br></p><p><img src="image2">test4</p>'
+    );
+    expect(await f('<p>test5<img src="image3"><br>test6</p>')).toEqual(
+      '<p>test5<img src="image3"></p><p><br>test6</p>'
+    );
+    expect(await f('<p>test7<br><img src="image4"><br>test8</p>')).toEqual(
+      '<p>test7<br></p><p><img src="image4"></p><p><br>test8</p>'
+    );
   });
 });
 
@@ -82,6 +100,38 @@ describe('removeBlankTransformer()', () => {
     expect(await f('<p><br></p>')).toEqual('');
     expect(await f('<p>test1</p><p><br></p><p>test2</p>')).toEqual(
       '<p>test1</p><p>test2</p>'
+    );
+  });
+});
+
+describe('firstParagraphAsCodeDockTransformer()', () => {
+  const f = async (html: string): Promise<string> => {
+    return new Promise((resolve, reject) => {
+      unified()
+        .use(rehypeParse, { fragment: true })
+        .use(firstParagraphAsCodeDockTransformer)
+        .use(stringify)
+        .freeze()
+        .process(html, (err, file) => {
+          if (err) {
+            reject(err);
+          }
+          resolve(String(file));
+        });
+    });
+  };
+  it('should convert paragraph like frontmatter to codedock', async () => {
+    expect(await f('<p>test1</p>')).toEqual('<p>test1</p>');
+    expect(await f('<p>tes2</p><p>tes3</p>')).toEqual('<p>tes2</p><p>tes3</p>');
+    expect(await f('<p>---<br>foo:bar<br>---<br></p><p>tes4</p>')).toEqual(
+      '<pre><code>===md\n---\n\nfoo:bar\n\n---\n</code></pre><p>tes4</p>'
+    );
+    expect(
+      await f(
+        '<p>---<br>foo:&lt;/code&gt;&lt;/pre&gt;<br>---<br></p><p>tes4</p>'
+      )
+    ).toEqual(
+      '<pre><code>===md\n---\n\nfoo:&#x3C;/code>&#x3C;/pre>\n\n---\n</code></pre><p>tes4</p>'
     );
   });
 });
