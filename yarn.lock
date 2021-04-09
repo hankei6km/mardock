@@ -823,6 +823,14 @@
     "@babel/runtime" "^7.12.5"
     "@testing-library/dom" "^7.28.1"
 
+"@textlint-ja/textlint-rule-no-synonyms@^1.1.0":
+  version "1.1.0"
+  resolved "https://registry.yarnpkg.com/@textlint-ja/textlint-rule-no-synonyms/-/textlint-rule-no-synonyms-1.1.0.tgz#ae359ccc29756674de4c6e9110ed2975996fef62"
+  integrity sha512-abGjQcWVuPCv9jewewTXe05rx/dKWWTc7diIl5ANA9VQYjny4tML2VVicuxLaBrhh4ds1DFqOB7RoMmE7DjCmw==
+  dependencies:
+    textlint-rule-helper "^2.1.1"
+    tiny-segmenter "^0.2.0"
+
 "@textlint-rule/textlint-rule-no-invalid-control-character@^1.2.0":
   version "1.2.0"
   resolved "https://registry.yarnpkg.com/@textlint-rule/textlint-rule-no-invalid-control-character/-/textlint-rule-no-invalid-control-character-1.2.0.tgz#3e8f03258d06b7deb2592bdb13626659c46abbf5"
@@ -8376,6 +8384,11 @@ stylis@3.5.4:
   resolved "https://registry.yarnpkg.com/stylis/-/stylis-3.5.4.tgz#f665f25f5e299cf3d64654ab949a57c768b73fbe"
   integrity sha512-8/3pSmthWM7lsPBKv7NXkzn2Uc9W7NotcwGNpJaa3k7WMM1XDCA4MgT5k/8BIexd5ydZdboXtU90XH9Ec4Bv/Q==
 
+sudachi-synonyms-dictionary@^6.0.0:
+  version "6.0.0"
+  resolved "https://registry.yarnpkg.com/sudachi-synonyms-dictionary/-/sudachi-synonyms-dictionary-6.0.0.tgz#a88ddf15cbc9054782280c5da2eddbeeba5bbf1a"
+  integrity sha512-xKwUI7YOyKZA0mViivhJWaICZWG/QsWYWAHAYUKAjY6UkYhamgr3YVfzQ+9Yoai9++OLJ7BAmCAhROdvDCuG7A==
+
 supports-color@^2.0.0:
   version "2.0.0"
   resolved "https://registry.yarnpkg.com/supports-color/-/supports-color-2.0.0.tgz#535d045ce6b6363fa40117084629995e9df324c7"
@@ -8518,10 +8531,10 @@ textlint-plugin-html@^0.2.0:
     structured-source "^3.0.2"
     traverse "^0.6.6"
 
-textlint-rule-en-spell@^1.2.1:
-  version "1.2.1"
-  resolved "https://registry.yarnpkg.com/textlint-rule-en-spell/-/textlint-rule-en-spell-1.2.1.tgz#5cd88bbbe466bc961153bd4853f7df3f21bd35c1"
-  integrity sha512-AnOlB/KhHDpoiyV9jTXTrypbkN8iDUApzRuF+InniWyScH1rOaYL4DI3f+FuyrgH5ZQQINsJrPQhduUfVoNUrg==
+textlint-rule-en-spell@^1.2.2:
+  version "1.2.2"
+  resolved "https://registry.yarnpkg.com/textlint-rule-en-spell/-/textlint-rule-en-spell-1.2.2.tgz#411413066a9713426118f3c68632dde18cd2830b"
+  integrity sha512-SJFyeNUJNSZdbc9ro4y3M8dcInK25e0dIFzM2sCNW/E7UNtj2PpGQ1OjW/45Y7Z1pFAevoQfiNv/RZjiOZQVuA==
   dependencies:
     dictionary-en "^3.0.0"
     nspell "^2.1.2"
@@ -8921,6 +8934,11 @@ timers-browserify@^2.0.4:
   integrity sha512-9phl76Cqm6FhSX9Xe1ZUAMLtm1BLkKj2Qd5ApyWkXzsMRaA7dgr81kf4wJmQf/hAvg8EEyJxDo3du/0KlhPiKQ==
   dependencies:
     setimmediate "^1.0.4"
+
+tiny-segmenter@^0.2.0:
+  version "0.2.0"
+  resolved "https://registry.yarnpkg.com/tiny-segmenter/-/tiny-segmenter-0.2.0.tgz#4f91115efaa90d1f98b481623b0dcc830a9e1a69"
+  integrity sha1-T5ERXvqpDR+YtIFiOw3MgwqeGmk=
 
 tiny-warning@^1.0.2:
   version "1.0.3"
