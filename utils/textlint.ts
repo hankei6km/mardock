@@ -66,7 +66,7 @@ export function getTextlintKernelOptions(
       options: {
         space: 'always'
       }
-    }
+    },
     // {
     //   // 'jtf-style/2.1.2.漢字': true,
     //   ruleId: 'jtf-style-2.1.2',
@@ -92,14 +92,14 @@ export function getTextlintKernelOptions(
     //   ruleId: 'jtf-style-3.3',
     //   rule: require('textlint-rule-preset-jtf-style/lib/3.3')
     // }
-    // {
-    //   ruleId: 'no-synonyms',
-    //   rule: require('@textlint-ja/textlint-rule-no-synonyms').default
-    // },
-    // {
-    //   ruleId: 'en-spell',
-    //   rule: require('textlint-rule-en-spell').default
-    // }
+    {
+      ruleId: 'no-synonyms',
+      rule: require('@textlint-ja/textlint-rule-no-synonyms').default
+    },
+    {
+      ruleId: 'en-spell',
+      rule: require('textlint-rule-en-spell').default
+    }
   ];
   // ruleOptions の  key は preset の rule に対して option を指定する場合は
   // 'japanese-???/rurleId' のように指定する.
