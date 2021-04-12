@@ -5,7 +5,6 @@ import ErrorPage from 'next/error';
 // import { makeStyles } from '@material-ui/core';
 import LayoutDocs from '../../components/LayoutDocs';
 import ListDocs from '../../components/ListDocs';
-import Link from '../../components/Link';
 import NavHtmlToc from '../../components/NavHtmlToc';
 import { PageData, IndexList } from '../../types/pageTypes';
 import { GetQuery } from '../../types/client/queryTypes';
@@ -49,9 +48,7 @@ export default function Docs({ pageData, items }: Props) {
           <ListDocs itemPath={'/docs'} items={items} />
         </section>
       }
-    >
-      <Link href="/docs">{'Back to Docs'}</Link>
-    </LayoutDocs>
+    ></LayoutDocs>
   );
 }
 
