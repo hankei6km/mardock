@@ -1,8 +1,8 @@
 // Converted from https://github.com/marp-team/marp-core/blob/main/themes/gaia.scss
-import { create } from 'jss';
-import preset from 'jss-preset-default';
-import { readFileSync } from 'fs';
-import mix from 'mix-css-color';
+const { create } = require('jss');
+const preset = require('jss-preset-default').default;
+const { readFileSync } = require('fs');
+const mix = require('mix-css-color');
 const hljs = readFileSync(
   'node_modules/highlight.js/styles/sunburst.css'
 ).toString('utf-8');
@@ -17,13 +17,7 @@ const colorDark = '#455a64';
 const colorPrimary = '#0288d1';
 const colorSecondary = '#81d4fa';
 
-type ColorItems = {
-  bg: string;
-  text: string;
-  highlight: string;
-};
-
-const colorSchemeStyle = ({ bg, text, highlight }: ColorItems) => ({
+const colorSchemeStyle = ({ bg, text, highlight }) => ({
   // update での更新ではなく、style.section 等で直接展開する
   // (update で展開させるとセレクターが処理されない、と思うが、未確認)
   color: text,
@@ -328,4 +322,4 @@ original credit
 ${hljs}
 ${sheet.toString()}`;
 
-export default themeGaia;
+module.exports = themeGaia;

@@ -1,5 +1,6 @@
 import React, { ReactNode, useEffect } from 'react';
 import Head from 'next/head';
+import { browser as marpCoreBrowserScript } from '@marp-team/marp-core/browser';
 import Notification from './Notification';
 import { SlideData } from '../types/pageTypes';
 
@@ -26,6 +27,12 @@ const Layout = ({ notification, head, body }: Props) => {
       });
     };
   }, [body]);
+  useEffect(() => {
+    // 上記のプレゼンテーション用とは別の helper script.
+    // Layout.tsx とやっていることは同じ.
+    const cleanup = marpCoreBrowserScript();
+    return () => cleanup();
+  }, []);
   return (
     <>
       <Head>
