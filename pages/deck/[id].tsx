@@ -22,12 +22,8 @@ import Link from '../../components/Link';
 import Carousel from 'react-material-ui-carousel';
 import SlideshowIcon from '@material-ui/icons/Slideshow';
 import PictureAsPdfIcon from '@material-ui/icons/PictureAsPdf';
-import { PageData, IndexList } from '../../types/pageTypes';
-import {
-  getAllPagesIds,
-  getPagesData,
-  getSortedIndexData
-} from '../../lib/pages';
+import { PageData } from '../../types/pageTypes';
+import { getAllPagesIds, getPagesData } from '../../lib/pages';
 import NavCategory from '../../components/NavCategory';
 // import ListDeck from '../../components/ListDeck';
 
@@ -159,7 +155,7 @@ const useStyles = makeStyles((theme) => ({
 type Props = {
   pageData: PageData;
   comment: string;
-  items: IndexList;
+  // items: IndexList;
 };
 
 export default function Deck({ pageData, comment }: Props) {
@@ -316,14 +312,14 @@ export const getStaticPaths: GetStaticPaths = async () => {
 
 export const getStaticProps: GetStaticProps = async (context) => {
   const { html, ...others } = await getPagesData('deck', context);
-  const items = await getSortedIndexData('deck', {
-    // filters: 'displayOnIndexPage[equals]true'
-  });
+  // const items = await getSortedIndexData('deck', {
+  // filters: 'displayOnIndexPage[equals]true'
+  // });
   return {
     props: {
       pageData: { ...others },
-      comment: html,
-      items
+      comment: html
+      //items
     }
   };
 };
