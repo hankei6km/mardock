@@ -1,7 +1,7 @@
-import { create } from 'jss';
-import preset from 'jss-preset-default';
-import { readFileSync } from 'fs';
-import mix from 'mix-css-color';
+const { create } = require('jss');
+const preset = require('jss-preset-default').default;
+const { readFileSync } = require('fs');
+const mix = require('mix-css-color');
 const hljs = readFileSync(
   'node_modules/highlight.js/styles/mono-blue.css'
 ).toString('utf-8');
@@ -17,21 +17,7 @@ const colorDark = '#263238'; // blueGrey[900]
 const colorPrimary = '#556cd6';
 const colorSecondary = '#81d4fa'; // lightBlue[200]
 
-type ColorItems = {
-  bg: string;
-  text: string;
-  highlight: string;
-  blockBg: string;
-  blockText: string;
-};
-
-const colorSchemeStyle = ({
-  bg,
-  text,
-  highlight,
-  blockBg,
-  blockText
-}: ColorItems) => ({
+const colorSchemeStyle = ({ bg, text, highlight, blockBg, blockText }) => ({
   // update での更新ではなく、style.section 等で直接展開する
   // (update で展開させるとセレクターが処理されない、と思うが、未確認)
   color: text,
@@ -351,4 +337,5 @@ const themeMardock = `
 ${hljs}
 ${sheet.toString()}`;
 
-export default themeMardock;
+// export default themeMardock;
+module.exports = themeMardock;
