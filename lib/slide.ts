@@ -122,16 +122,20 @@ export function slidePdf(
 ): Promise<number> {
   // とりあえず。
   return new Promise((resolve) => {
-    const marpP = execFile(marpPath, ['--pdf'], (err, stdout, _stderr) => {
-      if (err) {
-        // throw new Error(`slideHtml error: ${err}`);
-        resolve(1);
-        return;
+    const marpP = execFile(
+      marpPath,
+      ['--pdf', '--html'],
+      (err, stdout, _stderr) => {
+        if (err) {
+          // throw new Error(`slideHtml error: ${err}`);
+          resolve(1);
+          return;
+        }
+        // TODO: どうにかして stream にできないか？
+        w.write(stdout);
+        resolve(0);
       }
-      // TODO: どうにかして stream にできないか？
-      w.write(stdout);
-      resolve(0);
-    });
+    );
     if (marpP && marpP.stdin) {
       marpP.stdin.write(markdown);
       marpP.stdin.end();

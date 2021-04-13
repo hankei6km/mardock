@@ -325,7 +325,6 @@ export const getStaticProps: GetStaticProps = async (context) => {
     others.deck.source,
     context.params?.id as string
   );
-  console.log(pdfPath);
   return {
     props: {
       pageData: { ...others },
