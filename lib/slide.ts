@@ -41,6 +41,12 @@ export function getSlidePdfPath(name: string): string {
 export function getSlidePublicPdfPath(name: string): string {
   return join(siteServerSideConfig.public.pdfPath, name);
 }
+export function getSlidePptxPath(name: string): string {
+  return join(basePath, siteServerSideConfig.assets.pptxPath, name);
+}
+export function getSlidePublicPptxPath(name: string): string {
+  return join(siteServerSideConfig.public.pptxPath, name);
+}
 
 // console.log(basePath);
 const marpPath = join(basePath, 'node_modules', '.bin', 'marp');
@@ -114,6 +120,15 @@ export async function slidePdf(
   return await slideVariantFile(markdown, w, ['--pdf', '--html'], options);
 }
 
+export async function slidePptx(
+  markdown: string,
+  w: Writable,
+  options: { encoding?: string } = { encoding: 'binary' }
+): Promise<number> {
+  // とりあえず。
+  return await slideVariantFile(markdown, w, ['--pptx', '--html'], options);
+}
+
 export async function slideWriteHtmlTo(
   markdown: string,
   slidePathHtml: string
@@ -160,6 +175,24 @@ export async function writeSlidePdf(
     // 'wx' で上書き失敗したときのエラー
   });
   const res = await slidePdf(source, w).catch(() => {});
+  if (res !== 0) {
+    ret = '';
+  }
+  w.close();
+  return ret;
+}
+
+export async function writeSlidePptx(
+  source: string,
+  id: string
+): Promise<string> {
+  let ret = getSlidePublicPptxPath(`${id}.pptx`);
+  const p = getSlidePptxPath(`${id}.pptx`);
+  const w = createWriteStream(p, { flags: 'wx', encoding: 'binary' });
+  w.on('error', () => {
+    // 'wx' で上書き失敗したときのエラー
+  });
+  const res = await slidePptx(source, w).catch(() => {});
   if (res !== 0) {
     ret = '';
   }

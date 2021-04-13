@@ -21,10 +21,14 @@ import LayoutDeck from '../../components/LayoutDeck';
 import Link from '../../components/Link';
 import Carousel from 'react-material-ui-carousel';
 import SlideshowIcon from '@material-ui/icons/Slideshow';
-import PictureAsPdfIcon from '@material-ui/icons/PictureAsPdf';
+import GetAppIcon from '@material-ui/icons/GetApp';
 import { PageData } from '../../types/pageTypes';
 import { getAllPagesIds, getPagesData } from '../../lib/pages';
-import { writeSlideTitleImage, writeSlidePdf } from '../../lib/slide';
+import {
+  writeSlideTitleImage,
+  writeSlidePdf,
+  writeSlidePptx
+} from '../../lib/slide';
 import NavCategory from '../../components/NavCategory';
 // import ListDeck from '../../components/ListDeck';
 
@@ -80,10 +84,13 @@ const useStyles = makeStyles((theme) => ({
   'DeckInfo-Buttons-outer': {
     display: 'flex',
     flexDirection: 'column',
+    // flexWrap: 'wrap',
     width: '100%',
     marginBottom: theme.spacing(1),
-    '& .MuiButton-root:not(:last-child)': {
-      marginBottom: theme.spacing(1)
+    '& .MuiButton-root': {
+      '&:not(:last-child)': {
+        marginBottom: theme.spacing(1)
+      }
     }
     // [theme.breakpoints.up('sm')]: {
     //   display: 'flex',
@@ -157,10 +164,11 @@ type Props = {
   pageData: PageData;
   comment: string;
   pdfPath: string;
+  pptxPath: string;
   // items: IndexList;
 };
 
-export default function Deck({ pageData, comment, pdfPath }: Props) {
+export default function Deck({ pageData, comment, pdfPath, pptxPath }: Props) {
   const classes = useStyles();
   const [navOpen, setNavOpen] = useState(false);
   // const router = useRouter();
@@ -201,19 +209,28 @@ export default function Deck({ pageData, comment, pdfPath }: Props) {
                   href="/slides[id]"
                   as={`/slides/${pageData.id}`}
                   startIcon={<SlideshowIcon />}
-                  color="primary"
+                  // color="primary"
                 >
-                  プレゼンテーション
+                  <Typography>プレゼンテーション</Typography>
                 </Button>
                 <Button
                   className="MuiButton-outlinedSecondary"
                   component={Link}
                   href={pdfPath}
-                  startIcon={<PictureAsPdfIcon />}
-                  color="secondary"
-                  disabled={pdfPath === ''}
+                  startIcon={<GetAppIcon />}
+                  // disabled={pdfPath === ''}
                 >
-                  PDF ダウンロード
+                  <Typography color="inherit">PDF ダウンロード</Typography>
+                </Button>
+                <Button
+                  className="MuiButton-outlinedSecondary"
+                  component={Link}
+                  href={pptxPath}
+                  startIcon={<GetAppIcon />}
+                  // color="primary"
+                  // disabled={pptxPath === ''}
+                >
+                  <Typography color="inherit">PPTX ダウンロード</Typography>
                 </Button>
               </Box>
               <div>
@@ -326,11 +343,16 @@ export const getStaticProps: GetStaticProps = async (context) => {
     others.deck.source,
     context.params?.id as string
   );
+  const pptxPath = await writeSlidePptx(
+    others.deck.source,
+    context.params?.id as string
+  );
   return {
     props: {
       pageData: { ...others },
       comment: html,
-      pdfPath
+      pdfPath,
+      pptxPath
       //items
     }
   };
