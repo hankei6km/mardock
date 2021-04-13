@@ -459,6 +459,9 @@ const Layout = ({
     //   `https://cdn.jsdelivr.net/npm/${marpCoreName}@${marpCoreVersion}/lib/browser.js`
     // );
     // やってることは上記 CDN で読み込む場合と同じだと思う、たぶん
+    // 追記.
+    // https://github.com/marp-team/marp-core#script-boolean--object に書いてあった。
+    // が、 cleanup の使い方は不明.
     // ページ別に実行(cleanup)した方が良いのか？
     const cleanup = marpCoreBrowserScript();
     return () => cleanup();

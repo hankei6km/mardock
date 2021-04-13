@@ -161,7 +161,8 @@ export async function slideDeck(id: string, source: string): Promise<DeckData> {
         new Element('article', { id: containerId }),
         new Element('div', { class: 'slides' })
       ],
-      slideContainer: new Element('div', { class: 'slide' })
+      slideContainer: new Element('div', { class: 'slide' }),
+      script: false
     });
     themes.forEach((t) => marp.themeSet.add(t));
     const { html, css } = marp.render(source, { htmlAsArray: true });
