@@ -211,6 +211,7 @@ export default function Deck({ pageData, comment, pdfPath }: Props) {
                   href={pdfPath}
                   startIcon={<PictureAsPdfIcon />}
                   color="secondary"
+                  disabled={pdfPath === ''}
                 >
                   PDF ダウンロード
                 </Button>

@@ -1,6 +1,6 @@
 import { createWriteStream } from 'fs';
 // import { access, constants } from 'fs/promises';
-import { execFile } from 'child_process';
+import { spawn, execFile } from 'child_process';
 import { join } from 'path';
 import { Writable } from 'stream';
 import Marp from '@marp-team/marp-core';
@@ -51,6 +51,7 @@ export function slideHtml(markdown: string, w: Writable): Promise<number> {
     // spawn で stdout.pipe を使うと後ろのデータがドロップしてしまう
     // (GitHub Actions のときに 8 割りくらい確率で)
     // しかたないので stdout の内容をべたで扱う.
+    // image と pdf の書き出しだとドロップしない?
     const marpP = execFile(marpPath, ['--html'], (err, stdout, _strderr) => {
       if (err) {
         throw new Error(`slideHtml error: ${err}`);
@@ -63,88 +64,54 @@ export function slideHtml(markdown: string, w: Writable): Promise<number> {
       marpP.stdin.end();
     }
   });
-  //marpCli(['./slides/slide-deck.md', '-o', './dist/index.html'])
-  //  .then((exitStatus) => {
-  //    if (exitStatus > 0) {
-  //      console.error(`Failure (Exit status: ${exitStatus})`);
-  //    } else {
-  //      console.log('Success');
-  //    }
-  //  })
-  //  .catch(console.error);
 }
 
-export function slideImage(
+export function slideVariantFile(
+  markdown: string,
+  w: Writable,
+  formatOpts: string[] = ['--image', 'png', '--html'],
+  options: { encoding?: string } = { encoding: 'binary' }
+): Promise<number> {
+  // とりあえず。
+  return new Promise((resolve) => {
+    const marpP = spawn(marpPath, formatOpts);
+    if (marpP && marpP.stdout) {
+      // marpP.stdout.setEncoding('base64');
+      marpP.stdout.setEncoding(options.encoding || 'binary');
+      marpP.stdout.on('data', (data) => {
+        w.write(data);
+      });
+    }
+    marpP.on('close', (code) => {
+      resolve(code);
+    });
+    if (marpP && marpP.stdin) {
+      marpP.stdin.write(markdown);
+      marpP.stdin.end();
+    }
+  });
+}
+
+export async function slideImage(
+  markdown: string,
+  w: Writable,
+  options: { encoding?: string } = { encoding: 'binary' }
+): Promise<number> {
+  return await slideVariantFile(
+    markdown,
+    w,
+    ['--image', 'png', '--html'],
+    options
+  );
+}
+
+export async function slidePdf(
   markdown: string,
   w: Writable,
   options: { encoding?: string } = { encoding: 'binary' }
 ): Promise<number> {
   // とりあえず。
-  return new Promise((resolve) => {
-    const marpP = execFile(
-      marpPath,
-      ['--image', 'png', '--html'],
-      (err, stdout, _stderr) => {
-        if (err) {
-          // throw new Error(`slideHtml error: ${err}`);
-          resolve(1);
-          return;
-        }
-        // TODO: どうにかして stream にできないか？
-        w.write(stdout);
-        resolve(0);
-      }
-    );
-    if (marpP && marpP.stdin) {
-      marpP.stdin.write(markdown);
-      marpP.stdin.end();
-    }
-    if (marpP && marpP.stdout) {
-      // marpP.stdout.setEncoding('base64');
-      marpP.stdout.setEncoding(options.encoding || 'binary');
-    }
-  });
-  //marpCli(['./slides/slide-deck.md', '-o', './dist/index.html'])
-  //  .then((exitStatus) => {
-  //    if (exitStatus > 0) {
-  //      console.error(`Failure (Exit status: ${exitStatus})`);
-  //    } else {
-  //      console.log('Success');
-  //    }
-  //  })
-  //  .catch(console.error);
-}
-
-export function slidePdf(
-  markdown: string,
-  w: Writable,
-  options: { encoding?: string } = { encoding: 'binary' }
-): Promise<number> {
-  // とりあえず。
-  return new Promise((resolve) => {
-    const marpP = execFile(
-      marpPath,
-      ['--pdf', '--html'],
-      (err, stdout, _stderr) => {
-        if (err) {
-          // throw new Error(`slideHtml error: ${err}`);
-          resolve(1);
-          return;
-        }
-        // TODO: どうにかして stream にできないか？
-        w.write(stdout);
-        resolve(0);
-      }
-    );
-    if (marpP && marpP.stdin) {
-      marpP.stdin.write(markdown);
-      marpP.stdin.end();
-    }
-    if (marpP && marpP.stdout) {
-      // marpP.stdout.setEncoding('base64');
-      marpP.stdout.setEncoding(options.encoding || 'binary');
-    }
-  });
+  return await slideVariantFile(markdown, w, ['--pdf', '--html'], options);
 }
 
 export async function slideWriteHtmlTo(
@@ -171,7 +138,7 @@ export async function writeSlideTitleImage(
   w.on('error', () => {
     // 'wx' で上書き失敗したときのエラー
   });
-  const res = await slideImage(source, w).catch(() => {});
+  const res = await slideImage(source, w).catch((err) => console.log(err));
   if (res !== 0) {
     // コマンド実行が失敗したのでテンポラリ画像(chrome が無い環境だと失敗する)
     ret.url = siteServerSideConfig.slide.fallbackImage.url;
