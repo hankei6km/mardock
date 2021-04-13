@@ -112,7 +112,8 @@ describe('getPagesData()', () => {
         height: 0,
         items: [],
         css: '',
-        script: []
+        script: [],
+        source: ''
       },
       htmlToc: {
         items: []

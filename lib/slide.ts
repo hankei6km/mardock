@@ -128,7 +128,10 @@ export async function writeSlideTitleImage(
     width: 1280,
     height: 720
   };
+  console.log(source);
+  console.log(id);
   const p = getSlideImagePath(`${id}.png`);
+  console.log(p);
   const w = createWriteStream(p, { flags: 'wx', encoding: 'binary' });
   w.on('error', () => {
     // 'wx' で上書き失敗したときのエラー
@@ -205,7 +208,8 @@ export async function slideDeck(id: string, source: string): Promise<DeckData> {
       script,
       items: html.map((v) => ({
         html: v
-      }))
+      })),
+      source
     };
   }
   return blankDeckData();
