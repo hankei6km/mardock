@@ -8,12 +8,14 @@ type SiteServerSideConfig = {
   //  プロジェクトルート起点の相対パスで指定.
   assets: {
     imagesPath: string;
+    pdfPath: string;
   };
   // ブラウザーで参照時のパス.
   // サブディレクトリ等が付いていないルートからのパスとして扱う
   // (GitHub Paegsの user / repo の場合でも無いものとして扱う)
   public: {
     imagesPath: string;
+    pdfPath: string;
   };
   slide: {
     fallbackImage: Omit<ConfigImageSource, 'alt'>;
@@ -38,10 +40,12 @@ const siteServerSideConfig: SiteServerSideConfig = {
   // id が 1件で 40byte  と想定、 content-length が 5M 程度とのことなので、1000*1000*5 / 40 で余裕を見て決めた値。
   allIdsLimit: 120000,
   assets: {
-    imagesPath: join('public', 'assets', 'images')
+    imagesPath: join('public', 'assets', 'images'),
+    pdfPath: join('public', 'assets', 'pdf')
   },
   public: {
-    imagesPath: join('/', 'assets', 'images')
+    imagesPath: join('/', 'assets', 'images'),
+    pdfPath: join('public', 'assets', 'pdf')
   },
   slide: {
     fallbackImage: {

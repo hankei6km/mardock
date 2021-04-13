@@ -24,7 +24,7 @@ import SlideshowIcon from '@material-ui/icons/Slideshow';
 import PictureAsPdfIcon from '@material-ui/icons/PictureAsPdf';
 import { PageData } from '../../types/pageTypes';
 import { getAllPagesIds, getPagesData } from '../../lib/pages';
-import { writeSlideTitleImage } from '../../lib/slide';
+import { writeSlideTitleImage, writeSlidePdf } from '../../lib/slide';
 import NavCategory from '../../components/NavCategory';
 // import ListDeck from '../../components/ListDeck';
 
@@ -317,7 +317,8 @@ export const getStaticProps: GetStaticProps = async (context) => {
   // filters: 'displayOnIndexPage[equals]true'
   // });
   // 画像作成、ここで作成するのは最適?
-  writeSlideTitleImage(others.deck.source, context.params?.id as string);
+  await writeSlideTitleImage(others.deck.source, context.params?.id as string);
+  await writeSlidePdf(others.deck.source, context.params?.id as string);
   return {
     props: {
       pageData: { ...others },

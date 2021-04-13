@@ -35,6 +35,12 @@ export function getSlideImagePath(name: string): string {
 export function getSlidePublicImagePath(name: string): string {
   return join(siteServerSideConfig.public.imagesPath, name);
 }
+export function getSlidePdfPath(name: string): string {
+  return join(basePath, siteServerSideConfig.assets.pdfPath, name);
+}
+export function getSlidePublicPdfPath(name: string): string {
+  return join(siteServerSideConfig.public.pdfPath, name);
+}
 
 // console.log(basePath);
 const marpPath = join(basePath, 'node_modules', '.bin', 'marp');
@@ -109,6 +115,34 @@ export function slideImage(
   //  .catch(console.error);
 }
 
+export function slidePdf(
+  markdown: string,
+  w: Writable,
+  options: { encoding?: string } = { encoding: 'binary' }
+): Promise<number> {
+  // とりあえず。
+  return new Promise((resolve) => {
+    const marpP = execFile(marpPath, ['--pdf'], (err, stdout, _stderr) => {
+      if (err) {
+        // throw new Error(`slideHtml error: ${err}`);
+        resolve(1);
+        return;
+      }
+      // TODO: どうにかして stream にできないか？
+      w.write(stdout);
+      resolve(0);
+    });
+    if (marpP && marpP.stdin) {
+      marpP.stdin.write(markdown);
+      marpP.stdin.end();
+    }
+    if (marpP && marpP.stdout) {
+      // marpP.stdout.setEncoding('base64');
+      marpP.stdout.setEncoding(options.encoding || 'binary');
+    }
+  });
+}
+
 export async function slideWriteHtmlTo(
   markdown: string,
   slidePathHtml: string
@@ -128,10 +162,7 @@ export async function writeSlideTitleImage(
     width: 1280,
     height: 720
   };
-  console.log(source);
-  console.log(id);
   const p = getSlideImagePath(`${id}.png`);
-  console.log(p);
   const w = createWriteStream(p, { flags: 'wx', encoding: 'binary' });
   w.on('error', () => {
     // 'wx' で上書き失敗したときのエラー
@@ -142,6 +173,25 @@ export async function writeSlideTitleImage(
     ret.url = siteServerSideConfig.slide.fallbackImage.url;
     ret.width = siteServerSideConfig.slide.fallbackImage.width;
     ret.height = siteServerSideConfig.slide.fallbackImage.height;
+  }
+  w.close();
+  return ret;
+}
+
+export async function writeSlidePdf(
+  source: string,
+  id: string
+): Promise<string> {
+  let ret = getSlidePublicPdfPath(`${id}.pdf`);
+  const p = getSlidePdfPath(`${id}.pdf`);
+  const w = createWriteStream(p, { flags: 'wx', encoding: 'binary' });
+  w.on('error', () => {
+    // 'wx' で上書き失敗したときのエラー
+  });
+  const res = await slidePdf(source, w).catch(() => {});
+  if (res !== 0) {
+    // コマンド実行が失敗したのでテンポラリ画像(chrome が無い環境だと失敗する)
+    ret = '';
   }
   w.close();
   return ret;
