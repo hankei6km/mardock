@@ -190,7 +190,6 @@ export async function writeSlidePdf(
   });
   const res = await slidePdf(source, w).catch(() => {});
   if (res !== 0) {
-    // コマンド実行が失敗したのでテンポラリ画像(chrome が無い環境だと失敗する)
     ret = '';
   }
   w.close();

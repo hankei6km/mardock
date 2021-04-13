@@ -156,10 +156,11 @@ const useStyles = makeStyles((theme) => ({
 type Props = {
   pageData: PageData;
   comment: string;
+  pdfPath: string;
   // items: IndexList;
 };
 
-export default function Deck({ pageData, comment }: Props) {
+export default function Deck({ pageData, comment, pdfPath }: Props) {
   const classes = useStyles();
   const [navOpen, setNavOpen] = useState(false);
   // const router = useRouter();
@@ -206,6 +207,8 @@ export default function Deck({ pageData, comment }: Props) {
                 </Button>
                 <Button
                   className="MuiButton-outlinedSecondary"
+                  component={Link}
+                  href={pdfPath}
                   startIcon={<PictureAsPdfIcon />}
                   color="secondary"
                 >
@@ -318,11 +321,16 @@ export const getStaticProps: GetStaticProps = async (context) => {
   // });
   // 画像作成、ここで作成するのは最適?
   await writeSlideTitleImage(others.deck.source, context.params?.id as string);
-  await writeSlidePdf(others.deck.source, context.params?.id as string);
+  const pdfPath = await writeSlidePdf(
+    others.deck.source,
+    context.params?.id as string
+  );
+  console.log(pdfPath);
   return {
     props: {
       pageData: { ...others },
-      comment: html
+      comment: html,
+      pdfPath
       //items
     }
   };

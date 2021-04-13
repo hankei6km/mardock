@@ -45,7 +45,7 @@ const siteServerSideConfig: SiteServerSideConfig = {
   },
   public: {
     imagesPath: join('/', 'assets', 'images'),
-    pdfPath: join('public', 'assets', 'pdf')
+    pdfPath: join('/', 'assets', 'pdf')
   },
   slide: {
     fallbackImage: {
