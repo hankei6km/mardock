@@ -274,6 +274,7 @@ export async function getPagesData(
           deckSlideSource,
           '.md',
           {
+            idPrefix: 'deckOverview',
             clobberPrefix: ''
           }
         );
