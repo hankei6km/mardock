@@ -207,24 +207,17 @@ export function slideDeckRemoveId(html: string): string {
   return $('body').html() || '';
 }
 
-export async function slideDeck(id: string, source: string): Promise<DeckData> {
+export async function _slideDeck(
+  marp: Marp,
+  id: string,
+  source: string
+): Promise<DeckData> {
   if (source) {
-    const containerId = `slide-${id}`;
-    const marp = new Marp({
-      inlineSVG: true,
-      html: true,
-      container: [
-        new Element('article', { id: containerId }),
-        new Element('div', { class: 'slides' })
-      ],
-      slideContainer: new Element('div', { class: 'slide' }),
-      script: false
-    });
     themes.forEach((t) => marp.themeSet.add(t));
     const { html, css } = marp.render(source, { htmlAsArray: true });
     // array を指定すると script が取得できない
     // 以下、とりあすの対応.
-    // slideData と共通かするか?:
+    // slideData と共通化するか?:
     // 一旦停止。
     // - 同じスクリプトが何度も読み込まれる。
     // - listner がリークしている可能性(きちんと調べていない)を考慮しなるべく動的には扱わない
@@ -252,7 +245,7 @@ export async function slideDeck(id: string, source: string): Promise<DeckData> {
       }
     }
     return {
-      id: containerId,
+      id,
       minX,
       minY,
       width,
@@ -266,6 +259,21 @@ export async function slideDeck(id: string, source: string): Promise<DeckData> {
     };
   }
   return blankDeckData();
+}
+
+export async function slideDeck(id: string, source: string): Promise<DeckData> {
+  const containerId = `slide-${id}`;
+  const marp = new Marp({
+    inlineSVG: true,
+    html: true,
+    container: [
+      new Element('article', { id: containerId }),
+      new Element('div', { class: 'slides' })
+    ],
+    slideContainer: new Element('div', { class: 'slide' }),
+    script: false
+  });
+  return await _slideDeck(marp, containerId, source);
 }
 
 export async function getSlideData(source: string): Promise<SlideData> {
