@@ -261,7 +261,10 @@ export async function _slideDeck(
   return blankDeckData();
 }
 
-export async function slideDeck(id: string, source: string): Promise<DeckData> {
+export async function slideDeckSlide(
+  id: string,
+  source: string
+): Promise<DeckData> {
   const containerId = `slide-${id}`;
   const marp = new Marp({
     inlineSVG: true,
@@ -271,6 +274,27 @@ export async function slideDeck(id: string, source: string): Promise<DeckData> {
       new Element('div', { class: 'slides' })
     ],
     slideContainer: new Element('div', { class: 'slide' }),
+    script: false
+  });
+  return await _slideDeck(marp, containerId, source);
+}
+
+export async function slideDeckOverview(
+  id: string,
+  source: string
+): Promise<DeckData> {
+  const containerId = `overview-${id}`;
+  const marp = new Marp({
+    inlineSVG: true,
+    html: true,
+    container: [
+      new Element('article', { id: containerId }),
+      new Element('div', { class: 'slides' }),
+      new Element('ul'),
+      new Element('li'),
+      new Element('div')
+    ],
+    slideContainer: [new Element('div', { class: 'slide' })],
     script: false
   });
   return await _slideDeck(marp, containerId, source);

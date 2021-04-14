@@ -250,30 +250,38 @@ export default function Deck({ pageData, comment, pdfPath, pptxPath }: Props) {
                 </Box>
               </div>
             </aside>
-            <Timeline className={classes['Deck-overview-root']}>
-              {pageData.deck.slide.items.map(({ html }, i, items) => (
-                <TimelineItem key={i}>
-                  <TimelineSeparator>
-                    <Avatar>
-                      <Typography>{`${i + 1}`}</Typography>
-                    </Avatar>
-                    {i + 1 < items.length && <TimelineConnector />}
-                  </TimelineSeparator>
-                  <TimelineContent>
-                    <article id={pageData.deck.slide.id}>
-                      <div className="slides">
+            <article
+              id={pageData.deck.overview.id}
+              className={classes['Deck-overview-root']}
+            >
+              <style
+                dangerouslySetInnerHTML={{
+                  __html: pageData.deck.overview.css
+                }}
+              />
+              <div className="slides">
+                <Timeline>
+                  {pageData.deck.overview.items.map(({ html }, i, items) => (
+                    <TimelineItem key={i}>
+                      <TimelineSeparator>
+                        <Avatar>
+                          <Typography>{`${i + 1}`}</Typography>
+                        </Avatar>
+                        {i + 1 < items.length && <TimelineConnector />}
+                      </TimelineSeparator>
+                      <TimelineContent>
                         <div
                           className="slide"
                           dangerouslySetInnerHTML={{
                             __html: html
                           }}
                         />
-                      </div>
-                    </article>
-                  </TimelineContent>
-                </TimelineItem>
-              ))}
-            </Timeline>
+                      </TimelineContent>
+                    </TimelineItem>
+                  ))}
+                </Timeline>
+              </div>
+            </article>
           </Box>
         </>
       }

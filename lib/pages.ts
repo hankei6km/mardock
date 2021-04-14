@@ -31,7 +31,12 @@ import {
   paginationIdsFromPageCount,
   pageCountFromTotalCount
 } from '../utils/pagination';
-import { getSlideData, slideDeck, slideDeckRemoveId } from './slide';
+import {
+  getSlideData,
+  slideDeckSlide,
+  slideDeckRemoveId,
+  slideDeckOverview
+} from './slide';
 import { htmlToMarkdown, sourceSetMarkdown } from './source';
 // import { getTextlintKernelOptions } from '../utils/textlint';
 
@@ -104,7 +109,7 @@ export async function getSortedIndexData(
           description: res.description || ''
         };
         if (res.source || res.sourceContents || res.sourcePages) {
-          const d = await slideDeck(
+          const d = await slideDeckSlide(
             res.id,
             await sourceSetMarkdown({
               sourceContents: res.sourceContents,
@@ -244,11 +249,12 @@ export async function getPagesData(
       config: fetchConfig
     });
     let content = await htmlToMarkdown(res.content || '');
-    let deckSource = await sourceSetMarkdown({
+    let deckSlideSource = await sourceSetMarkdown({
       sourceContents: res.sourceContents,
       sourcePages: res.sourcePages,
       source: res.source
     });
+    let deckOverviewSource = '';
 
     let notification: Notification | undefined = undefined; // スイッチ的に動作するのが面白くない
     if (preview) {
@@ -292,7 +298,11 @@ export async function getPagesData(
       },
       description: res.description || ''
     };
-    ret.deck.slide = await slideDeck(res.id, deckSource);
+    ret.deck.slide = await slideDeckSlide(res.id, deckSlideSource);
+    ret.deck.overview = await slideDeckOverview(
+      res.id,
+      deckOverviewSource || deckSlideSource
+    );
     if (notification) {
       ret.notification = notification;
     }
