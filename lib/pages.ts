@@ -244,8 +244,14 @@ export async function getPagesData(
       config: fetchConfig
     });
     let content = await htmlToMarkdown(res.content || '');
+    let deckSource = await sourceSetMarkdown({
+      sourceContents: res.sourceContents,
+      sourcePages: res.sourcePages,
+      source: res.source
+    });
+
     let notification: Notification | undefined = undefined; // スイッチ的に動作するのが面白くない
-    if (preview || params.previewDemo === 'true') {
+    if (preview) {
       const { result, messages, list } = await draftLint(content, '.md');
       notification = {
         ...siteServerSideConfig.draft
@@ -286,14 +292,7 @@ export async function getPagesData(
       },
       description: res.description || ''
     };
-    ret.deck = await slideDeck(
-      res.id,
-      await sourceSetMarkdown({
-        sourceContents: res.sourceContents,
-        sourcePages: res.sourcePages,
-        source: res.source
-      })
-    );
+    ret.deck = await slideDeck(res.id, deckSource);
     if (notification) {
       ret.notification = notification;
     }

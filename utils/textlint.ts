@@ -12,7 +12,7 @@ export type Presets = {
 // Preset の rule には 'presetId/ruleId' となるように指定する.
 export type RuleOptions = { [key: string]: TextlintKernelRule['options'] };
 
-export type DraftLintOptions = {
+export type DraftLintLintOptions = {
   ext?: string;
   presets?: Presets;
   rules?: TextlintKernelRule;
@@ -22,7 +22,7 @@ export type DraftLintOptions = {
 
 // https://github.com/mobilusoss/textlint-browser-runner/tree/master/packages/textlint-bundler
 export function getTextlintKernelOptions(
-  draftLintOptions?: DraftLintOptions
+  draftLintLintOptions?: DraftLintLintOptions
 ): TextlintKernelOptions {
   const {
     ext = '.html',
@@ -30,7 +30,7 @@ export function getTextlintKernelOptions(
     rules = undefined,
     ruleOptions = undefined,
     filterRules = undefined
-  }: DraftLintOptions = draftLintOptions || {};
+  }: DraftLintLintOptions = draftLintLintOptions || {};
   // preset の ruleId の扱い.
   // `${presetRuleNameWithoutPrefix}/${ruleId}`
   // '/' については RuleSeparator で定義されているが export されてない.
