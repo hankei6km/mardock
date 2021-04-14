@@ -23,6 +23,7 @@ export type DeckData = {
   css: string;
   script: string[];
   items: DeckItem[];
+  source: string;
 };
 
 export type Notification = {
@@ -92,7 +93,8 @@ export const blankDeckData = (): DeckData => ({
   height: 0,
   items: [],
   css: '',
-  script: []
+  script: [],
+  source: ''
 });
 export const blankPageData = (): PageData => ({
   id: '',
@@ -126,16 +128,7 @@ export const blankIndexData = (): IndexData => ({
   title: '',
   category: [],
   articleTitle: '',
-  deck: {
-    id: '',
-    minX: 0,
-    minY: 0,
-    width: 0,
-    height: 0,
-    items: [],
-    css: '',
-    script: []
-  },
+  deck: blankDeckData(),
   mainVisual: { url: '', width: 0, height: 0 },
   description: ''
 });

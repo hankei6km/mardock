@@ -16,6 +16,9 @@ jest.mock('fs', () => ({
 jest.mock('child_process', () => {
   return {
     ...jest.requireActual('child_process'),
+    spawn: jest
+      .fn()
+      .mockImplementation(jest.requireActual('child_process').spawn),
     execFile: jest
       .fn()
       .mockImplementation(jest.requireActual('child_process').execFile)
@@ -26,6 +29,9 @@ afterEach(() => {
   jest
     .spyOn(fs, 'createWriteStream')
     .mockImplementation(jest.requireActual('fs').createWriteStream);
+  jest
+    .spyOn(child_process, 'spawn')
+    .mockImplementation(jest.requireActual('child_process').spawn);
   jest
     .spyOn(child_process, 'execFile')
     .mockImplementation(jest.requireActual('child_process').execFile);
@@ -61,17 +67,26 @@ describe('writeSlideTitleImage()', () => {
           close
         } as unknown) as fs.WriteStream;
       });
+    const setEncoding = jest.fn();
     const execFile = jest
-      .spyOn(child_process, 'execFile')
-      .mockImplementation((_a1, _a2, cb) => {
-        // queueMicrotask(() => (cb as any)(null, Buffer.from('ok', 'utf8'), ''));
-        process.nextTick(() =>
-          (cb as any)(null, Buffer.from('ok', 'utf8'), '')
-        );
+      .spyOn(child_process, 'spawn')
+      .mockImplementation((_a1, _a2) => {
+        let closeCb = (_code: number) => undefined;
         return ({
+          on: jest.fn().mockImplementation((a1, cb) => {
+            expect(a1).toEqual('close');
+            closeCb = cb as any;
+          }),
           stdin: {
             write: jest.fn(),
-            end: jest.fn()
+            end: jest.fn().mockImplementation(() => closeCb(0))
+          },
+          stdout: {
+            on: jest.fn().mockImplementation((a1, cb) => {
+              expect(a1).toEqual('data');
+              (cb as any)(Buffer.from('ok', 'utf8'), '');
+            }),
+            setEncoding
           }
         } as unknown) as child_process.ChildProcess;
       });
@@ -89,6 +104,7 @@ describe('writeSlideTitleImage()', () => {
     );
     expect(execFile.mock.calls[0][0]).toEqual('node_modules/.bin/marp');
     expect(execFile.mock.calls[0][1]).toEqual(['--image', 'png', '--html']);
+    expect(setEncoding.mock.calls[0][0]).toEqual('binary');
     expect(write.mock.calls[0][0].toString('utf8')).toEqual('ok');
     expect(close).toHaveBeenCalledTimes(1);
     expect(res).toEqual({
