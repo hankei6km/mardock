@@ -251,7 +251,7 @@ export default function Deck({ pageData, comment, pdfPath, pptxPath }: Props) {
               </div>
             </aside>
             <Timeline className={classes['Deck-overview-root']}>
-              {pageData.deck.items.map(({ html }, i, items) => (
+              {pageData.deck.slide.items.map(({ html }, i, items) => (
                 <TimelineItem key={i}>
                   <TimelineSeparator>
                     <Avatar>
@@ -260,7 +260,7 @@ export default function Deck({ pageData, comment, pdfPath, pptxPath }: Props) {
                     {i + 1 < items.length && <TimelineConnector />}
                   </TimelineSeparator>
                   <TimelineContent>
-                    <article id={pageData.deck.id}>
+                    <article id={pageData.deck.slide.id}>
                       <div className="slides">
                         <div
                           className="slide"
@@ -293,7 +293,7 @@ export default function Deck({ pageData, comment, pdfPath, pptxPath }: Props) {
       <>
         <style
           dangerouslySetInnerHTML={{
-            __html: pageData.deck.css
+            __html: pageData.deck.slide.css
           }}
         />
         <Box className={classes['Page-root']}>
@@ -303,8 +303,8 @@ export default function Deck({ pageData, comment, pdfPath, pptxPath }: Props) {
             // indicators={false}
             // 2.2.x だと NavButton が常に表示か非表示にしかできない?
           >
-            {pageData.deck.items.map(({ html }, i) => (
-              <article id={pageData.deck.id} key={i}>
+            {pageData.deck.slide.items.map(({ html }, i) => (
+              <article id={pageData.deck.slide.id} key={i}>
                 <div className="slides">
                   <div
                     className="slide"
@@ -338,13 +338,16 @@ export const getStaticProps: GetStaticProps = async (context) => {
   // filters: 'displayOnIndexPage[equals]true'
   // });
   // 画像作成、ここで作成するのは最適?
-  await writeSlideTitleImage(others.deck.source, context.params?.id as string);
+  await writeSlideTitleImage(
+    others.deck.slide.source,
+    context.params?.id as string
+  );
   const pdfPath = await writeSlidePdf(
-    others.deck.source,
+    others.deck.slide.source,
     context.params?.id as string
   );
   const pptxPath = await writeSlidePptx(
-    others.deck.source,
+    others.deck.slide.source,
     context.params?.id as string
   );
   return {

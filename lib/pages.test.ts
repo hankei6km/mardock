@@ -105,15 +105,28 @@ describe('getPagesData()', () => {
       articleTitle: 'Home',
       updated: '2020-12-27T04:04:30.107Z',
       deck: {
-        id: '',
-        minX: 0,
-        minY: 0,
-        width: 0,
-        height: 0,
-        items: [],
-        css: '',
-        script: [],
-        source: ''
+        slide: {
+          id: '',
+          minX: 0,
+          minY: 0,
+          width: 0,
+          height: 0,
+          items: [],
+          css: '',
+          script: [],
+          source: ''
+        },
+        overview: {
+          id: '',
+          minX: 0,
+          minY: 0,
+          width: 0,
+          height: 0,
+          items: [],
+          css: '',
+          script: [],
+          source: ''
+        }
       },
       htmlToc: {
         items: []
@@ -153,7 +166,7 @@ describe('getPagesData()', () => {
         height: 720
       }
     });
-    expect(res.deck.items[0].html).toContain('test1');
+    expect(res.deck.slide.items[0].html).toContain('test1');
   });
 });
 

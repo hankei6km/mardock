@@ -292,7 +292,7 @@ export async function getPagesData(
       },
       description: res.description || ''
     };
-    ret.deck = await slideDeck(res.id, deckSource);
+    ret.deck.slide = await slideDeck(res.id, deckSource);
     if (notification) {
       ret.notification = notification;
     }
