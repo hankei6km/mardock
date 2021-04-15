@@ -2,6 +2,7 @@ import cheerio from 'cheerio';
 import { TextlintKernel } from '@textlint/kernel';
 import { TextlintKernelOptions } from '@textlint/kernel/lib/textlint-kernel-interface';
 import { getTextlintKernelOptions } from '../utils/textlint';
+import merge from 'deepmerge';
 import traverse from 'traverse';
 const parseHtml = require('textlint-plugin-html/lib/html-to-ast').parse;
 
@@ -70,23 +71,40 @@ export function getInsInfos(html: string, messages: any[]): InsInfos {
   return ret;
 }
 
+export type DraftLintOptions = {
+  textLintKernelOptions?: TextlintKernelOptions;
+  messageStyle?: { [key: string]: string };
+  idPrefix?: string;
+  clobberPrefix?: string;
+};
 export async function draftLint(
   source: string,
   ext: string,
-  options?: TextlintKernelOptions,
-  messageStyle: { [key: string]: string } = {
-    color: 'red',
-    // https://stackoverflow.com/questions/10732690/offsetting-an-html-anchor-to-adjust-for-fixed-header
-    // https://css-tricks.com/hash-tag-links-padding/
-    'padding-top': '140px',
-    'margin-top': '-140px',
-    display: 'inline-block'
-  },
-  idPrefix: string = '',
-  // https://github.com/syntax-tree/hast-util-sanitize#clobberprefix
-  clobberPrefix: string = 'user-content-'
+  options: DraftLintOptions = {}
 ): Promise<DraftLintResult> {
   let ret: DraftLintResult = { result: '', messages: [], list: '' };
+
+  const {
+    textLintKernelOptions,
+    messageStyle,
+    idPrefix,
+    clobberPrefix
+  } = merge(
+    {
+      messageStyle: {
+        color: 'red',
+        // https://stackoverflow.com/questions/10732690/offsetting-an-html-anchor-to-adjust-for-fixed-header
+        // https://css-tricks.com/hash-tag-links-padding/
+        'padding-top': '140px',
+        'margin-top': '-140px',
+        display: 'inline-block'
+      },
+      idPrefix: '',
+      // https://github.com/syntax-tree/hast-util-sanitize#clobberprefix
+      clobberPrefix: 'user-content-'
+    },
+    options
+  );
 
   // https://github.com/mobilusoss/textlint-browser-runner/tree/master/packages/textlint-bundler
   const kernel = new TextlintKernel();
@@ -95,7 +113,7 @@ export async function draftLint(
     await kernel.lintText(
       source,
       // todo: options(presets など)は SiteServerSideConfig で定義できるようにする.
-      options || getTextlintKernelOptions({ ext })
+      textLintKernelOptions || getTextlintKernelOptions({ ext })
     )
   ];
   if (results && results.length > 0 && results[0].messages.length > 0) {

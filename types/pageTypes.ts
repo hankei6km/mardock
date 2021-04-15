@@ -57,7 +57,10 @@ export type PageData = {
   articleTitle: string;
   htmlToc: HtmlToc;
   html: string; // markdown から変換された html がセットされる.
-  deck: DeckData;
+  deck: {
+    slide: DeckData;
+    overview: DeckData;
+  };
   mainVisual: {
     url: string;
     width: number;
@@ -82,7 +85,8 @@ export type IndexData = Omit<
   | 'curCategory'
   | 'htmlToc'
   | 'html'
->;
+  | 'deck'
+> & { deck: DeckData };
 export type IndexList = ContentList<IndexData>;
 
 export const blankDeckData = (): DeckData => ({
@@ -111,7 +115,12 @@ export const blankPageData = (): PageData => ({
   },
   html: '',
   deck: {
-    ...blankDeckData()
+    slide: {
+      ...blankDeckData()
+    },
+    overview: {
+      ...blankDeckData()
+    }
   },
   mainVisual: { url: '', width: 0, height: 0 },
   description: ''

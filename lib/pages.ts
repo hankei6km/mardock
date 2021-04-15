@@ -31,7 +31,12 @@ import {
   paginationIdsFromPageCount,
   pageCountFromTotalCount
 } from '../utils/pagination';
-import { getSlideData, slideDeck, slideDeckRemoveId } from './slide';
+import {
+  getSlideData,
+  slideDeckSlide,
+  slideDeckRemoveId,
+  slideDeckOverview
+} from './slide';
 import { htmlToMarkdown, sourceSetMarkdown } from './source';
 // import { getTextlintKernelOptions } from '../utils/textlint';
 
@@ -104,7 +109,7 @@ export async function getSortedIndexData(
           description: res.description || ''
         };
         if (res.source || res.sourceContents || res.sourcePages) {
-          const d = await slideDeck(
+          const d = await slideDeckSlide(
             res.id,
             await sourceSetMarkdown({
               sourceContents: res.sourceContents,
@@ -244,16 +249,43 @@ export async function getPagesData(
       config: fetchConfig
     });
     let content = await htmlToMarkdown(res.content || '');
+    let deckSlideSource = await sourceSetMarkdown({
+      sourceContents: res.sourceContents,
+      sourcePages: res.sourcePages,
+      source: res.source
+    });
+    let deckOverviewSource = '';
+
     let notification: Notification | undefined = undefined; // スイッチ的に動作するのが面白くない
-    if (preview || params.previewDemo === 'true') {
-      const { result, messages, list } = await draftLint(content, '.md');
-      notification = {
-        ...siteServerSideConfig.draft
-      };
-      if (messages.length > 0) {
-        content = result;
-        notification.messageHtml = `${notification.messageHtml}${list}`;
-        notification.serverity = 'warning';
+    if (preview) {
+      {
+        const { result, messages, list } = await draftLint(content, '.md');
+        notification = {
+          ...siteServerSideConfig.draft
+        };
+        if (messages.length > 0) {
+          content = result;
+          notification.messageHtml = `${notification.messageHtml}${list}`;
+          notification.serverity = 'warning';
+        }
+      }
+      {
+        const { result, messages, list } = await draftLint(
+          deckSlideSource,
+          '.md',
+          {
+            idPrefix: 'deckOverview',
+            clobberPrefix: ''
+          }
+        );
+        notification = {
+          ...siteServerSideConfig.draft
+        };
+        if (messages.length > 0) {
+          deckOverviewSource = result;
+          notification.messageHtml = `${notification.messageHtml}${list}`;
+          notification.serverity = 'warning';
+        }
       }
     }
     const { articleTitle, html, htmlToc } = await getArticleDataFromContent(
@@ -286,13 +318,10 @@ export async function getPagesData(
       },
       description: res.description || ''
     };
-    ret.deck = await slideDeck(
+    ret.deck.slide = await slideDeckSlide(res.id, deckSlideSource);
+    ret.deck.overview = await slideDeckOverview(
       res.id,
-      await sourceSetMarkdown({
-        sourceContents: res.sourceContents,
-        sourcePages: res.sourcePages,
-        source: res.source
-      })
+      deckOverviewSource || deckSlideSource
     );
     if (notification) {
       ret.notification = notification;

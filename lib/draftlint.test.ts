@@ -1,5 +1,5 @@
 import { getTextlintKernelOptions } from '../utils/textlint';
-import { getInsInfos, draftLint } from './draftlint';
+import { getInsInfos, draftLint, DraftLintOptions } from './draftlint';
 
 describe('mapInsertIndices()', () => {
   it('should returns indices that is actually insertion positions', async () => {
@@ -41,17 +41,19 @@ describe('mapInsertIndices()', () => {
 });
 
 describe('draftLint()', () => {
-  const presets = getTextlintKernelOptions({
-    presets: [
-      {
-        presetId: 'ja-technical-writing',
-        preset: require('textlint-rule-preset-ja-technical-writing')
-      }
-    ],
-    rules: undefined,
-    ruleOptions: {},
-    filterRules: []
-  });
+  const presets: DraftLintOptions = {
+    textLintKernelOptions: getTextlintKernelOptions({
+      presets: [
+        {
+          presetId: 'ja-technical-writing',
+          preset: require('textlint-rule-preset-ja-technical-writing')
+        }
+      ],
+      rules: undefined,
+      ruleOptions: {},
+      filterRules: []
+    })
+  };
   it('should inserts message that from textlint', async () => {
     const res = await draftLint(
       '<p>今日は、おいしい、ものが、食べれた。</p>',
