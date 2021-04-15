@@ -1,5 +1,6 @@
 import { join } from 'path';
 import { ConfigImageSource } from './site.config';
+import draftlintConfig from './$draftlint-config.json';
 // サーバー側で使う設定.
 // ブラウザでは使わない or 見せたくない項目(セキュリティ的にの他にサイズ的な等
 type SiteServerSideConfig = {
@@ -36,6 +37,7 @@ type SiteServerSideConfig = {
     messageHtml: string;
     serverity: 'info' | 'warning' | 'alert';
   };
+  draftlintConfig: any;
 };
 
 const siteServerSideConfig: SiteServerSideConfig = {
@@ -76,6 +78,7 @@ const siteServerSideConfig: SiteServerSideConfig = {
     title: '[DRAFT]',
     messageHtml: '<p><a href="/api/exit-preview">プレビュー終了</a></p>',
     serverity: 'info'
-  }
+  },
+  draftlintConfig: JSON.parse(draftlintConfig.config)
 };
 export default siteServerSideConfig;
