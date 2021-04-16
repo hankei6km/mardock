@@ -79,6 +79,6 @@ const siteServerSideConfig: SiteServerSideConfig = {
     messageHtml: '<p><a href="/api/exit-preview">プレビュー終了</a></p>',
     serverity: 'info'
   },
-  draftlintConfig: JSON.parse(draftlintConfig.config)
+  draftlintConfig: JSON.parse((draftlintConfig.config || '[{"raw":""}]')[0].raw)
 };
 export default siteServerSideConfig;
