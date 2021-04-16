@@ -76,6 +76,7 @@ export type DraftLintOptions = {
   messageStyle?: { [key: string]: string };
   idPrefix?: string;
   clobberPrefix?: string;
+  titleSuffix?: string;
 };
 export async function draftLint(
   source: string,
@@ -88,7 +89,8 @@ export async function draftLint(
     textLintKernelOptions,
     messageStyle,
     idPrefix,
-    clobberPrefix
+    clobberPrefix,
+    titleSuffix
   } = merge(
     {
       messageStyle: {
@@ -101,7 +103,8 @@ export async function draftLint(
       },
       idPrefix: '',
       // https://github.com/syntax-tree/hast-util-sanitize#clobberprefix
-      clobberPrefix: 'user-content-'
+      clobberPrefix: 'user-content-',
+      titleSuffix: ''
     },
     options
   );
@@ -146,7 +149,9 @@ export async function draftLint(
       // https://github.com/textlint/textlint/blob/master/packages/%40textlint/kernel/src/shared/rule-severity.ts
       // https://github.com/textlint/textlint/blob/master/packages/%40textlint/kernel/src/context/TextlintRuleSeverityLevelKeys.ts
       $d('dt').text(
-        m.severity === 0 ? 'info' : m.severity === 1 ? 'warning' : 'error'
+        `${m.severity === 0 ? 'info' : m.severity === 1 ? 'warning' : 'error'}${
+          titleSuffix ? `: ${titleSuffix}` : ''
+        }`
       );
       const $a = $d('a');
       $a.attr('href', `#${clobberPrefix}${m.id}`);

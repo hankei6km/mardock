@@ -258,29 +258,29 @@ export async function getPagesData(
 
     let notification: Notification | undefined = undefined; // スイッチ的に動作するのが面白くない
     if (preview) {
+      notification = {
+        ...siteServerSideConfig.draft
+      };
       {
-        const { result, messages, list } = await draftLint(content, '.md');
-        notification = {
-          ...siteServerSideConfig.draft
-        };
+        const { result, messages, list } = await draftLint(content, '.md', {
+          titleSuffix: 'content'
+        });
         if (messages.length > 0) {
           content = result;
           notification.messageHtml = `${notification.messageHtml}${list}`;
           notification.serverity = 'warning';
         }
       }
-      {
+      if (deckSlideSource) {
         const { result, messages, list } = await draftLint(
           deckSlideSource,
           '.md',
           {
             idPrefix: 'deckOverview',
-            clobberPrefix: ''
+            clobberPrefix: '',
+            titleSuffix: 'slide'
           }
         );
-        notification = {
-          ...siteServerSideConfig.draft
-        };
         if (messages.length > 0) {
           deckOverviewSource = result;
           notification.messageHtml = `${notification.messageHtml}${list}`;
