@@ -26,6 +26,9 @@ yarn-error.log*
 # codesandbox
 /.codesandbox
 
+# config external
+/src/$*
+
 .vercel
 /tmp
 /work
