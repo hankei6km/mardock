@@ -1,10 +1,14 @@
-import React, { useState } from 'react';
+import React, { useEffect, useCallback, useState } from 'react';
 import { GetStaticProps, GetStaticPaths } from 'next';
 import { makeStyles } from '@material-ui/core/styles';
+import { useTheme } from '@material-ui/core/styles';
+import useScrollTrigger from '@material-ui/core/useScrollTrigger';
+import useMediaQuery from '@material-ui/core/useMediaQuery';
 // import { useRouter } from 'next/router';
 import ErrorPage from 'next/error';
 import Avatar from '@material-ui/core/Avatar';
 import Box from '@material-ui/core/Box';
+import Paper from '@material-ui/core/Paper';
 import Button from '@material-ui/core/Button';
 import IconButton from '@material-ui/core/IconButton';
 import Typography from '@material-ui/core/Typography';
@@ -18,6 +22,8 @@ import TimelineContent from '@material-ui/lab/TimelineContent';
 // import TimelineDot from '@material-ui/lab/TimelineDot';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import LayoutDeck from '../../components/LayoutDeck';
+import { appBarHeight } from '../../components/Layout';
+import { animateScroll as scroll } from 'react-scroll';
 import Link from '../../components/Link';
 import Carousel from 'react-material-ui-carousel';
 import SlideshowIcon from '@material-ui/icons/Slideshow';
@@ -30,19 +36,26 @@ import {
   writeSlidePptx
 } from '../../lib/slide';
 import NavCategory from '../../components/NavCategory';
+import ButtonSelect from '../../components/ButtonSelect';
 // import ListDeck from '../../components/ListDeck';
 
 const useStyles = makeStyles((theme) => ({
   'Page-root': {
     display: 'block',
+    position: 'sticky',
+    top: appBarHeight + theme.spacing(2),
     backgroundColor: theme.palette.content.background.default.main,
     // borderRadius: theme.shape.borderRadius,
-    padding: theme.spacing(0),
-    marginBottom: theme.spacing(1),
+    // marginBottom: theme.spacing(1),
     [theme.breakpoints.up('sm')]: {
       display: 'block',
-      padding: theme.spacing(2)
+      // position: 'sticky',
+      // top: headerOffset,
+      padding: theme.spacing(1, 2)
     }
+  },
+  'Page-paper': {
+    padding: theme.spacing(0, 0, 1, 0)
   },
   'DeckInfo-root': {
     ...theme.typography.body1,
@@ -79,7 +92,7 @@ const useStyles = makeStyles((theme) => ({
     }
   },
   'DeckInfo-header-title': {
-    ...theme.typography.body1
+    ...theme.typography.h5
   },
   'DeckInfo-Buttons-outer': {
     display: 'flex',
@@ -92,18 +105,6 @@ const useStyles = makeStyles((theme) => ({
         marginBottom: theme.spacing(1)
       }
     }
-    // [theme.breakpoints.up('sm')]: {
-    //   display: 'flex',
-    //   flexDirection: 'row',
-    //   justifyContent: 'center',
-    //   '& .MuiButton-root': {
-    //     minWidth: '12em',
-    //     marginBottom: theme.spacing(1)
-    //   },
-    //   '& .MuiButton-root:not(:last-child)': {
-    //     marginRight: theme.spacing(1)
-    //   }
-    // }
   },
   DeckInfo: {
     maxWidth: theme.breakpoints.values.md,
@@ -146,6 +147,7 @@ const useStyles = makeStyles((theme) => ({
       margin: theme.spacing(1, 0)
     }
   },
+  'Deck-overview-curPage': { backgroundColor: theme.palette.primary.main },
   'DeckInfo-overview-title': {
     // ...theme.typography.body1,
     display: 'flex',
@@ -170,8 +172,103 @@ type Props = {
 
 export default function Deck({ pageData, comment, pdfPath, pptxPath }: Props) {
   const classes = useStyles();
+  const theme = useTheme();
+  const downLg = useMediaQuery(theme.breakpoints.down('sm'));
   const [navOpen, setNavOpen] = useState(false);
-  // const router = useRouter();
+  // (index を 1 つにまとめるとボタンのダブルクリックなどでループになる)
+  const [curPageIdx, setCurPageIdx] = useState(0); // 変更する index
+  const [pageIdx, setPageIdx] = useState(0); // 変更された index
+  const [pagESwitchedByClick, setPageSwitchedByClick] = useState(false);
+  const [sectionShowing, _setSectionShowing] = useState(false);
+  const setSectionShowing = useCallback(
+    (v: boolean) => {
+      if (downLg) {
+        _setSectionShowing(v);
+      }
+    },
+    [downLg]
+  );
+  const [sectionStickyTop, setSectionStickyTop] = useState(0);
+  const [pageElm, setPageElm] = useState<Element | null>(null);
+  const [overviewElms, setOverviewElms] = useState<Element[]>([]);
+  const trigger = useScrollTrigger({
+    disableHysteresis: true,
+    threshold: 200
+  });
+
+  const measuredRef = useCallback((node) => {
+    if (node !== null) {
+      setPageElm(node); // pageEle 他で使う
+    }
+  }, []);
+
+  useEffect(() => {
+    setSectionStickyTop(
+      sectionShowing ? 0 : pageElm ? -pageElm.getBoundingClientRect().bottom : 0
+    );
+  }, [sectionShowing, pageElm]);
+
+  const overviewRef = useCallback(
+    (node) => {
+      if (node !== null) {
+        const elms: Element[] = new Array(pageData.deck.slide.items.length);
+        (document.querySelectorAll('.slides > ul > li') || []).forEach(
+          (n, i) => {
+            elms[i] = n;
+          }
+        );
+        setOverviewElms(elms);
+      }
+    },
+    [pageData.deck.slide.items.length]
+  );
+
+  useEffect(() => {
+    if (pageElm && overviewElms && overviewElms.length > 0) {
+      const scroller = window;
+      let timerId: any = 0;
+      const handleScroll = () => {
+        if (timerId !== 0) {
+          clearTimeout(timerId);
+        }
+        timerId = setTimeout(() => {
+          timerId = 0;
+          if (sectionShowing && !pagESwitchedByClick) {
+            const { height, bottom } = pageElm.getBoundingClientRect();
+            const top = bottom - height * 0.3;
+            const idx = overviewElms.findIndex(
+              (elm) => elm.getBoundingClientRect().top > top
+            );
+            if (idx >= 0) {
+              setCurPageIdx(idx);
+            }
+          }
+        }, 800);
+      };
+      scroller.addEventListener('scroll', handleScroll);
+      return () => {
+        if (timerId !== 0) {
+          clearTimeout(timerId);
+        }
+        scroller.removeEventListener('scroll', handleScroll);
+      };
+    }
+  }, [pageElm, overviewElms, sectionShowing, pagESwitchedByClick]);
+
+  useEffect(() => {
+    if (pagESwitchedByClick) {
+      let timerId: any = setTimeout(() => {
+        clearTimeout(timerId);
+        setPageSwitchedByClick(false);
+      }, 1000);
+      return () => {
+        if (timerId !== 0) {
+          clearTimeout(timerId);
+        }
+      };
+    }
+  }, [pagESwitchedByClick]);
+
   if (pageData === undefined || !pageData.title) {
     return <ErrorPage statusCode={404} />;
   }
@@ -179,6 +276,7 @@ export default function Deck({ pageData, comment, pdfPath, pptxPath }: Props) {
     <LayoutDeck
       apiName={'deck'}
       {...pageData}
+      sectionStickyTop={sectionStickyTop}
       bottomSection={
         <>
           <Box component="section" className={classes['DeckInfo-root']}>
@@ -193,14 +291,30 @@ export default function Deck({ pageData, comment, pdfPath, pptxPath }: Props) {
                 <ExpandMoreIcon />
               </IconButton>
               <Typography className={classes['DeckInfo-header-title']}>
-                スライド概要
+                {pageData.articleTitle}
               </Typography>
             </Box>
-            <aside
+            <Box
               className={`${classes['DeckInfo']}${
                 navOpen ? ' DeckInfo-Open' : ''
               }`}
             >
+              <div>
+                <article
+                  className={classes['DeckInfo-author-comment']}
+                  title="author comment"
+                  dangerouslySetInnerHTML={{
+                    __html: comment
+                  }}
+                />
+                <Box className={classes['DeckInfo-Category-outer']}>
+                  <NavCategory
+                    categoryPath={'/deck/category'}
+                    allCategory={pageData.allCategory}
+                    category={pageData.category}
+                  />
+                </Box>
+              </div>
               <Box className={classes['DeckInfo-Buttons-outer']}>
                 <Button
                   className="MuiButton-outlinedPrimary"
@@ -233,23 +347,7 @@ export default function Deck({ pageData, comment, pdfPath, pptxPath }: Props) {
                   <Typography color="inherit">PPTX ダウンロード</Typography>
                 </Button>
               </Box>
-              <div>
-                <article
-                  className={classes['DeckInfo-author-comment']}
-                  title="author comment"
-                  dangerouslySetInnerHTML={{
-                    __html: comment
-                  }}
-                />
-                <Box className={classes['DeckInfo-Category-outer']}>
-                  <NavCategory
-                    categoryPath={'/deck/category'}
-                    allCategory={pageData.allCategory}
-                    category={pageData.category}
-                  />
-                </Box>
-              </div>
-            </aside>
+            </Box>
             <article
               id={pageData.deck.overview.id}
               className={classes['Deck-overview-root']}
@@ -259,23 +357,56 @@ export default function Deck({ pageData, comment, pdfPath, pptxPath }: Props) {
                   __html: pageData.deck.overview.css
                 }}
               />
-              <div className="slides">
+              <div ref={overviewRef} className="slides">
                 <Timeline>
                   {pageData.deck.overview.items.map(({ html }, i, items) => (
                     <TimelineItem key={i}>
                       <TimelineSeparator>
-                        <Avatar>
-                          <Typography>{`${i + 1}`}</Typography>
-                        </Avatar>
+                        <ButtonSelect
+                          onClick={() => {
+                            if (curPageIdx !== i || !sectionShowing) {
+                              setSectionShowing(true);
+                              setPageSwitchedByClick(true);
+                              setPageIdx(i);
+                              setCurPageIdx(i);
+                              return;
+                            }
+                            setSectionShowing(false);
+                          }}
+                        >
+                          <Avatar
+                            className={
+                              i === pageIdx
+                                ? classes['Deck-overview-curPage']
+                                : ''
+                            }
+                          >
+                            <Typography>{`${i + 1}`}</Typography>
+                          </Avatar>
+                        </ButtonSelect>
                         {i + 1 < items.length && <TimelineConnector />}
                       </TimelineSeparator>
                       <TimelineContent>
-                        <div
-                          className="slide"
-                          dangerouslySetInnerHTML={{
-                            __html: html
+                        <ButtonSelect
+                          onClick={() => {
+                            if (curPageIdx !== i || !sectionShowing) {
+                              setSectionShowing(true);
+                              setPageSwitchedByClick(true);
+                              setPageIdx(i);
+                              setCurPageIdx(i);
+                              return;
+                            }
+                            setSectionShowing(false);
                           }}
-                        />
+                        >
+                          <div
+                            id={`page-${i}`}
+                            className="slide"
+                            dangerouslySetInnerHTML={{
+                              __html: html
+                            }}
+                          />
+                        </ButtonSelect>
                       </TimelineContent>
                     </TimelineItem>
                   ))}
@@ -285,48 +416,76 @@ export default function Deck({ pageData, comment, pdfPath, pptxPath }: Props) {
           </Box>
         </>
       }
-      // bottomSection={
-      //   <section>
-      //     <Typography component="h2">slides list</Typography>
-      //     <ListDeck
-      //       itemPath={'/deck'}
-      //       items={items}
-      //       variant="thin"
-      //       // classes={classes}
-      //     />
-      //   </section>
-      // }
-      notification={pageData.notification}
-    >
-      <>
-        <style
-          dangerouslySetInnerHTML={{
-            __html: pageData.deck.slide.css
-          }}
-        />
-        <Box className={classes['Page-root']}>
-          <Carousel
-            autoPlay={false}
-            animation={'slide'}
-            // indicators={false}
-            // 2.2.x だと NavButton が常に表示か非表示にしかできない?
+      section={
+        <div ref={measuredRef} className={classes['Page-root']}>
+          <Paper
+            elevation={trigger && downLg && sectionShowing ? 2 : 0}
+            className={classes['Page-paper']}
           >
-            {pageData.deck.slide.items.map(({ html }, i) => (
-              <article id={pageData.deck.slide.id} key={i}>
-                <div className="slides">
-                  <div
-                    className="slide"
-                    dangerouslySetInnerHTML={{
-                      __html: html
-                    }}
-                  />
-                </div>
-              </article>
-            ))}
-          </Carousel>
-        </Box>
-      </>
-    </LayoutDeck>
+            <article id={pageData.deck.slide.id}>
+              <div className="slides">
+                <style
+                  dangerouslySetInnerHTML={{
+                    __html: pageData.deck.slide.css
+                  }}
+                />
+                <Carousel
+                  autoPlay={false}
+                  animation={'slide'}
+                  index={curPageIdx}
+                  onChange={(index: any) => {
+                    if (!pagESwitchedByClick) {
+                      const to =
+                        overviewElms && overviewElms.length >= index
+                          ? overviewElms[index]
+                          : null;
+                      if (to && (downLg === false || sectionShowing)) {
+                        //to.scrollIntoView({ behavior: 'smooth' });
+                        const { top, bottom } = to.getBoundingClientRect();
+                        const topOffset = downLg
+                          ? pageElm?.getBoundingClientRect().bottom || 0
+                          : appBarHeight + theme.spacing(2); // .Page-root の top と合わせる.
+                        if (top < topOffset) {
+                          scroll.scrollTo(
+                            document.documentElement.scrollTop +
+                              top -
+                              topOffset -
+                              theme.spacing(1),
+                            { duration: 800 }
+                          );
+                        } else if (
+                          document.documentElement.clientHeight <= bottom
+                        ) {
+                          scroll.scrollTo(
+                            document.documentElement.scrollTop +
+                              bottom -
+                              document.documentElement.clientHeight +
+                              theme.spacing(1),
+                            { duration: 800 }
+                          );
+                        }
+                      }
+                    }
+                    setPageIdx(index);
+                  }}
+                >
+                  {pageData.deck.slide.items.map(({ html }, i) => (
+                    <div
+                      key={i}
+                      className="slideDeck"
+                      dangerouslySetInnerHTML={{
+                        __html: html
+                      }}
+                    />
+                  ))}
+                </Carousel>
+              </div>
+            </article>
+          </Paper>
+        </div>
+      }
+      notification={pageData.notification}
+    ></LayoutDeck>
   );
 }
 

@@ -41,7 +41,7 @@
     "qrcode": "^1.4.4",
     "react": "^17.0.1",
     "react-dom": "^17.0.1",
-    "react-material-ui-carousel": "2.1.2",
+    "react-material-ui-carousel": "2.2.4",
     "react-scroll": "^1.8.2",
     "rehype-minify-whitespace": "^4.0.5",
     "rehype-parse": "^7.0.1",

@@ -103,41 +103,41 @@ const ListDeckItem = (props: Props) => {
         <CardMedia>
           {deck.items[0] ? (
             <>
-              <style
-                dangerouslySetInnerHTML={{
-                  __html: deck.css
-                }}
-              />
-              <Carousel
-                autoPlay={false}
-                indicators={false}
-                animation={'slide'}
-                // 2.2.x だと NavButton が常に表示か非表示にしかできない?
+              <article
+                key={deck.id}
+                id={deck.id}
+                className={classes['ListDeckItem-thumb']}
               >
-                {deck.items.map(({ html }) => (
-                  <Link
-                    key={itemId}
-                    href={join(itemPath, '[id]')}
-                    as={join(itemPath, itemId)}
-                    // article を link でラップはあり?
+                <div className="slides">
+                  <style
+                    dangerouslySetInnerHTML={{
+                      __html: deck.css
+                    }}
+                  />
+                  <Carousel
+                    autoPlay={false}
+                    indicators={false}
+                    animation={'slide'}
+                    // 2.2.x だと NavButton が常に表示か非表示にしかできない?
                   >
-                    <article
-                      key={deck.id}
-                      id={deck.id}
-                      className={classes['ListDeckItem-thumb']}
-                    >
-                      <div className="slides">
+                    {deck.items.map(({ html }) => (
+                      <Link
+                        key={itemId}
+                        href={join(itemPath, '[id]')}
+                        as={join(itemPath, itemId)}
+                        // article を link でラップはあり?
+                      >
                         <div
-                          className="slide"
+                          className="slideDeck"
                           dangerouslySetInnerHTML={{
                             __html: html
                           }}
                         />
-                      </div>
-                    </article>
-                  </Link>
-                ))}
-              </Carousel>
+                      </Link>
+                    ))}
+                  </Carousel>
+                </div>
+              </article>
             </>
           ) : (
             <Box style={{ height: 180 }}>

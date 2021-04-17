@@ -271,9 +271,33 @@ export async function slideDeckSlide(
     html: true,
     container: [
       new Element('article', { id: containerId }),
-      new Element('div', { class: 'slides' })
+      new Element('div', { class: 'slides' }),
+      new Element('div'),
+      new Element('div'),
+      new Element('div')
     ],
-    slideContainer: new Element('div', { class: 'slide' }),
+    slideContainer: new Element('div', { class: 'slideDeck' }),
+    script: false
+  });
+  return await _slideDeck(marp, containerId, source);
+}
+export async function slideDeckIndex(
+  id: string,
+  source: string
+): Promise<DeckData> {
+  const containerId = `slide-${id}`;
+  const marp = new Marp({
+    inlineSVG: true,
+    html: true,
+    container: [
+      new Element('article', { id: containerId }),
+      new Element('div', { class: 'slides' }),
+      new Element('div'),
+      new Element('div'),
+      new Element('div'),
+      new Element('a')
+    ],
+    slideContainer: new Element('div', { class: 'slideDeck' }),
     script: false
   });
   return await _slideDeck(marp, containerId, source);
@@ -292,7 +316,8 @@ export async function slideDeckOverview(
       new Element('div', { class: 'slides' }),
       new Element('ul'),
       new Element('li'),
-      new Element('div')
+      new Element('div'),
+      new Element('button')
     ],
     slideContainer: [new Element('div', { class: 'slide' })],
     script: false

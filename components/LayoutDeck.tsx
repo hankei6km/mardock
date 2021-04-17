@@ -1,6 +1,6 @@
 import React from 'react';
 import { makeStyles } from '@material-ui/core';
-import Layout, { Props } from './Layout';
+import Layout, { Props as LayoutProps } from './Layout';
 // import Box from '@material-ui/core/Box';
 
 const useStyles = makeStyles((theme) => ({
@@ -12,17 +12,18 @@ const useStyles = makeStyles((theme) => ({
       }
     }
   },
-  'Layout-section': {
+  'Layout-section': ({ sectionStickyTop }: Props) => ({
     gridArea: 'main',
-    // position: 'sticky',
-    // top: -300,
+    position: 'sticky',
+    top: sectionStickyTop,
+    transition: 'top .3s',
     // ...theme.typography.body1,
-    padding: theme.spacing(0, 1),
+    padding: theme.spacing(0),
     [theme.breakpoints.up('md')]: {
-      position: 'unset',
-      top: 'unset'
+      // position: 'unset',
+      // top: 'unset'
     }
-  },
+  }),
   'Layout-children': {
     widht: '100%',
     position: 'sticky',
@@ -30,8 +31,17 @@ const useStyles = makeStyles((theme) => ({
   }
 }));
 
-const LayoutDeck = ({ children, ...others }: Props) => {
-  const classes = useStyles();
+type Props = { sectionStickyTop: number } & LayoutProps;
+
+const LayoutDeck = (props: Props) => {
+  const {
+    children,
+    section,
+    sectionStickyTop,
+    classes: inClasses,
+    ...others
+  } = props;
+  const classes = useStyles(props);
   // useEffect(() => {
   //   if (others.deck && others.deck.script) {
   //     others.deck.script.forEach((b) => {
@@ -52,7 +62,11 @@ const LayoutDeck = ({ children, ...others }: Props) => {
   return (
     <Layout
       {...others}
-      // section={<Box className={classes['Layout-children']}>{children}</Box>}
+      headerHideOptions={{
+        disableHysteresis: true,
+        threshold: 0
+      }}
+      section={section}
       classes={classes}
     >
       {children}
