@@ -1,5 +1,5 @@
 import { createMuiTheme } from '@material-ui/core/styles';
-import { blueGrey, red } from '@material-ui/core/colors';
+import { blueGrey, grey, red } from '@material-ui/core/colors';
 // import createBreakpoints from '@material-ui/core/styles/createBreakpoints';
 
 // https://github.com/mui-org/material-ui/blob/dc68f1ae8470a38660e2dd40fba319dcba405784/examples/nextjs/src/theme.js
@@ -86,7 +86,7 @@ const theme = createMuiTheme({
           main: '#fff'
         },
         home: {
-          main: blueGrey['50']
+          main: grey['50']
         },
         deck: {
           main: blueGrey['50']

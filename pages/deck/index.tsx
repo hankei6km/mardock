@@ -1,5 +1,7 @@
 import { GetStaticProps } from 'next';
 import ErrorPage from 'next/error';
+import { makeStyles } from '@material-ui/core';
+import Box from '@material-ui/core/Box';
 import Layout from '../../components/Layout';
 import ListDeck from '../../components/ListDeck';
 // import Typography from '@material-ui/core/Typography';
@@ -7,9 +9,16 @@ import { PageData, IndexList } from '../../types/pageTypes';
 import { getPagesData, getSortedIndexData } from '../../lib/pages';
 import NavPagination from '../../components/NavPagination';
 import { GetQuery } from '../../types/client/queryTypes';
+import { pageCountFromTotalCount } from '../../utils/pagination';
 
-const itemsPerPage = 10;
+const itemsPerPage = 12;
 const pagePath: string[] = [];
+
+const useStyles = makeStyles((theme) => ({
+  'ListDeck-outer': {
+    marginBottom: theme.spacing(2)
+  }
+}));
 
 type Props = {
   pageData: PageData;
@@ -17,6 +26,7 @@ type Props = {
 };
 
 const DeckPage = ({ pageData, items }: Props) => {
+  const classes = useStyles();
   if (pageData === undefined || !pageData.title) {
     return <ErrorPage statusCode={404} />;
   }
@@ -36,7 +46,9 @@ const DeckPage = ({ pageData, items }: Props) => {
       notification={pageData.notification}
     >
       <section>
-        <ListDeck itemPath={'/deck'} items={items} imgWidth={600} />
+        <Box className={classes['ListDeck-outer']}>
+          <ListDeck itemPath={'/deck'} items={items} imgWidth={600} />
+        </Box>
         <NavPagination
           pageNo={pageData.pageNo}
           pageCount={pageData.pageCount}
@@ -67,17 +79,23 @@ export const getStaticProps: GetStaticProps = async (context) => {
     }
   );
   const q: GetQuery = {};
-  if (itemsPerPage !== undefined) {
-    q.limit = itemsPerPage;
-    if (pageNo !== undefined) {
-      q.offset = itemsPerPage * (pageNo - 1);
-    }
+  q.limit = itemsPerPage;
+  if (pageNo !== undefined) {
+    q.offset = itemsPerPage * (pageNo - 1);
   }
   if (curCategory) {
     q.filters = `category[contains]${curCategory}`;
   }
   const items = await getSortedIndexData('deck', q);
-  return { props: { pageData, items } };
+  return {
+    props: {
+      pageData: {
+        ...pageData,
+        pageCount: pageCountFromTotalCount(items.totalCount, itemsPerPage)
+      },
+      items
+    }
+  };
 };
 
 export default DeckPage;

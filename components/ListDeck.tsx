@@ -19,7 +19,7 @@ type Props = {
   items: IndexList;
   cellHeight?: number | 'auto';
   imgWidth?: number;
-  variant?: 'thin';
+  variant?: 'cover' | 'thin';
   classes?: { [key: string]: string };
 };
 const ListDeck = (props: Props) => {
@@ -54,7 +54,7 @@ const ListDeck = (props: Props) => {
           category={item.category}
           deck={item.deck}
           variant={variant}
-          classes={classes}
+          classes={inClasses}
         />
       ))}
     </GridList>
