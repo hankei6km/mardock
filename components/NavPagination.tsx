@@ -7,7 +7,11 @@ import Link from './Link';
 import { pruneClasses } from '../utils/classes';
 
 const useStyles = makeStyles(() => ({
-  'NavPagination-root': {}
+  'NavPagination-root': {
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center'
+  }
 }));
 const classNames = ['NavPagination-root'];
 
