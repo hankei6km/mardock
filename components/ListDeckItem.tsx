@@ -18,9 +18,22 @@ import Carousel from 'react-material-ui-carousel';
 
 const useStyles = makeStyles((theme) => ({
   'ListDeckItem-thumb-outer': (props: Props) =>
-    props.variant === 'thin'
+    props.variant === 'cover'
       ? {
-          width: '100%'
+          width: '100%',
+          [theme.breakpoints.up('sm')]: {
+            width: '80%'
+          }
+        }
+      : props.variant === 'thin'
+      ? {
+          width: '80%',
+          [theme.breakpoints.up('sm')]: {
+            width: '49%'
+          },
+          [theme.breakpoints.up('md')]: {
+            width: '100%'
+          }
         }
       : {
           width: '100%',
@@ -71,7 +84,7 @@ type Props = {
   itemPath: string;
   category: PagesCategory[];
   deck: DeckData;
-  variant?: 'thin';
+  variant?: 'cover' | 'thin';
   classes?: { [key: string]: string };
 };
 // } & { width: Breakpoint };
