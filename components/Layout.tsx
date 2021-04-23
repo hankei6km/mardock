@@ -33,7 +33,7 @@ export const appBarHeight = 64;
 
 const useStyles = makeStyles((theme) => ({
   'Header-root': {
-    position: 'sticky',
+    position: 'fixed',
     top: 0,
     backgroundColor: theme.palette.background.default
   },
@@ -516,73 +516,76 @@ const Layout = ({
         alwaysShowing={alwaysShowing}
         headerHideOptions={headerHideOptions}
       >
-        <AppBar
-          component="header"
-          // color="default"
-          className={classes['Header-root']}
-        >
-          <Container maxWidth={maxWidth} disableGutters>
-            <Toolbar disableGutters className={classes['Header-toolbar']}>
-              <Box className={classes['Header-content']}>
-                <Box className={classes['Header-title']}>
-                  <Box className={classes['Header-site-title-root']}>
-                    <Avatar
-                      component={Link}
-                      href={'/'}
-                      className={classes['Header-site-title-image']}
-                      alt={siteIcon.alt}
-                      imgProps={{ width: 120, height: 120 }}
-                      src={avatarSrc}
-                      srcSet={avatarSrcSet}
+        <Box>
+          <AppBar
+            component="header"
+            // color="default"
+            className={classes['Header-root']}
+          >
+            <Container maxWidth={maxWidth} disableGutters>
+              <Toolbar disableGutters className={classes['Header-toolbar']}>
+                <Box className={classes['Header-content']}>
+                  <Box className={classes['Header-title']}>
+                    <Box className={classes['Header-site-title-root']}>
+                      <Avatar
+                        component={Link}
+                        href={'/'}
+                        className={classes['Header-site-title-image']}
+                        alt={siteIcon.alt}
+                        imgProps={{ width: 120, height: 120 }}
+                        src={avatarSrc}
+                        srcSet={avatarSrcSet}
+                      />
+                      <Typography
+                        component="h1"
+                        className={classes['Header-site-title-text-outer']}
+                      >
+                        <Link href="/" underline="none" color="textPrimary">
+                          {siteNameDecorated.map((t, i) => (
+                            <Typography
+                              key={`site-title:${i}`}
+                              component="span"
+                              className={
+                                classes[
+                                  t.strong
+                                    ? 'Header-site-title-text-strong'
+                                    : 'Header-site-title-text-plain'
+                                ]
+                              }
+                            >
+                              {t.label}
+                            </Typography>
+                          ))}
+                        </Link>
+                      </Typography>
+                    </Box>
+                    <Box className={classes['NavMain-menu-button-outer']}>
+                      <IconButton
+                        aria-label="toggle primary-navigation"
+                        className={classes['NavMain-menu-button']}
+                        onClick={() => setNavOpen(!navOpen)}
+                      >
+                        <MenuIcon />
+                      </IconButton>
+                    </Box>
+                  </Box>
+                  <Box
+                    className={
+                      navOpen
+                        ? `${classes['NavMain-outer']} Header-content-NavOpen`
+                        : classes['NavMain-outer']
+                    }
+                  >
+                    <NavMain
+                      classes={{ 'NavMain-root': classes['NavMain-root'] }}
                     />
-                    <Typography
-                      component="h1"
-                      className={classes['Header-site-title-text-outer']}
-                    >
-                      <Link href="/" underline="none" color="textPrimary">
-                        {siteNameDecorated.map((t, i) => (
-                          <Typography
-                            key={`site-title:${i}`}
-                            component="span"
-                            className={
-                              classes[
-                                t.strong
-                                  ? 'Header-site-title-text-strong'
-                                  : 'Header-site-title-text-plain'
-                              ]
-                            }
-                          >
-                            {t.label}
-                          </Typography>
-                        ))}
-                      </Link>
-                    </Typography>
-                  </Box>
-                  <Box className={classes['NavMain-menu-button-outer']}>
-                    <IconButton
-                      aria-label="toggle primary-navigation"
-                      className={classes['NavMain-menu-button']}
-                      onClick={() => setNavOpen(!navOpen)}
-                    >
-                      <MenuIcon />
-                    </IconButton>
                   </Box>
                 </Box>
-                <Box
-                  className={
-                    navOpen
-                      ? `${classes['NavMain-outer']} Header-content-NavOpen`
-                      : classes['NavMain-outer']
-                  }
-                >
-                  <NavMain
-                    classes={{ 'NavMain-root': classes['NavMain-root'] }}
-                  />
-                </Box>
-              </Box>
-            </Toolbar>
-          </Container>
-        </AppBar>
+              </Toolbar>
+            </Container>
+          </AppBar>
+          <Box style={{ height: appBarHeight }} />
+        </Box>
       </HideOnScroll>
       <Box className={classes['NavBreadcrumbs-outer']}>
         {(apiName === 'deck' || apiName === 'docs') && (
