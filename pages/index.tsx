@@ -57,9 +57,7 @@ const IndexPage = ({ pageData, intro, items }: Props) => {
               <NavHtmlToc htmlToc={pageData.htmlToc} />
             </section>
           </aside>
-        ) : (
-          ''
-        )
+        ) : undefined
       }
       bottomSection={
         <section>

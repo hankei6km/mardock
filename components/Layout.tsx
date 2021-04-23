@@ -1,15 +1,10 @@
-import React, {
-  ReactElement,
-  ReactNode,
-  useEffect,
-  useContext,
-  useState
-} from 'react';
+import React, { ReactElement, useEffect, useContext, useState } from 'react';
 // import { useRouter } from 'next/router';
 import { makeStyles } from '@material-ui/core';
 import { useTheme } from '@material-ui/core/styles';
 import useMediaQuery from '@material-ui/core/useMediaQuery';
 import useScrollTrigger from '@material-ui/core/useScrollTrigger';
+import { UseScrollTriggerOptions } from '@material-ui/core/useScrollTrigger/useScrollTrigger';
 import Head from 'next/head';
 import Container from '@material-ui/core/Container';
 import Avatar from '@material-ui/core/Avatar';
@@ -33,6 +28,8 @@ import NavMain from './NavMain';
 import NavBreadcrumbs from './NavBreadcrumbs';
 import DateUpdated from './DateUpdated';
 import { gridTempalteAreasFromLayout } from '../utils/grid';
+
+export const appBarHeight = 64;
 
 const useStyles = makeStyles((theme) => ({
   'Header-root': {
@@ -121,12 +118,28 @@ const useStyles = makeStyles((theme) => ({
       paddingRight: 0
     }
   },
-  'NavBreadcrumbs-outer': {
-    width: '100%',
-    display: 'none',
+  'NavBreadcrumbs-outer': ({ apiName, id }: Props) => {
+    let backgroundColor = theme.palette.content.background.default.main;
+    if (apiName === 'pages' && id === 'home') {
+      backgroundColor = theme.palette.content.background.home.main;
+    }
+    if (apiName === 'pages' && id === 'deck') {
+      backgroundColor = theme.palette.content.background.deck.main;
+    }
+    return {
+      width: '100%',
+      display: 'none',
+      minHeight: theme.spacing(2),
+      zIndex: theme.zIndex.appBar - 1,
+      padding: theme.spacing(1, 0),
+      backgroundColor,
+      [theme.breakpoints.up('md')]: {
+        display: 'block'
+      }
+    };
+  },
+  NavBreadcrumbs: {
     [theme.breakpoints.up('md')]: {
-      display: 'block',
-      // padding: theme.spacing(1, 0)
       marginBottom: theme.spacing(1)
     }
   },
@@ -169,7 +182,7 @@ const useStyles = makeStyles((theme) => ({
         display: 'flex',
         flexDirection: 'column',
         [theme.breakpoints.up('md')]: {
-          margin: theme.spacing(2, 0),
+          margin: theme.spacing(0, 0, 2, 0),
           display: 'grid',
           gridGap: theme.spacing(1),
           gridTemplateColumns: 'repeat(11, 1fr)',
@@ -237,7 +250,7 @@ const useStyles = makeStyles((theme) => ({
       ...theme.typography.h4,
       marginBottom: theme.spacing(1)
     },
-    '& article > h3': {
+    '& > article > h3': {
       ...theme.typography.h6,
       marginBottom: theme.spacing(1),
       paddingTop: theme.spacing(0.5),
@@ -248,7 +261,7 @@ const useStyles = makeStyles((theme) => ({
       backgroundColor: theme.palette.divider // ライトグレイぽい色は他にないかね
       // background: `linear-gradient(to right, ${theme.palette.primary.main} ,#f0f0f0)`
     },
-    '& article > h4': {
+    '& > article > h4': {
       ...theme.typography.h6,
       display: 'inline',
       marginBottom: theme.spacing(1),
@@ -258,40 +271,40 @@ const useStyles = makeStyles((theme) => ({
       color: theme.palette.getContrastText(theme.palette.primary.main),
       backgroundColor: theme.palette.primary.main
     },
-    '& article > :not(section) a': {
+    '& > article > :not(section) a': {
       textDecorationLine: 'none',
       '&:hover': {
         textDecorationLine: 'underline'
       }
     },
-    '& article > p > img, article > p > a > img': {
+    '& > article > p > img, article > p > a > img': {
       borderRadius: theme.shape.borderRadius,
       width: '100%',
       height: '100%'
       // objectFit: 'contain'
     },
-    '& article > ul': {
+    '& > article > ul': {
       paddingLeft: theme.spacing(3),
       paddingRight: theme.spacing(1),
       [theme.breakpoints.up('sm')]: {
         paddingLeft: theme.spacing(4)
       }
     },
-    '& article pre > code': {
+    '& > article pre > code': {
       borderRadius: theme.shape.borderRadius,
       fontSize: theme.typography.body2.fontSize,
       [theme.breakpoints.up('sm')]: {
         fontSize: theme.typography.body1.fontSize
       }
     },
-    '& article :not(pre) > code': {
+    '& > article :not(pre) > code': {
       padding: '.2em .4em',
       margin: 0,
       fontSize: '95%',
       backgroundColor: 'rgba(27,31,35,.1);',
       borderRadius: '3px'
     },
-    '& article > blockquote': {
+    '& > article > blockquote': {
       marginLeft: theme.spacing(1),
       marginRight: theme.spacing(1),
       borderRadius: theme.shape.borderRadius,
@@ -299,7 +312,7 @@ const useStyles = makeStyles((theme) => ({
       borderLeft: `6px solid ${theme.palette.secondary.main}`,
       backgroundColor: theme.palette.divider
     },
-    '& article  > table': {
+    '& > article  > table': {
       display: 'block', // table 自体をスクロールさせるため(thead 等はそのままでもよい?)
       overflow: 'auto',
       maxWidth: '100%',
@@ -328,7 +341,7 @@ const useStyles = makeStyles((theme) => ({
         }
       }
     },
-    '& article > .embed.youtube': {
+    '& > article > .embed.youtube': {
       marginBottom: theme.spacing(1)
     },
     '& > section': {
@@ -376,11 +389,12 @@ const ogImageParamsStr = ogImageParams.toString();
 
 export type Props = {
   apiName: ApiNameArticle;
-  children?: ReactNode;
-  section?: ReactNode;
-  topSection?: ReactNode;
-  topPersistSection?: ReactNode;
-  bottomSection?: ReactNode;
+  children?: ReactElement;
+  section?: ReactElement;
+  topSection?: ReactElement;
+  topPersistSection?: ReactElement;
+  bottomSection?: ReactElement;
+  headerHideOptions?: UseScrollTriggerOptions;
   classes?: { [key: string]: string }; // prune をかけないので注意
 } & Partial<PageData>;
 
@@ -392,13 +406,15 @@ function getAvatarSrcSet(src: string): string {
 
 function HideOnScroll({
   children,
-  alwaysShowing
+  alwaysShowing,
+  headerHideOptions = {}
 }: {
   children?: ReactElement;
   alwaysShowing: boolean;
+  headerHideOptions?: UseScrollTriggerOptions;
 }) {
   // https://material-ui.com/components/app-bar/#hide-app-bar
-  const trigger = useScrollTrigger();
+  const trigger = useScrollTrigger(headerHideOptions);
 
   return (
     <Slide
@@ -427,6 +443,7 @@ const Layout = ({
   html: html = '',
   mainVisual = { url: '', width: 0, height: 0 },
   notification,
+  headerHideOptions = {},
   classes: inClasses
 }: Props) => {
   const classes = useStyles({
@@ -495,7 +512,10 @@ const Layout = ({
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="viewport" content="initial-scale=1.0, width=device-width" />
       </Head>
-      <HideOnScroll alwaysShowing={alwaysShowing}>
+      <HideOnScroll
+        alwaysShowing={alwaysShowing}
+        headerHideOptions={headerHideOptions}
+      >
         <AppBar
           component="header"
           // color="default"
@@ -564,19 +584,21 @@ const Layout = ({
           </Container>
         </AppBar>
       </HideOnScroll>
-      <Box className={classes['Layout-section-root']}>
+      <Box className={classes['NavBreadcrumbs-outer']}>
         {(apiName === 'deck' || apiName === 'docs') && (
           <>
             <Container
               maxWidth={maxWidth}
               disableGutters
-              className={classes['NavBreadcrumbs-outer']}
+              className={classes['NavBreadcrumbs']}
             >
               <NavBreadcrumbs lastBreadcrumb={title} classes={classes} />
             </Container>
             <Divider className={classes['NavBreadcrumbs-divider']} />
           </>
         )}
+      </Box>
+      <Box className={classes['Layout-section-root']}>
         <Container maxWidth={maxWidth} disableGutters>
           <Box className={'Layout-body'}>
             {(topPersistSection || topSection) && (

@@ -34,27 +34,31 @@ const AboutPage = ({ pageData }: Props) => {
       {...pageData}
       notification={pageData.notification}
     >
-      <Box py={1}>
-        <Typography>{Package.version}</Typography>
-      </Box>
-      <Box py={1}>
-        <Link variant="button" href="/open_source_licenses.zip">
-          Open Source Licenses
-        </Link>
-      </Box>
-      <Box>
-        <Typography component="h3" variant="h5">{licenseName}</Typography>
-        <Typography variant="body1" paragraph>
-          {cpoyright}
-        </Typography>
-        {licenseLines.map((v, i) => (
-          <Box key={i}>
-            <Typography variant="body2" paragraph>
-              {v}
-            </Typography>
-          </Box>
-        ))}
-      </Box>
+      <>
+        <Box py={1}>
+          <Typography>{Package.version}</Typography>
+        </Box>
+        <Box py={1}>
+          <Link variant="button" href="/open_source_licenses.zip">
+            Open Source Licenses
+          </Link>
+        </Box>
+        <Box>
+          <Typography component="h3" variant="h5">
+            {licenseName}
+          </Typography>
+          <Typography variant="body1" paragraph>
+            {cpoyright}
+          </Typography>
+          {licenseLines.map((v, i) => (
+            <Box key={i}>
+              <Typography variant="body2" paragraph>
+                {v}
+              </Typography>
+            </Box>
+          ))}
+        </Box>
+      </>
     </Layout>
   );
 };

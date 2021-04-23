@@ -39,9 +39,7 @@ export default function Docs({ pageData, items }: Props) {
               <NavHtmlToc htmlToc={pageData.htmlToc} />
             </section>
           </aside>
-        ) : (
-          ''
-        )
+        ) : undefined
       }
       bottomSection={
         <section>

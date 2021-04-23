@@ -34,6 +34,7 @@ import {
 import {
   getSlideData,
   slideDeckSlide,
+  slideDeckIndex,
   slideDeckRemoveId,
   slideDeckOverview
 } from './slide';
@@ -109,7 +110,7 @@ export async function getSortedIndexData(
           description: res.description || ''
         };
         if (res.source || res.sourceContents || res.sourcePages) {
-          const d = await slideDeckSlide(
+          const d = await slideDeckIndex(
             res.id,
             await sourceSetMarkdown({
               sourceContents: res.sourceContents,
