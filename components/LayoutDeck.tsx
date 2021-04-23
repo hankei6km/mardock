@@ -23,16 +23,11 @@ const useStyles = makeStyles((theme) => ({
     position: 'sticky',
     top: sectionStickyTop,
     transition: 'top .3s',
-    // ...theme.typography.body1,
     padding: theme.spacing(0),
     [theme.breakpoints.up('md')]: {
-      position: 'fixed',
-      top: 130,
-      // window 幅いっぱいまで広げる.
-      // gridTemplateAreas での main 指定幅は子要素の方で widht を指定
-      width: '100%',
+      position: 'unset',
+      top: 'unset',
       maxWidth: theme.breakpoints.values.lg
-      // top: 'unset'
     }
   }),
   'Layout-children': {

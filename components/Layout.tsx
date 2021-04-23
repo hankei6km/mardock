@@ -134,6 +134,7 @@ const useStyles = makeStyles((theme) => ({
       padding: theme.spacing(1, 0),
       backgroundColor,
       [theme.breakpoints.up('md')]: {
+        padding: theme.spacing(1),
         display: 'block'
       }
     };

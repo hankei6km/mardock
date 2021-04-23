@@ -48,9 +48,8 @@ const useStyles = makeStyles((theme) => ({
       padding: theme.spacing(1, 2)
     },
     [theme.breakpoints.up('md')]: {
-      // 親が fixed 指定で window 幅いっぱいまで広げている
-      // gridTemplateAreas の指定にあうように widht を指定
-      width: '63%',
+      position: 'sticky',
+      top: 121,
       padding: theme.spacing(1, 2)
     }
   },
