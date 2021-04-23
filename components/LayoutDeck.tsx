@@ -1,9 +1,15 @@
 import React from 'react';
 import { makeStyles } from '@material-ui/core';
-import Layout, { Props as LayoutProps } from './Layout';
+import Layout, { Props as LayoutProps, appBarHeight } from './Layout';
 // import Box from '@material-ui/core/Box';
 
 const useStyles = makeStyles((theme) => ({
+  'NavBreadcrumbs-outer': {
+    [theme.breakpoints.up('md')]: {
+      position: 'sticky',
+      top: appBarHeight
+    }
+  },
   'Layout-section-root': {
     '& .Layout-body': {
       [theme.breakpoints.up('md')]: {
@@ -20,7 +26,12 @@ const useStyles = makeStyles((theme) => ({
     // ...theme.typography.body1,
     padding: theme.spacing(0),
     [theme.breakpoints.up('md')]: {
-      // position: 'unset',
+      position: 'fixed',
+      top: 130,
+      // window 幅いっぱいまで広げる.
+      // gridTemplateAreas での main 指定幅は子要素の方で widht を指定
+      width: '100%',
+      maxWidth: theme.breakpoints.values.lg
       // top: 'unset'
     }
   }),
