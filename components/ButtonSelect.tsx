@@ -16,6 +16,7 @@ export default function ButtonSelect(props: Props) {
         outline: 'unset',
         justifyContent: 'unset'
       }}
+      focusRipple
       {...props}
     />
   );
