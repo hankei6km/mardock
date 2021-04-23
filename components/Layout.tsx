@@ -459,7 +459,7 @@ const Layout = ({
   const maxWidth = 'lg';
   const theme = useTheme();
   //最初に false になるが、ロード時の不自然な動作はでないと
-  const downMd = useMediaQuery(theme.breakpoints.down('md'));
+  const downMd = useMediaQuery(theme.breakpoints.down('sm'));
   const [alwaysShowing, setAlwaysShowing] = useState(false);
   const avatarSrc = siteIcon.url;
   const avatarSrcSet = getAvatarSrcSet(avatarSrc);

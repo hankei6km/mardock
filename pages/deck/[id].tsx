@@ -42,15 +42,15 @@ import ButtonSelect from '../../components/ButtonSelect';
 const useStyles = makeStyles((theme) => ({
   'Page-root': {
     display: 'block',
-    position: 'sticky',
     top: appBarHeight + theme.spacing(2),
     backgroundColor: theme.palette.content.background.default.main,
-    // borderRadius: theme.shape.borderRadius,
-    // marginBottom: theme.spacing(1),
     [theme.breakpoints.up('sm')]: {
-      display: 'block',
-      // position: 'sticky',
-      // top: headerOffset,
+      padding: theme.spacing(1, 2)
+    },
+    [theme.breakpoints.up('md')]: {
+      // 親が fixed 指定で window 幅いっぱいまで広げている
+      // gridTemplateAreas の指定にあうように widht を指定
+      width: '63%',
       padding: theme.spacing(1, 2)
     }
   },
