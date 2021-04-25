@@ -28,7 +28,7 @@ const useStyles = makeStyles((theme) => ({
   JumpToListDeck: {
     width: '100%',
     '& span': {
-      ...theme.typography.body1,
+      //   ...theme.typography.body1,
       color: theme.palette.primary.contrastText
     }
   }
@@ -76,13 +76,13 @@ const IndexPage = ({ pageData, intro, items }: Props) => {
         <Box className={classes['ListDeck-outer']}>
           <ListDeck itemPath={'/deck'} items={intro} variant="cover" />
         </Box>
-        <Box className={classes['JumpToListDeck-outer']}>
+        <Box className={`${classes['JumpToListDeck-outer']}`}>
           <Button
             component={Link}
             href="/deck"
             className={`MuiButton-containedPrimary ${classes['JumpToListDeck']}`}
           >
-            スライド一覧を表示
+            <Typography component="span">スライド一覧を表示</Typography>
           </Button>
         </Box>
       </section>

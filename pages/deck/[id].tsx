@@ -42,15 +42,14 @@ import ButtonSelect from '../../components/ButtonSelect';
 const useStyles = makeStyles((theme) => ({
   'Page-root': {
     display: 'block',
-    position: 'sticky',
     top: appBarHeight + theme.spacing(2),
     backgroundColor: theme.palette.content.background.default.main,
-    // borderRadius: theme.shape.borderRadius,
-    // marginBottom: theme.spacing(1),
     [theme.breakpoints.up('sm')]: {
-      display: 'block',
-      // position: 'sticky',
-      // top: headerOffset,
+      padding: theme.spacing(1, 2)
+    },
+    [theme.breakpoints.up('md')]: {
+      position: 'sticky',
+      top: 121,
       padding: theme.spacing(1, 2)
     }
   },
@@ -101,6 +100,11 @@ const useStyles = makeStyles((theme) => ({
     width: '100%',
     marginBottom: theme.spacing(1),
     '& .MuiButton-root': {
+      '&:not(:first-child)': {
+        '& span': {
+          color: 'inherit'
+        }
+      },
       '&:not(:last-child)': {
         marginBottom: theme.spacing(1)
       }
@@ -325,26 +329,30 @@ export default function Deck({ pageData, comment, pdfPath, pptxPath }: Props) {
                   startIcon={<SlideshowIcon />}
                   // color="primary"
                 >
-                  <Typography>プレゼンテーション</Typography>
+                  <Typography component="span">プレゼンテーション</Typography>
                 </Button>
                 <Button
-                  className="MuiButton-outlinedSecondary"
+                  className="MuiButton-outlinedSecondary MuiTypography-colorSecondary"
                   component={Link}
                   href={pdfPath}
                   startIcon={<GetAppIcon />}
-                  // disabled={pdfPath === ''}
+                  disabled={pdfPath === ''}
+                  color="secondary"
                 >
-                  <Typography color="inherit">PDF ダウンロード</Typography>
+                  <Typography component="span" color="secondary">
+                    PDF ダウンロード
+                  </Typography>
                 </Button>
                 <Button
-                  className="MuiButton-outlinedSecondary"
+                  className="MuiButton-outlinedSecondary MuiTypography-colorSecondary"
                   component={Link}
                   href={pptxPath}
                   startIcon={<GetAppIcon />}
                   // color="primary"
-                  // disabled={pptxPath === ''}
+                  disabled={pptxPath === ''}
+                  color="secondary"
                 >
-                  <Typography color="inherit">PPTX ダウンロード</Typography>
+                  <Typography>PPTX ダウンロード</Typography>
                 </Button>
               </Box>
             </Box>

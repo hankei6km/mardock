@@ -1,9 +1,15 @@
 import React from 'react';
 import { makeStyles } from '@material-ui/core';
-import Layout, { Props as LayoutProps } from './Layout';
+import Layout, { Props as LayoutProps, appBarHeight } from './Layout';
 // import Box from '@material-ui/core/Box';
 
 const useStyles = makeStyles((theme) => ({
+  'NavBreadcrumbs-outer': {
+    [theme.breakpoints.up('md')]: {
+      position: 'sticky',
+      top: appBarHeight
+    }
+  },
   'Layout-section-root': {
     '& .Layout-body': {
       [theme.breakpoints.up('md')]: {
@@ -17,11 +23,11 @@ const useStyles = makeStyles((theme) => ({
     position: 'sticky',
     top: sectionStickyTop,
     transition: 'top .3s',
-    // ...theme.typography.body1,
     padding: theme.spacing(0),
     [theme.breakpoints.up('md')]: {
-      // position: 'unset',
-      // top: 'unset'
+      position: 'unset',
+      top: 'unset',
+      maxWidth: theme.breakpoints.values.lg
     }
   }),
   'Layout-children': {
