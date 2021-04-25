@@ -10,6 +10,8 @@ import CssBaseline from '@material-ui/core/CssBaseline';
 import theme from '../src/theme';
 import { join } from 'path';
 import 'lite-youtube-embed/src/lite-yt-embed.css';
+import '../src/slick.css';
+import '../src/slick-theme.css';
 import { SnackbarProvider } from 'notistack';
 import SiteContext from '../components/SiteContext';
 import siteConfig from '../src/site.config';
