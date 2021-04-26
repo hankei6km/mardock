@@ -276,6 +276,7 @@ export async function slideDeckSlide(
       new Element('div'),
       new Element('div'),
       new Element('div'),
+      new Element('div'),
       new Element('div')
     ],
     slideContainer: new Element('div', { class: 'slideDeck' }),

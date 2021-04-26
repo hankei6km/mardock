@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useCallback, useState } from 'react';
+import React, { useEffect, useCallback, useState } from 'react';
 import { GetStaticProps, GetStaticPaths } from 'next';
 import { makeStyles } from '@material-ui/core/styles';
 import { useTheme } from '@material-ui/core/styles';
@@ -26,7 +26,6 @@ import { appBarHeight } from '../../components/Layout';
 import { animateScroll as scroll } from 'react-scroll';
 import Link from '../../components/Link';
 // import Carousel from 'react-material-ui-carousel';
-import Slider from 'react-slick';
 import SlideshowIcon from '@material-ui/icons/Slideshow';
 import GetAppIcon from '@material-ui/icons/GetApp';
 import { PageData } from '../../types/pageTypes';
@@ -38,6 +37,7 @@ import {
 } from '../../lib/slide';
 import NavCategory from '../../components/NavCategory';
 import ButtonSelect from '../../components/ButtonSelect';
+import PageSwitcher from '../../components/PageSwitcher';
 // import ListDeck from '../../components/ListDeck';
 
 const useStyles = makeStyles((theme) => ({
@@ -181,7 +181,6 @@ export default function Deck({ pageData, comment, pdfPath, pptxPath }: Props) {
   const downLg = useMediaQuery(theme.breakpoints.down('sm'));
   const [navOpen, setNavOpen] = useState(false);
   // (index を 1 つにまとめるとボタンのダブルクリックなどでループになる)
-  const sliderEl = useRef<any>(null);
   const [curPageIdx, setCurPageIdx] = useState(0); // 変更する index
   // const [pageIdx, setPageIdx] = useState(0); // 変更された index
   const [pagESwitchedByClick, setPageSwitchedByClick] = useState(false);
@@ -228,12 +227,6 @@ export default function Deck({ pageData, comment, pdfPath, pptxPath }: Props) {
     },
     [pageData.deck.slide.items.length]
   );
-
-  useEffect(() => {
-    if (sliderEl && sliderEl.current) {
-      sliderEl.current.slickGoTo(curPageIdx);
-    }
-  }, [curPageIdx]);
 
   useEffect(() => {
     if (pageElm && overviewElms && overviewElms.length > 0) {
@@ -445,9 +438,9 @@ export default function Deck({ pageData, comment, pdfPath, pptxPath }: Props) {
                     __html: pageData.deck.slide.css
                   }}
                 />
-                <Slider
-                  ref={sliderEl}
+                <PageSwitcher
                   {...{
+                    curPageIdx,
                     dots: true,
                     infinite: true,
                     speed: 300,
@@ -499,7 +492,7 @@ export default function Deck({ pageData, comment, pdfPath, pptxPath }: Props) {
                       }}
                     />
                   ))}
-                </Slider>
+                </PageSwitcher>
               </div>
             </article>
           </Paper>
