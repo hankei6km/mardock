@@ -25,7 +25,7 @@ import LayoutDeck from '../../components/LayoutDeck';
 import { appBarHeight } from '../../components/Layout';
 import { animateScroll as scroll } from 'react-scroll';
 import Link from '../../components/Link';
-// import Carousel from 'react-material-ui-carousel';
+import Carousel from 'react-material-ui-carousel';
 import SlideshowIcon from '@material-ui/icons/Slideshow';
 import GetAppIcon from '@material-ui/icons/GetApp';
 import { PageData } from '../../types/pageTypes';
@@ -37,7 +37,6 @@ import {
 } from '../../lib/slide';
 import NavCategory from '../../components/NavCategory';
 import ButtonSelect from '../../components/ButtonSelect';
-import PageSwitcher from '../../components/PageSwitcher';
 // import ListDeck from '../../components/ListDeck';
 
 const useStyles = makeStyles((theme) => ({
@@ -182,7 +181,7 @@ export default function Deck({ pageData, comment, pdfPath, pptxPath }: Props) {
   const [navOpen, setNavOpen] = useState(false);
   // (index を 1 つにまとめるとボタンのダブルクリックなどでループになる)
   const [curPageIdx, setCurPageIdx] = useState(0); // 変更する index
-  // const [pageIdx, setPageIdx] = useState(0); // 変更された index
+  const [pageIdx, setPageIdx] = useState(0); // 変更された index
   const [pagESwitchedByClick, setPageSwitchedByClick] = useState(false);
   const [sectionShowing, _setSectionShowing] = useState(false);
   const setSectionShowing = useCallback(
@@ -376,7 +375,7 @@ export default function Deck({ pageData, comment, pdfPath, pptxPath }: Props) {
                             if (curPageIdx !== i || !sectionShowing) {
                               setSectionShowing(true);
                               setPageSwitchedByClick(true);
-                              //setPageIdx(i);
+                              setPageIdx(i);
                               setCurPageIdx(i);
                               return;
                             }
@@ -385,7 +384,7 @@ export default function Deck({ pageData, comment, pdfPath, pptxPath }: Props) {
                         >
                           <Avatar
                             className={
-                              i === curPageIdx
+                              i === pageIdx
                                 ? classes['Deck-overview-curPage']
                                 : ''
                             }
@@ -401,7 +400,7 @@ export default function Deck({ pageData, comment, pdfPath, pptxPath }: Props) {
                             if (curPageIdx !== i || !sectionShowing) {
                               setSectionShowing(true);
                               setPageSwitchedByClick(true);
-                              // setPageIdx(i);
+                              setPageIdx(i);
                               setCurPageIdx(i);
                               return;
                             }
@@ -438,49 +437,44 @@ export default function Deck({ pageData, comment, pdfPath, pptxPath }: Props) {
                     __html: pageData.deck.slide.css
                   }}
                 />
-                <PageSwitcher
-                  {...{
-                    curPageIdx,
-                    dots: true,
-                    infinite: true,
-                    speed: 300,
-                    slidesToShow: 1,
-                    slidesToScroll: 1,
-                    afterChange: (index: any) => {
-                      if (!pagESwitchedByClick) {
-                        const to =
-                          overviewElms && overviewElms.length >= index
-                            ? overviewElms[index]
-                            : null;
-                        if (to && (downLg === false || sectionShowing)) {
-                          //to.scrollIntoView({ behavior: 'smooth' });
-                          const { top, bottom } = to.getBoundingClientRect();
-                          const topOffset = downLg
-                            ? pageElm?.getBoundingClientRect().bottom || 0
-                            : appBarHeight + theme.spacing(2); // .Page-root の top と合わせる.
-                          if (top < topOffset) {
-                            scroll.scrollTo(
-                              document.documentElement.scrollTop +
-                                top -
-                                topOffset -
-                                theme.spacing(1),
-                              { duration: 800 }
-                            );
-                          } else if (
-                            document.documentElement.clientHeight <= bottom
-                          ) {
-                            scroll.scrollTo(
-                              document.documentElement.scrollTop +
-                                bottom -
-                                document.documentElement.clientHeight +
-                                theme.spacing(1),
-                              { duration: 800 }
-                            );
-                          }
+                <Carousel
+                  autoPlay={false}
+                  animation={'slide'}
+                  index={curPageIdx}
+                  onChange={(index: any) => {
+                    if (!pagESwitchedByClick) {
+                      const to =
+                        overviewElms && overviewElms.length >= index
+                          ? overviewElms[index]
+                          : null;
+                      if (to && (downLg === false || sectionShowing)) {
+                        //to.scrollIntoView({ behavior: 'smooth' });
+                        const { top, bottom } = to.getBoundingClientRect();
+                        const topOffset = downLg
+                          ? pageElm?.getBoundingClientRect().bottom || 0
+                          : appBarHeight + theme.spacing(2); // .Page-root の top と合わせる.
+                        if (top < topOffset) {
+                          scroll.scrollTo(
+                            document.documentElement.scrollTop +
+                              top -
+                              topOffset -
+                              theme.spacing(1),
+                            { duration: 800 }
+                          );
+                        } else if (
+                          document.documentElement.clientHeight <= bottom
+                        ) {
+                          scroll.scrollTo(
+                            document.documentElement.scrollTop +
+                              bottom -
+                              document.documentElement.clientHeight +
+                              theme.spacing(1),
+                            { duration: 800 }
+                          );
                         }
                       }
-                      setCurPageIdx(index);
                     }
+                    setPageIdx(index);
                   }}
                 >
                   {pageData.deck.slide.items.map(({ html }, i) => (
@@ -492,7 +486,7 @@ export default function Deck({ pageData, comment, pdfPath, pptxPath }: Props) {
                       }}
                     />
                   ))}
-                </PageSwitcher>
+                </Carousel>
               </div>
             </article>
           </Paper>
