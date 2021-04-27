@@ -1,4 +1,4 @@
-import React, { useEffect, useCallback, useState } from 'react';
+import React, { useEffect, useCallback, useState, KeyboardEvent } from 'react';
 import { GetStaticProps, GetStaticPaths } from 'next';
 import { makeStyles } from '@material-ui/core/styles';
 import { useTheme } from '@material-ui/core/styles';
@@ -247,7 +247,7 @@ export default function Deck({ pageData, comment, pdfPath, pptxPath }: Props) {
               setCurPageIdx(idx);
             }
           }
-        }, 800);
+        }, 400);
       };
       scroller.addEventListener('scroll', handleScroll);
       return () => {
@@ -272,6 +272,30 @@ export default function Deck({ pageData, comment, pdfPath, pptxPath }: Props) {
       };
     }
   }, [pagESwitchedByClick]);
+
+  useEffect(() => {
+    const lastPageIdx = overviewElms.length - 1;
+    const handleKeyup = (e: Event) => {
+      const key = ((e as unknown) as KeyboardEvent).key;
+      if (key === 'ArrowLeft') {
+        if (pageIdx > 0) {
+          setCurPageIdx(pageIdx - 1);
+        } else {
+          setCurPageIdx(lastPageIdx);
+        }
+      } else if (key === 'ArrowRight') {
+        if (pageIdx < lastPageIdx) {
+          setCurPageIdx(pageIdx + 1);
+        } else {
+          setCurPageIdx(0);
+        }
+      }
+    };
+    document.addEventListener('keyup', handleKeyup);
+    return () => {
+      document.removeEventListener('keyup', handleKeyup);
+    };
+  }, [overviewElms.length, pageIdx]);
 
   if (pageData === undefined || !pageData.title) {
     return <ErrorPage statusCode={404} />;
@@ -441,6 +465,7 @@ export default function Deck({ pageData, comment, pdfPath, pptxPath }: Props) {
                   autoPlay={false}
                   animation={'slide'}
                   index={curPageIdx}
+                  fullHeightHover={false}
                   onChange={(index: any) => {
                     if (!pagESwitchedByClick) {
                       const to =
