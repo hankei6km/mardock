@@ -118,7 +118,7 @@ const ListDeckItem = (props: Props) => {
                     autoPlay={false}
                     indicators={false}
                     animation={'slide'}
-                    // 2.2.x だと NavButton が常に表示か非表示にしかできない?
+                    fullHeightHover={false}
                   >
                     {deck.items.map(({ html }) => (
                       <Link

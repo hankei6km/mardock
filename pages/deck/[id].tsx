@@ -247,7 +247,7 @@ export default function Deck({ pageData, comment, pdfPath, pptxPath }: Props) {
               setCurPageIdx(idx);
             }
           }
-        }, 800);
+        }, 400);
       };
       scroller.addEventListener('scroll', handleScroll);
       return () => {
@@ -465,6 +465,7 @@ export default function Deck({ pageData, comment, pdfPath, pptxPath }: Props) {
                   autoPlay={false}
                   animation={'slide'}
                   index={curPageIdx}
+                  fullHeightHover={false}
                   onChange={(index: any) => {
                     if (!pagESwitchedByClick) {
                       const to =
