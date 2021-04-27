@@ -182,7 +182,7 @@ export default function Deck({ pageData, comment, pdfPath, pptxPath }: Props) {
   // (index を 1 つにまとめるとボタンのダブルクリックなどでループになる)
   const [curPageIdx, setCurPageIdx] = useState(0); // 変更する index
   const [pageIdx, setPageIdx] = useState(0); // 変更された index
-  const [pagESwitchedByClick, setPageSwitchedByClick] = useState(false);
+  const [pageSwitched, setPageSwitched] = useState(false);
   const [sectionShowing, _setSectionShowing] = useState(false);
   const setSectionShowing = useCallback(
     (v: boolean) => {
@@ -237,7 +237,7 @@ export default function Deck({ pageData, comment, pdfPath, pptxPath }: Props) {
         }
         timerId = setTimeout(() => {
           timerId = 0;
-          if (sectionShowing && !pagESwitchedByClick) {
+          if (sectionShowing && !pageSwitched) {
             const { height, bottom } = pageElm.getBoundingClientRect();
             const top = bottom - height * 0.3;
             const idx = overviewElms.findIndex(
@@ -257,21 +257,21 @@ export default function Deck({ pageData, comment, pdfPath, pptxPath }: Props) {
         scroller.removeEventListener('scroll', handleScroll);
       };
     }
-  }, [pageElm, overviewElms, sectionShowing, pagESwitchedByClick]);
+  }, [pageElm, overviewElms, sectionShowing, pageSwitched]);
 
   useEffect(() => {
-    if (pagESwitchedByClick) {
+    if (pageSwitched) {
       let timerId: any = setTimeout(() => {
         clearTimeout(timerId);
-        setPageSwitchedByClick(false);
-      }, 1000);
+        setPageSwitched(false);
+      }, 800);
       return () => {
         if (timerId !== 0) {
           clearTimeout(timerId);
         }
       };
     }
-  }, [pagESwitchedByClick]);
+  }, [pageSwitched]);
 
   useEffect(() => {
     const lastPageIdx = overviewElms.length - 1;
@@ -398,7 +398,7 @@ export default function Deck({ pageData, comment, pdfPath, pptxPath }: Props) {
                           onClick={() => {
                             if (curPageIdx !== i || !sectionShowing) {
                               setSectionShowing(true);
-                              setPageSwitchedByClick(true);
+                              setPageSwitched(true);
                               setPageIdx(i);
                               setCurPageIdx(i);
                               return;
@@ -423,7 +423,7 @@ export default function Deck({ pageData, comment, pdfPath, pptxPath }: Props) {
                           onClick={() => {
                             if (curPageIdx !== i || !sectionShowing) {
                               setSectionShowing(true);
-                              setPageSwitchedByClick(true);
+                              setPageSwitched(true);
                               setPageIdx(i);
                               setCurPageIdx(i);
                               return;
@@ -467,7 +467,7 @@ export default function Deck({ pageData, comment, pdfPath, pptxPath }: Props) {
                   index={curPageIdx}
                   fullHeightHover={false}
                   onChange={(index: any) => {
-                    if (!pagESwitchedByClick) {
+                    if (!pageSwitched) {
                       const to =
                         overviewElms && overviewElms.length >= index
                           ? overviewElms[index]
@@ -500,6 +500,7 @@ export default function Deck({ pageData, comment, pdfPath, pptxPath }: Props) {
                       }
                     }
                     setPageIdx(index);
+                    setPageSwitched(true);
                   }}
                 >
                   {pageData.deck.slide.items.map(({ html }, i) => (
