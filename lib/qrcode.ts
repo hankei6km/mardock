@@ -30,5 +30,6 @@ async function transformer(tree: MdNode): Promise<void> {
 export async function qrcodeToDataUrl(markdown: string): Promise<string> {
   const tree = fromMarkdown(markdown);
   await transformer(tree);
-  return toMarkdown(tree, { rule: '-' });
+  // markdown のノーマライズがここで行われる形になっている.
+  return toMarkdown(tree, { bullet:'-', rule: '-' });
 }
