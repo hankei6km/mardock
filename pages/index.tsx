@@ -68,7 +68,18 @@ const IndexPage = ({ pageData, intro, items }: Props) => {
           >
             最近のスライド
           </Typography>
-          <ListDeck itemPath={'/deck'} items={items} variant="thin" />
+          <Box className={classes['ListDeck-outer']}>
+            <ListDeck itemPath={'/deck'} items={items} variant="thin" />
+          </Box>
+          <Box className={`${classes['JumpToListDeck-outer']}`}>
+            <Button
+              component={Link}
+              href="/deck"
+              className={`MuiButton-containedPrimary ${classes['JumpToListDeck']}`}
+            >
+              <Typography component="span">スライド一覧を表示</Typography>
+            </Button>
+          </Box>
         </section>
       }
     >
