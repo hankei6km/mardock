@@ -81,9 +81,8 @@ describe('writeSlideTitleImage()', () => {
             end: jest.fn().mockImplementation(() => closeCb(0))
           },
           stdout: {
-            on: jest.fn().mockImplementation((a1, cb) => {
-              expect(a1).toEqual('data');
-              (cb as any)(Buffer.from('ok', 'utf8'), '');
+            pipe: jest.fn().mockImplementation((w) => {
+              (w as any).write(Buffer.from('ok', 'utf8'));
             }),
             setEncoding
           }

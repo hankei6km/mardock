@@ -61,9 +61,7 @@ export function slideHtml(markdown: string, w: Writable): Promise<number> {
     // 理由が判明: Writable の扱い方を間違っていた. 完全に自分のミス.
     const marpP = spawn(marpPath, ['--html']);
     if (marpP && marpP.stdout) {
-      marpP.stdout.on('data', (data) => {
-        w.write(data);
-      });
+      marpP.stdout.pipe(w);
     }
     marpP.on('close', (code) => {
       resolve(code);
@@ -87,9 +85,7 @@ export function slideVariantFile(
     if (marpP && marpP.stdout) {
       // marpP.stdout.setEncoding('base64');
       marpP.stdout.setEncoding(options.encoding || 'binary');
-      marpP.stdout.on('data', (data) => {
-        w.write(data);
-      });
+      marpP.stdout.pipe(w);
     }
     marpP.on('close', (code) => {
       resolve(code);
