@@ -1,8 +1,8 @@
 import { createWriteStream } from 'fs';
 // import { access, constants } from 'fs/promises';
-import { spawn, execFile } from 'child_process';
+import { spawn } from 'child_process';
 import { join } from 'path';
-import { Writable } from 'stream';
+import { Writable, PassThrough } from 'stream';
 import Marp from '@marp-team/marp-core';
 import cheerio from 'cheerio';
 import siteServerSideConfig from '../src/site.server-side-config';
@@ -58,12 +58,15 @@ export function slideHtml(markdown: string, w: Writable): Promise<number> {
     // (GitHub Actions のときに 8 割りくらい確率で)
     // しかたないので stdout の内容をべたで扱う.
     // image と pdf の書き出しだとドロップしない?
-    const marpP = execFile(marpPath, ['--html'], (err, stdout, _strderr) => {
-      if (err) {
-        throw new Error(`slideHtml error: ${err}`);
-      }
-      w.write(stdout);
-      resolve(0);
+    // 理由が判明: Writable の扱い方を間違っていた. 完全に自分のミス.
+    const marpP = spawn(marpPath, ['--html']);
+    if (marpP && marpP.stdout) {
+      marpP.stdout.on('data', (data) => {
+        w.write(data);
+      });
+    }
+    marpP.on('close', (code) => {
+      resolve(code);
     });
     if (marpP && marpP.stdin) {
       marpP.stdin.write(markdown);
@@ -327,10 +330,9 @@ export async function slideDeckOverview(
 
 export async function getSlideData(source: string): Promise<SlideData> {
   let html = '';
-  const s = new Writable({
-    write(data) {
-      html = html + data.toString();
-    }
+  const s = new PassThrough();
+  s.on('data', (d) => {
+    html = html + d;
   });
   await slideHtml(source, s);
   // test で実行したときで 64659 となるので、

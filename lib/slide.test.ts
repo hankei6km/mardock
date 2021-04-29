@@ -1,6 +1,6 @@
 import * as fs from 'fs';
 import * as child_process from 'child_process';
-import { Writable } from 'stream';
+import { PassThrough } from 'stream';
 import {
   slideHtml,
   slideDeckRemoveId,
@@ -41,10 +41,9 @@ afterEach(() => {
 describe('slideHtml()', () => {
   it('should convert slide to html', async () => {
     let b = '';
-    const w = new Writable({
-      write(data) {
-        b = b + data.toString();
-      }
+    const w = new PassThrough();
+    w.on('data', (data) => {
+      b = b + data.toString();
     });
     expect(await slideHtml('#test1 \n\n---\n- item1\n- item2', w)).toEqual(0);
     expect(b).toContain('html');
