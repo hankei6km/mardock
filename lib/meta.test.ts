@@ -14,32 +14,51 @@ afterEach(() => {
 
 describe('metaOpen()', () => {
   it('should returns meta object from markdown', () => {
-    expect(metaOpen('')).toEqual({});
-    expect(metaOpen('# test1\ntest data1')).toEqual({});
+    expect(metaOpen('')).toEqual({ errMessage: '', data: {} });
+    expect(metaOpen('# test1\ntest data1')).toEqual({
+      errMessage: '',
+      data: {}
+    });
     expect(metaOpen('---\ntitle: title2\n---\n# test2\ntest data2')).toEqual({
-      title: 'title2'
+      errMessage: '',
+      data: {
+        title: 'title2'
+      }
     });
     expect(
       metaOpen(
         '---\ntitle: title3\ndescription: desc3\nurl: url3\nimage: image3\n---\n# test3\ntest data3'
       )
     ).toEqual({
-      title: 'title3',
-      description: 'desc3',
-      url: 'url3',
-      image: 'image3'
+      errMessage: '',
+      data: {
+        title: 'title3',
+        description: 'desc3',
+        url: 'url3',
+        image: 'image3'
+      }
     });
     expect(
       metaOpen(
         '---\ntitle: title3\nfoo: 1\ndescription: desc3\nurl: url3\nimage: image3\n---\n# test3\ntest data3'
       )
     ).toEqual({
-      title: 'title3',
-      foo: 1,
-      description: 'desc3',
-      url: 'url3',
-      image: 'image3'
+      errMessage: '',
+      data: {
+        title: 'title3',
+        foo: 1,
+        description: 'desc3',
+        url: 'url3',
+        image: 'image3'
+      }
     });
+  });
+  it('should returns errMessage from invalid soruce', () => {
+    const r = metaOpen(
+      '---\ntitle:title4\ndescription: desc4\nurl: url4\nimage: image4\n---\n# test4\ntest data4'
+    );
+    expect(r.errMessage).toContain('YAMLException:');
+    expect(r.data).toEqual({});
   });
 });
 
@@ -50,20 +69,33 @@ describe('metaDeck()', () => {
         '---\ntitle: title3\nfoo: 1\ndescription: desc3\nurl: url3\nimage: image3\n---\n# test3\ntest data3'
       )
     ).toEqual({
-      title: 'title3',
-      description: 'desc3',
-      url: 'url3',
-      image: 'image3'
+      errMessage: '',
+      data: {
+        title: 'title3',
+        description: 'desc3',
+        url: 'url3',
+        image: 'image3'
+      }
     });
     expect(
       metaDeck(
         '---\ntitle: title4\nfoo: 2\ndescription: 4\nurl: url4\nimage: image4\n---\n# test4\ntest data4'
       )
     ).toEqual({
-      title: 'title4',
-      url: 'url4',
-      image: 'image4'
+      errMessage: '',
+      data: {
+        title: 'title4',
+        url: 'url4',
+        image: 'image4'
+      }
     });
+  });
+  it('should returns errMessage from invalid soruce', () => {
+    const r = metaDeck(
+      '---\ntitle:title5\ndescription: desc5\nurl: url5\nimage: image5\n---\n# test5\ntest data5'
+    );
+    expect(r.errMessage).toContain('YAMLException:');
+    expect(r.data).toEqual({});
   });
 });
 

@@ -20,17 +20,33 @@ function baseUrl(): string {
   return '';
 }
 
-export function metaOpen(source: string): { [key: string]: any } {
-  const s = matter(source);
-  return s.data ? { ...s.data } : {};
+export type MetaCommonResult = {
+  errMessage: string;
+  data: { [key: string]: any };
+};
+
+export function metaOpen(source: string): MetaCommonResult {
+  const ret: MetaCommonResult = {
+    errMessage: '',
+    data: {}
+  };
+  try {
+    const s = matter(source);
+    ret.data = s.data ? { ...s.data } : {};
+  } catch (err) {
+    ret.errMessage = `${err}`;
+  }
+  return ret;
 }
 
-export function metaDeck(source: string) {
-  const ret: { [key: string]: string } = {};
-  Object.entries(metaOpen(source)).forEach(([k, v]) => {
+export function metaDeck(source: string): MetaCommonResult {
+  const ret: MetaCommonResult = { errMessage: '', data: {} };
+  const m = metaOpen(source);
+  ret.errMessage = m.errMessage;
+  Object.entries(m.data).forEach(([k, v]) => {
     if (metaDeckKeys.findIndex((n) => k === n) >= 0) {
       if (typeof v === 'string') {
-        ret[k] = v;
+        ret.data[k] = v;
       }
     }
   });

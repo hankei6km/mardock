@@ -288,7 +288,7 @@ export async function slideDeckSlide(
     script: false
   });
   const ret = await _slideDeck(marp, containerId, source);
-  ret.meta = metaDeck(source);
+  ret.meta = metaDeck(source).data; // ここではエラーは無視する(プレビューモードで検証する)
   return ret;
 }
 export async function slideDeckIndex(
