@@ -125,4 +125,39 @@ describe('metaPage()', () => {
       description: 'deck desc'
     });
   });
+  it('should returns fullpath image url', () => {
+    const saveEnv = process.env;
+    beforeEach(() => {
+      process.env = {
+        ...saveEnv
+      };
+    });
+    afterEach(() => {
+      process.env = saveEnv;
+    });
+    process.env.GITHUB_REPOSITORY = 'hankei6km/mardock';
+    expect(
+      metaPage({
+        ...baseMock,
+        apiName: 'deck',
+        mainVisual: {
+          url: '',
+          width: 0,
+          height: 0
+        },
+        deck: {
+          ...baseMock.deck,
+          slide: {
+            ...baseMock.deck.slide,
+            meta: { title: 'deck title', description: 'deck desc' }
+          }
+        }
+      })
+    ).toEqual({
+      title: 'deck title',
+      keyword: [],
+      image: 'https://hankei6km.github.io/mardock/assets/images/id1.png',
+      description: 'deck desc'
+    });
+  });
 });

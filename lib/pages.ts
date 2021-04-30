@@ -95,9 +95,7 @@ export async function getSortedIndexData(
       return async (): Promise<IndexData> => {
         // ここでは res.content は html として扱う
         const { articleTitle } = getArticleData(res.title, res.content || '');
-        const mainVisual = res.mainVisual?.url
-          ? res.mainVisual
-          : siteServerSideConfig.mainVisual.fallbackImage;
+        const mainVisual = res.mainVisual?.url ? res.mainVisual : siteServerSideConfig.mainVisual.fallbackImage;
         const ret = {
           ...blankIndexData(),
           id: res.id,

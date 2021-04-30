@@ -468,9 +468,10 @@ const Layout = ({
       ? `${pageMeta.title} | static slide site`
       : `${pageMeta.title} | mardock | static slide site`;
   const description = pageMeta.description;
-  const ogImageUrl = pageMeta.image
-    ? `${pageMeta.image}?${ogImageParamsStr}`
-    : '';
+  let ogImageUrl = pageMeta.image;
+  if (ogImageUrl.startsWith('https://images.microcms-assets.io/')) {
+    ogImageUrl = `${pageMeta.image}?${ogImageParamsStr}`;
+  }
   // header footer は https://github.com/hankei6km/my-starter-nextjs-typescript-material-ui-micro-cms-aspida に outer で記述だが、
   // 今回は直接記述.
   useEffect(() => {
