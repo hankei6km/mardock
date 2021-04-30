@@ -1,7 +1,7 @@
 import { createWriteStream } from 'fs';
 // import { access, constants } from 'fs/promises';
 import { spawn } from 'child_process';
-import { join } from 'path';
+import { join, format } from 'path';
 import { Writable, PassThrough } from 'stream';
 import Marp from '@marp-team/marp-core';
 import cheerio from 'cheerio';
@@ -13,6 +13,7 @@ import {
   blankDeckData
 } from '../types/pageTypes';
 import { PagesImage } from '../types/client/contentTypes';
+import { metaDeck } from './meta';
 import themes from '../src/marp-theme';
 // import qrcode from '../src/markdown-it-qrcode';
 const { Element } = require('@marp-team/marpit');
@@ -29,8 +30,15 @@ const { Element } = require('@marp-team/marpit');
 // とりあえず相対パス:
 // TODO: 絶対パスで取得
 const basePath = '.';
+export const slidePublicImageExt = 'png';
 export function getSlideImagePath(name: string): string {
   return join(basePath, siteServerSideConfig.assets.imagesPath, name);
+}
+export function getSlidePublicImageFilename(id: string): string {
+  return format({
+    name: id,
+    ext: `.${slidePublicImageExt}`
+  });
 }
 export function getSlidePublicImagePath(name: string): string {
   return join(siteServerSideConfig.public.imagesPath, name);
@@ -76,7 +84,7 @@ export function slideHtml(markdown: string, w: Writable): Promise<number> {
 export function slideVariantFile(
   markdown: string,
   w: Writable,
-  formatOpts: string[] = ['--image', 'png', '--html'],
+  formatOpts: string[] = ['--image', slidePublicImageExt, '--html'],
   options: { encoding?: string } = { encoding: 'binary' }
 ): Promise<number> {
   // とりあえず。
@@ -105,7 +113,7 @@ export async function slideImage(
   return await slideVariantFile(
     markdown,
     w,
-    ['--image', 'png', '--html'],
+    ['--image', slidePublicImageExt, '--html'],
     options
   );
 }
@@ -143,11 +151,11 @@ export async function writeSlideTitleImage(
   id: string
 ): Promise<PagesImage> {
   const ret: PagesImage = {
-    url: getSlidePublicImagePath(`${id}.png`),
+    url: getSlidePublicImagePath(getSlidePublicImageFilename(id)),
     width: 1280,
     height: 720
   };
-  const p = getSlideImagePath(`${id}.png`);
+  const p = getSlideImagePath(getSlidePublicImageFilename(id));
   const w = createWriteStream(p, { flags: 'wx', encoding: 'binary' });
   w.on('error', () => {
     // 'wx' で上書き失敗したときのエラー
@@ -254,7 +262,8 @@ export async function _slideDeck(
       items: html.map((v) => ({
         html: v
       })),
-      source
+      source,
+      meta: {}
     };
   }
   return blankDeckData();
@@ -278,7 +287,9 @@ export async function slideDeckSlide(
     slideContainer: new Element('div', { class: 'slideDeck' }),
     script: false
   });
-  return await _slideDeck(marp, containerId, source);
+  const ret = await _slideDeck(marp, containerId, source);
+  ret.meta = metaDeck(source);
+  return ret;
 }
 export async function slideDeckIndex(
   id: string,

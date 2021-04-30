@@ -24,6 +24,7 @@ export type DeckData = {
   script: string[];
   items: DeckItem[];
   source: string;
+  meta: { [key: string]: string };
 };
 
 export type Notification = {
@@ -42,6 +43,13 @@ export type TocItems = TocItem[];
 export type HtmlToc = {
   // label: string;
   items: TocItem[];
+};
+
+export type MetaData = {
+  title: string;
+  keyword: string[]; // 今回は使わない、か category をコピーか.
+  description: string;
+  image: string; // Tewitter card 等のバリエーションは保持しない、利用時に生成する(imgix 前提)
 };
 
 export type PageData = {
@@ -67,12 +75,14 @@ export type PageData = {
     height: number;
   };
   description: string;
+  meta: MetaData;
 };
 
 export type SlideData = {
   notification?: Notification;
   head: SlideHeadData[];
   body: SlideBodyData[];
+  meta: { [key: string]: string };
 };
 
 // リストの項目用. この辺はもう少しきちんと作り直す/
@@ -86,6 +96,7 @@ export type IndexData = Omit<
   | 'htmlToc'
   | 'html'
   | 'deck'
+  | 'meta'
 > & { deck: DeckData };
 export type IndexList = ContentList<IndexData>;
 
@@ -98,7 +109,15 @@ export const blankDeckData = (): DeckData => ({
   items: [],
   css: '',
   script: [],
-  source: ''
+  source: '',
+  meta: {}
+});
+
+export const blankMetaData = (): MetaData => ({
+  title: '',
+  keyword: [],
+  description: '',
+  image: ''
 });
 export const blankPageData = (): PageData => ({
   id: '',
@@ -123,12 +142,14 @@ export const blankPageData = (): PageData => ({
     }
   },
   mainVisual: { url: '', width: 0, height: 0 },
-  description: ''
+  description: '',
+  meta: blankMetaData()
 });
 
 export const blankSlideData = (): SlideData => ({
   head: [],
-  body: []
+  body: [],
+  meta: {}
 });
 
 export const blankIndexData = (): IndexData => ({

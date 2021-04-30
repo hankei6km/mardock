@@ -114,7 +114,8 @@ describe('getPagesData()', () => {
           items: [],
           css: '',
           script: [],
-          source: ''
+          source: '',
+          meta: {}
         },
         overview: {
           id: '',
@@ -125,7 +126,8 @@ describe('getPagesData()', () => {
           items: [],
           css: '',
           script: [],
-          source: ''
+          source: '',
+          meta: {}
         }
       },
       htmlToc: {
@@ -137,6 +139,13 @@ describe('getPagesData()', () => {
           'https://images.microcms-assets.io/assets/cc433627f35c4232b7cb97e0376507a7/eb84db7f1a7a4409bd20ffc27abe60e4/mardock-temp-image.png',
         width: 1280,
         height: 720
+      },
+      meta: {
+        title: 'Home',
+        keyword: [],
+        description: 'description of draftlint',
+        image:
+          'https://images.microcms-assets.io/assets/cc433627f35c4232b7cb97e0376507a7/eb84db7f1a7a4409bd20ffc27abe60e4/mardock-temp-image.png'
       }
     });
   });
@@ -164,6 +173,13 @@ describe('getPagesData()', () => {
           'https://images.microcms-assets.io/assets/cc433627f35c4232b7cb97e0376507a7/eb84db7f1a7a4409bd20ffc27abe60e4/mardock-temp-image.png',
         width: 1280,
         height: 720
+      },
+      meta: {
+        title: 'slide1',
+        keyword: [],
+        description: '',
+        image:
+          'https://images.microcms-assets.io/assets/cc433627f35c4232b7cb97e0376507a7/eb84db7f1a7a4409bd20ffc27abe60e4/mardock-temp-image.png'
       }
     });
     expect(res.deck.slide.items[0].html).toContain('test1');
