@@ -11,7 +11,6 @@ type metaPageOpts = { apiName: ApiNameArticle } & Pick<
 >;
 
 function baseUrl(): string {
-  console.log(process.env.GITHUB_REPOSITORY);
   const [githubUser, githubRepo] = process.env.GITHUB_REPOSITORY
     ? process.env.GITHUB_REPOSITORY.split('/', 2)
     : ['', ''];

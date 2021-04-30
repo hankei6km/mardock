@@ -1,6 +1,17 @@
 import { metaOpen, metaDeck, metaPage } from './meta';
 import { blankDeckData } from '../types/pageTypes';
 
+const saveEnv = process.env;
+beforeEach(() => {
+  process.env = {
+    ...saveEnv
+  };
+  process.env.GITHUB_REPOSITORY = '';
+});
+afterEach(() => {
+  process.env = saveEnv;
+});
+
 describe('metaOpen()', () => {
   it('should returns meta object from markdown', () => {
     expect(metaOpen('')).toEqual({});
@@ -125,16 +136,7 @@ describe('metaPage()', () => {
       description: 'deck desc'
     });
   });
-  it('should returns fullpath image url', () => {
-    const saveEnv = process.env;
-    beforeEach(() => {
-      process.env = {
-        ...saveEnv
-      };
-    });
-    afterEach(() => {
-      process.env = saveEnv;
-    });
+  it('should returns image url', () => {
     process.env.GITHUB_REPOSITORY = 'hankei6km/mardock';
     expect(
       metaPage({
