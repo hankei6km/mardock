@@ -162,18 +162,17 @@ export async function draftLint(
     ret.list = $dl.parent().html() || '';
   }
 
-  const metaResutl = metaDeck(source);
-  console.log(metaResutl);
-  if (metaResutl.errMessage) {
+  const metaResult = metaDeck(source);
+  if (metaResult.errMessage) {
     ret.messages.push({
       ruleId: 'meta',
-      message: metaResutl.errMessage,
+      message: metaResult.errMessage,
       id: '',
       severity: 0
     });
     const $dl = cheerio.load('<dl/>')('dl');
     const $d = cheerio.load('<dt>meta data</dt><dd></dd>');
-    $d('dt').text(metaResutl.errMessage);
+    $d('dd').text(metaResult.errMessage);
     $dl.append($d('body').children());
     ret.list = ret.list + ($dl.parent().html() || '');
   }

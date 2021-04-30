@@ -54,11 +54,16 @@ describe('metaOpen()', () => {
     });
   });
   it('should returns errMessage from invalid soruce', () => {
-    const r = metaOpen(
+    const r1 = metaOpen(
       '---\ntitle:title4\ndescription: desc4\nurl: url4\nimage: image4\n---\n# test4\ntest data4'
     );
-    expect(r.errMessage).toContain('YAMLException:');
-    expect(r.data).toEqual({});
+    expect(r1.errMessage).toContain('YAMLException:');
+    expect(r1.data).toEqual({});
+    const r2 = metaOpen(
+      '---\ntitle:title4\ndescription: desc4\nurl: url4\nimage: image4\n---\n# test4\ntest data4'
+    );
+    expect(r2.errMessage).toContain('YAMLException:');
+    expect(r2.data).toEqual({});
   });
 });
 
@@ -91,11 +96,11 @@ describe('metaDeck()', () => {
     });
   });
   it('should returns errMessage from invalid soruce', () => {
-    const r = metaDeck(
+    const r1 = metaDeck(
       '---\ntitle:title5\ndescription: desc5\nurl: url5\nimage: image5\n---\n# test5\ntest data5'
     );
-    expect(r.errMessage).toContain('YAMLException:');
-    expect(r.data).toEqual({});
+    expect(r1.errMessage).toContain('YAMLException:');
+    expect(r1.data).toEqual({});
   });
 });
 

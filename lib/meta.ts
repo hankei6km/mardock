@@ -31,7 +31,9 @@ export function metaOpen(source: string): MetaCommonResult {
     data: {}
   };
   try {
-    const s = matter(source);
+    // https://github.com/jonschlinkert/gray-matter/issues/43
+    // https://github.com/jonschlinkert/gray-matter/issues/106
+    const s = matter(source, {});
     ret.data = s.data ? { ...s.data } : {};
   } catch (err) {
     ret.errMessage = `${err}`;
