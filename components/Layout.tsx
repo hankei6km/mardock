@@ -439,11 +439,10 @@ const Layout = ({
   bottomSection,
   updated,
   title = 'This is the default title',
-  description,
   articleTitle,
   html: html = '',
-  mainVisual = { url: '', width: 0, height: 0 },
   notification,
+  meta: pageMeta = { title: '', keyword: [], image: '', description: '' }, // blankMetaData は使わない
   headerHideOptions = {},
   classes: inClasses
 }: Props) => {
@@ -466,9 +465,12 @@ const Layout = ({
   const avatarSrcSet = getAvatarSrcSet(avatarSrc);
   const _title =
     apiName === 'pages' && id === 'home'
-      ? `${title} | static slide site`
-      : `${title} | mardock | static slide site`;
-  const ogImageUrl = mainVisual ? `${mainVisual}?${ogImageParamsStr}` : '';
+      ? `${pageMeta.title} | static slide site`
+      : `${pageMeta.title} | mardock | static slide site`;
+  const description = pageMeta.description;
+  const ogImageUrl = pageMeta.image
+    ? `${pageMeta.image}?${ogImageParamsStr}`
+    : '';
   // header footer は https://github.com/hankei6km/my-starter-nextjs-typescript-material-ui-micro-cms-aspida に outer で記述だが、
   // 今回は直接記述.
   useEffect(() => {
