@@ -554,7 +554,7 @@ export const getStaticProps: GetStaticProps = async (context) => {
   return {
     props: {
       pageData: { ...others },
-      comment: html,
+      comment: others.meta.description || html,
       pdfPath,
       pptxPath
       //items
