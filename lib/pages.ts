@@ -39,6 +39,7 @@ import {
   slideDeckOverview
 } from './slide';
 import { htmlToMarkdown, sourceSetMarkdown } from './source';
+import { metaPage } from './meta';
 // import { getTextlintKernelOptions } from '../utils/textlint';
 
 // const itemsPerPage = 10;
@@ -324,6 +325,7 @@ export async function getPagesData(
       res.id,
       deckOverviewSource || deckSlideSource
     );
+    ret.meta = metaPage({ apiName, ...ret });
     if (notification) {
       ret.notification = notification;
     }

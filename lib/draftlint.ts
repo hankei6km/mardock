@@ -4,6 +4,7 @@ import { TextlintKernelOptions } from '@textlint/kernel/lib/textlint-kernel-inte
 import { getTextlintKernelOptions } from '../utils/textlint';
 import merge from 'deepmerge';
 import traverse from 'traverse';
+import { metaDeck } from './meta';
 const parseHtml = require('textlint-plugin-html/lib/html-to-ast').parse;
 
 type MappedMessage = {
@@ -159,6 +160,21 @@ export async function draftLint(
       $dl.append($d('body').children());
     });
     ret.list = $dl.parent().html() || '';
+  }
+
+  const metaResult = metaDeck(source);
+  if (metaResult.errMessage) {
+    ret.messages.push({
+      ruleId: 'meta',
+      message: metaResult.errMessage,
+      id: '',
+      severity: 0
+    });
+    const $dl = cheerio.load('<dl/>')('dl');
+    const $d = cheerio.load('<dt>meta data</dt><dd></dd>');
+    $d('dd').text(metaResult.errMessage);
+    $dl.append($d('body').children());
+    ret.list = ret.list + ($dl.parent().html() || '');
   }
   return ret;
 }
