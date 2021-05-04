@@ -11,6 +11,9 @@ import NavHtmlToc from '../components/NavHtmlToc';
 // import Typography from '@material-ui/core/Typography';
 import { PageData, IndexList } from '../types/pageTypes';
 import { getPagesData, getSortedIndexData } from '../lib/pages';
+import { GetQuery } from '../types/client/queryTypes';
+
+const itemsPerPage = 12;
 
 const useStyles = makeStyles((theme) => ({
   'ListDeck-outer': {
@@ -18,6 +21,19 @@ const useStyles = makeStyles((theme) => ({
   },
   'ListDeck-recent-title': {
     margin: theme.spacing(3, 0)
+  },
+  'MoreListDeck-outer': {
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+    width: '100%'
+  },
+  MoreListDeck: {
+    width: '100%',
+    '& span': {
+      //   ...theme.typography.body1,
+      color: theme.palette.primary.contrastText
+    }
   },
   'JumpToListDeck-outer': {
     display: 'flex',
@@ -71,15 +87,17 @@ const IndexPage = ({ pageData, intro, items }: Props) => {
           <Box className={classes['ListDeck-outer']}>
             <ListDeck itemPath={'/deck'} items={items} variant="thin" />
           </Box>
-          <Box className={`${classes['JumpToListDeck-outer']}`}>
-            <Button
-              component={Link}
-              href="/deck"
-              className={`MuiButton-containedPrimary ${classes['JumpToListDeck']}`}
-            >
-              <Typography component="span">スライド一覧を表示</Typography>
-            </Button>
-          </Box>
+          {items.totalCount > itemsPerPage && (
+            <Box className={`${classes['MoreListDeck-outer']}`}>
+              <Button
+                component={Link}
+                href="/deck/page/2"
+                className={`MuiButton-containedPrimary ${classes['MoreListDeck']}`}
+              >
+                <Typography component="span">続きを表示</Typography>
+              </Button>
+            </Box>
+          )}
         </section>
       }
     >
@@ -109,7 +127,9 @@ export const getStaticProps: GetStaticProps = async (context) => {
   const intro = await getSortedIndexData('deck', {
     filters: 'id[equals]mardock-intro'
   });
-  const items = await getSortedIndexData('deck', {});
+  const q: GetQuery = {};
+  q.limit = itemsPerPage;
+  const items = await getSortedIndexData('deck', q);
   return { props: { pageData, intro, items } };
 };
 
