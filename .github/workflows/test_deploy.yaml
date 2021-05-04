@@ -1,7 +1,7 @@
 name: test_deplpoy
 on:
   push:
-    branches_ignore:
+    branches-ignore:
       - master
       - main
 
