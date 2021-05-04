@@ -37,6 +37,7 @@ import {
 } from '../../lib/slide';
 import NavCategory from '../../components/NavCategory';
 import ButtonSelect from '../../components/ButtonSelect';
+import { ShowOnScroll } from '../../components/HideShowScroll';
 // import ListDeck from '../../components/ListDeck';
 
 const useStyles = makeStyles((theme) => ({
@@ -51,6 +52,19 @@ const useStyles = makeStyles((theme) => ({
       position: 'sticky',
       top: 121,
       padding: theme.spacing(1, 2)
+    }
+  },
+  'Page-show-button-outer': {
+    position: 'fixed',
+    //width: '100%',
+    top: 0,
+    right: 0,
+    border: 'solid 1px',
+    borderRadius: '4px',
+    zIndex: 2000,
+    backgroundColor: 'white',
+    '& .MuiIconButton-root': {
+      padding: theme.spacing(0.5)
     }
   },
   'Page-paper': {
@@ -450,6 +464,22 @@ export default function Deck({ pageData, comment, pdfPath, pptxPath }: Props) {
       }
       section={
         <div ref={measuredRef} className={classes['Page-root']}>
+          <ShowOnScroll
+            headerHideOptions={{
+              disableHysteresis: true,
+              threshold: 0
+            }}
+            alwaysHiding={!downLg || sectionShowing}
+          >
+            <Box className={classes['Page-show-button-outer']}>
+              <IconButton
+                aria-label="Show deck page area"
+                onClick={() => setSectionShowing(true)}
+              >
+                <ExpandMoreIcon />
+              </IconButton>
+            </Box>
+          </ShowOnScroll>
           <Paper
             elevation={trigger && downLg && sectionShowing ? 2 : 0}
             className={classes['Page-paper']}
