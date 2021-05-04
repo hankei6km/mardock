@@ -3,6 +3,7 @@ on:
   push:
     branches_ignore:
       - master
+      - main
 
 jobs:
 
