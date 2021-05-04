@@ -18,10 +18,10 @@ jobs:
     - run: echo "${{ github.event.action }}"
     - uses: actions/checkout@v2
 
-    - name: Use Node.js 14.5
+    - name: Use Node.js 14.x
       uses: actions/setup-node@v1
       with:
-         node-version: 14.5
+         node-version: 14.x
 
     - name: Get yarn cache directory path
       id: yarn-cache-dir-path
@@ -49,6 +49,10 @@ jobs:
 
     - name: Install modules
       run: yarn install
+
+    # https://qiita.com/developer-kikikaikai/items/198d75efd10eb525c41f
+    - name: Install japanese fonts
+      run: sudo apt-get update && sudo apt-get install fonts-noto-cjk
 
     # https://qiita.com/ozaki25/items/fe9912fc41c3a5c5bfea
     # https://qiita.com/manten120/items/87e9e822800403904dc8

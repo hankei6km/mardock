@@ -1,8 +1,9 @@
-name: deplpoy
+name: test_deplpoy
 on:
   push:
     branches_ignore:
       - master
+      - main
 
 jobs:
 
