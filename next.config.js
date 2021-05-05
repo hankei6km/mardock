@@ -39,7 +39,7 @@ module.exports = (phase) => {
     : '';
   const assetPrefix =
     isStaging && process.env.STAGING_DIR
-      ? path.join('/', process.env.STAGING_DIR, _assetPrefix)
+      ? path.join(_assetPrefix, process.env.STAGING_DIR)
       : _assetPrefix;
   // lib/meta.ts 内で baseUrl を独自に設定しているので注意
   const basePath = assetPrefix;
