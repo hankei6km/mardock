@@ -3,7 +3,6 @@ import React, { ReactElement, useEffect, useContext, useState } from 'react';
 import { makeStyles } from '@material-ui/core';
 import { useTheme } from '@material-ui/core/styles';
 import useMediaQuery from '@material-ui/core/useMediaQuery';
-import useScrollTrigger from '@material-ui/core/useScrollTrigger';
 import { UseScrollTriggerOptions } from '@material-ui/core/useScrollTrigger/useScrollTrigger';
 import Head from 'next/head';
 import Container from '@material-ui/core/Container';
@@ -11,7 +10,6 @@ import Avatar from '@material-ui/core/Avatar';
 import Box from '@material-ui/core/Box';
 import Divider from '@material-ui/core/Divider';
 import AppBar from '@material-ui/core/AppBar';
-import Slide from '@material-ui/core/Slide';
 import Toolbar from '@material-ui/core/Toolbar';
 import IconButton from '@material-ui/core/IconButton';
 import Typography from '@material-ui/core/Typography';
@@ -27,6 +25,7 @@ import Link from './Link';
 import NavMain from './NavMain';
 import NavBreadcrumbs from './NavBreadcrumbs';
 import DateUpdated from './DateUpdated';
+import { HideOnScroll } from './HideShowScroll';
 import { gridTempalteAreasFromLayout } from '../utils/grid';
 
 export const appBarHeight = 64;
@@ -403,30 +402,6 @@ function getAvatarSrcSet(src: string): string {
   const u = src.split('?', 2)[0];
   // return encodeURIComponent(
   return `${u}?dpr64=Mw&fit64=Y3JvcA&h64=MTIw&w64=MTIw 3x, ${u}?dpr64=Mg&fit64=Y3JvcA&h64=MTIw&w64=MTIw 2x, ${u}?dpr64=&fit64=Y3JvcA&h64=MTIw&w64=MTIw 1x`;
-}
-
-function HideOnScroll({
-  children,
-  alwaysShowing,
-  headerHideOptions = {}
-}: {
-  children?: ReactElement;
-  alwaysShowing: boolean;
-  headerHideOptions?: UseScrollTriggerOptions;
-}) {
-  // https://material-ui.com/components/app-bar/#hide-app-bar
-  const trigger = useScrollTrigger(headerHideOptions);
-
-  return (
-    <Slide
-      appear={false}
-      direction="down"
-      in={!trigger || alwaysShowing}
-      //style={{ transitionDelay: !trigger ? '500ms' : '0ms' }}
-    >
-      {children}
-    </Slide>
-  );
 }
 
 const Layout = ({

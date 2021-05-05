@@ -20,6 +20,7 @@ import TimelineSeparator from '@material-ui/lab/TimelineSeparator';
 import TimelineConnector from '@material-ui/lab/TimelineConnector';
 import TimelineContent from '@material-ui/lab/TimelineContent';
 // import TimelineDot from '@material-ui/lab/TimelineDot';
+import ExpandLessIcon from '@material-ui/icons/ExpandLess';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import LayoutDeck from '../../components/LayoutDeck';
 import { appBarHeight } from '../../components/Layout';
@@ -27,6 +28,7 @@ import { animateScroll as scroll } from 'react-scroll';
 import Link from '../../components/Link';
 import Carousel from 'react-material-ui-carousel';
 import SlideshowIcon from '@material-ui/icons/Slideshow';
+import AspectRatioIcon from '@material-ui/icons/AspectRatio';
 import GetAppIcon from '@material-ui/icons/GetApp';
 import { PageData } from '../../types/pageTypes';
 import { getAllPagesIds, getPagesData } from '../../lib/pages';
@@ -37,7 +39,6 @@ import {
 } from '../../lib/slide';
 import NavCategory from '../../components/NavCategory';
 import ButtonSelect from '../../components/ButtonSelect';
-// import ListDeck from '../../components/ListDeck';
 
 const useStyles = makeStyles((theme) => ({
   'Page-root': {
@@ -502,6 +503,12 @@ export default function Deck({ pageData, comment, pdfPath, pptxPath }: Props) {
                     setPageIdx(index);
                     setPageSwitched(true);
                   }}
+                  indicatorContainerProps={{
+                    className: '',
+                    style: {
+                      padding: '0px 40px'
+                    }
+                  }}
                 >
                   {pageData.deck.slide.items.map(({ html }, i) => (
                     <div
@@ -516,6 +523,24 @@ export default function Deck({ pageData, comment, pdfPath, pptxPath }: Props) {
               </div>
             </article>
           </Paper>
+          <Box style={{ position: 'absolute', bottom: 0, left: 0 }}>
+            <IconButton
+              aria-label="Hide deck page area"
+              onClick={() => setSectionShowing(false)}
+            >
+              <ExpandLessIcon />
+            </IconButton>
+          </Box>
+          <Box style={{ position: 'absolute', bottom: 0, right: 0 }}>
+            <IconButton
+              aria-label="Open presentation page"
+              component={Link}
+              href="/slides[id]"
+              as={`/slides/${pageData.id}`}
+            >
+              <AspectRatioIcon />
+            </IconButton>
+          </Box>
         </div>
       }
       notification={pageData.notification}
