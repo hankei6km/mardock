@@ -83,5 +83,7 @@ jobs:
         github_token: ${{ secrets.GITHUB_TOKEN }}
         publish_dir: ./out
         publish_branch: gh-pages
-        destination_dir: $STAGING_DIR
+        destination_dir: ${{ env.STAGING_DIR }}
+      env:
+        STAGING_DIR: ${{ secrets.STAGING_DIR }}
 
