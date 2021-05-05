@@ -9,7 +9,12 @@ jobs:
 
   deploy:
     runs-on: ubuntu-latest
-    environment: pages
+
+    # pages-staging:
+    # PR を main の deploy に上書きしないように用意した environment.
+    # secret ととして STAGING=1 と STAGING_DIR=develop が設定されている.
+    environment: pages-staging
+
     # repository_dispatch しか使えないならいらない?
     # if: github.ref == 'refs/heads/main'
 
@@ -17,13 +22,6 @@ jobs:
     - run: echo "${{ github.event.action }}"
     - uses: actions/checkout@v2
 
-
-    - name: Setup env vars to STAGING
-      run: |
-        export STAGING_DIR=develop
-        echo "::set-env name=STATING_DIR::$STAGING_DIR"  
-        export STAGING=1
-        echo "::set-env name=STATING::$STAGING"  
 
     - name: Use Node.js 14.x
       uses: actions/setup-node@v1
