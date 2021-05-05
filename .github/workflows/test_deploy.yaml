@@ -12,7 +12,7 @@ jobs:
 
     # pages-staging:
     # PR を main の deploy に上書きしないように用意した environment.
-    # secret ととして STAGING=1 と STAGING_DIR=develop が設定されている.
+    # STAGING_DIR=develop が設定されている.
     environment: pages-staging
 
     # repository_dispatch しか使えないならいらない?
@@ -66,7 +66,7 @@ jobs:
       env:
         API_BASE_URL: ${{ secrets.API_BASE_URL }}
         GET_API_KEY: ${{ secrets.GET_API_KEY }}
-        STAGING: ${{ secrets.STAGING }}
+        STAGING: "1"
         STAGING_DIR: ${{ secrets.STAGING_DIR }}
         # API route は動作しない
         # PREVIEW_SECRET: ${{ secrets.GITHUB_TOKEN }}
