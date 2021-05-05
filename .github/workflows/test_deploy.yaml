@@ -66,6 +66,8 @@ jobs:
       env:
         API_BASE_URL: ${{ secrets.API_BASE_URL }}
         GET_API_KEY: ${{ secrets.GET_API_KEY }}
+        STAGING: ${{ secrets.STAGING }}
+        STAGING_DIR: ${{ secrets.STAGING_DIR }}
         # API route は動作しない
         # PREVIEW_SECRET: ${{ secrets.GITHUB_TOKEN }}
 
