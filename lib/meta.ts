@@ -1,3 +1,4 @@
+import { join } from 'path';
 import matter from 'gray-matter';
 import { PageData, MetaData } from '../types/pageTypes';
 import { getSlidePublicImagePath, getSlidePublicImageFilename } from './slide';
@@ -15,7 +16,10 @@ function baseUrl(): string {
     ? process.env.GITHUB_REPOSITORY.split('/', 2)
     : ['', ''];
   if (githubUser) {
-    return `https://${githubUser}.github.io/${githubRepo}`;
+    const baseUrl = process.env.STAGING_DIR
+      ? join(githubRepo, process.env.STAGING_DIR)
+      : githubRepo;
+    return `https://${githubUser}.github.io/${baseUrl}`;
   }
   return '';
 }
