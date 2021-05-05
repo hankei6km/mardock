@@ -2,6 +2,7 @@ const {
   PHASE_DEVELOPMENT_SERVER,
   PHASE_PRODUCTION_BUILD
 } = require('next/constants');
+const path = require('path');
 
 // This uses phases as outlined here: https://nextjs.org/docs/#custom-configuration
 module.exports = (phase) => {
@@ -33,9 +34,14 @@ module.exports = (phase) => {
   };
 
   // https://docs.github.com/ja/actions/reference/environment-variables
-  const assetPrefix = process.env.GITHUB_REPOSITORY
+  let _assetPrefix = process.env.GITHUB_REPOSITORY
     ? `/${process.env.GITHUB_REPOSITORY.split('/', 2)[1]}`
     : '';
+  const assetPrefix =
+    isStaging && process.env.STAGING_DIR
+      ? path.join(process.env.STAGING_DIR, _assetPrefix)
+      : _assetPrefix;
+      // lib/meta.ts 内で baseUrl を独自に設定しているので注意
   const basePath = assetPrefix;
 
   console.log(`assetPrefix:${assetPrefix}`);
