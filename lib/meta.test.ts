@@ -113,10 +113,7 @@ describe('metaPage()', () => {
     articleTitle: 'atitle1',
     mainVisual: { url: 'img1', width: 100, height: 100 },
     description: 'desc1',
-    deck: {
-      slide: blankDeckData(),
-      overview: blankDeckData()
-    }
+    deck: blankDeckData()
   };
   it('should returns meta object from page data', () => {
     expect(metaPage({ ...baseMock })).toEqual({
@@ -142,10 +139,7 @@ describe('metaPage()', () => {
         ...baseMock,
         deck: {
           ...baseMock.deck,
-          slide: {
-            ...baseMock.deck.slide,
-            meta: { title: 'deck title', description: 'deck desc' }
-          }
+          meta: { title: 'deck title', description: 'deck desc' }
         }
       })
     ).toEqual({
@@ -167,10 +161,7 @@ describe('metaPage()', () => {
         },
         deck: {
           ...baseMock.deck,
-          slide: {
-            ...baseMock.deck.slide,
-            meta: { title: 'deck title', description: 'deck desc' }
-          }
+          meta: { title: 'deck title', description: 'deck desc' }
         }
       })
     ).toEqual({
@@ -195,10 +186,7 @@ describe('metaPage()', () => {
         },
         deck: {
           ...baseMock.deck,
-          slide: {
-            ...baseMock.deck.slide,
-            meta: { title: 'deck title', description: 'deck desc' }
-          }
+          meta: { title: 'deck title', description: 'deck desc' }
         }
       })
     ).toEqual({

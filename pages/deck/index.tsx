@@ -10,6 +10,7 @@ import { getPagesData, getSortedIndexData } from '../../lib/pages';
 import NavPagination from '../../components/NavPagination';
 import { GetQuery } from '../../types/client/queryTypes';
 import { pageCountFromTotalCount } from '../../utils/pagination';
+import { writeFeed } from '../../lib/feed';
 
 const itemsPerPage = 12;
 const pagePath: string[] = [];
@@ -87,6 +88,17 @@ export const getStaticProps: GetStaticProps = async (context) => {
     q.filters = `category[contains]${curCategory}`;
   }
   const items = await getSortedIndexData('deck', q);
+  console.log(
+    await writeFeed(
+      {
+        id: 'https://hankei6km.github.io/mardock',
+        title: 'mardock',
+        copyright: ''
+      },
+      items.contents.map(({ meta }) => meta),
+      'deck'
+    )
+  );
   return {
     props: {
       pageData: {

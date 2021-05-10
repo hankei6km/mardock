@@ -1,6 +1,15 @@
+import { createWriteStream } from 'fs';
+import { join } from 'path';
 import { Feed, FeedOptions } from 'feed';
-import { Writable } from 'stream';
+import siteServerSideConfig from '../src/site.server-side-config';
 import { MetaData } from '../types/pageTypes';
+
+export function getFeedsPublicPath(name: string): string {
+  return join(siteServerSideConfig.public.feedsPath, name);
+}
+export function getFeedsPath(name: string): string {
+  return join(siteServerSideConfig.assets.feedsPath, name);
+}
 
 export function feed(options: FeedOptions, metas: MetaData[]) {
   const feed = new Feed(options);
@@ -10,17 +19,25 @@ export function feed(options: FeedOptions, metas: MetaData[]) {
       id: meta.link,
       link: meta.link,
       date: new Date(meta.updated),
-      description: meta.description
+      description: meta.description,
+      image: meta.image
     });
   });
   return feed.rss2();
 }
 
-export function feedWrite(
+export async function writeFeed(
   options: FeedOptions,
   metas: MetaData[],
-  w: Writable
-) {
+  name: string
+): Promise<string> {
+  let ret = getFeedsPublicPath(`${name}.xml`);
+  const p = getFeedsPath(`${name}.xml`);
+  const w = createWriteStream(p, { flags: 'wx', encoding: 'utf8' });
+  w.on('error', () => {
+    // 'wx' で上書き失敗したときのエラー
+  });
   w.write(feed(options, metas));
-  w.end();
+  w.close();
+  return ret;
 }

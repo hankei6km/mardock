@@ -125,6 +125,7 @@ export async function getSortedIndexData(
           }));
           ret.deck = d;
         }
+        ret.meta = metaPage({ apiName, ...ret });
         return ret;
       };
     });
@@ -325,7 +326,7 @@ export async function getPagesData(
       res.id,
       deckOverviewSource || deckSlideSource
     );
-    ret.meta = metaPage({ apiName, ...ret });
+    ret.meta = metaPage({ apiName, ...ret, deck: ret.deck.slide });
     if (notification) {
       ret.notification = notification;
     }

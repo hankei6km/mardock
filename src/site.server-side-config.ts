@@ -11,6 +11,7 @@ type SiteServerSideConfig = {
     imagesPath: string;
     pdfPath: string;
     pptxPath: string;
+    feedsPath: string;
   };
   // ブラウザーで参照時のパス.
   // サブディレクトリ等が付いていないルートからのパスとして扱う
@@ -19,6 +20,7 @@ type SiteServerSideConfig = {
     imagesPath: string;
     pdfPath: string;
     pptxPath: string;
+    feedsPath: string;
   };
   slide: {
     fallbackImage: Omit<ConfigImageSource, 'alt'>;
@@ -46,12 +48,14 @@ const siteServerSideConfig: SiteServerSideConfig = {
   assets: {
     imagesPath: join('public', 'assets', 'images'),
     pdfPath: join('public', 'assets', 'pdf'),
-    pptxPath: join('public', 'assets', 'pptx')
+    pptxPath: join('public', 'assets', 'pptx'),
+    feedsPath: join('public', 'assets', 'feeds')
   },
   public: {
     imagesPath: join('/', 'assets', 'images'),
     pdfPath: join('/', 'assets', 'pdf'),
-    pptxPath: join('/', 'assets', 'pptx')
+    pptxPath: join('/', 'assets', 'pptx'),
+    feedsPath: join('/', 'assets', 'feeds')
   },
   slide: {
     fallbackImage: {

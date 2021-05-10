@@ -310,7 +310,9 @@ export async function slideDeckIndex(
     slideContainer: new Element('div', { class: 'slideDeck' }),
     script: false
   });
-  return await _slideDeck(marp, containerId, source);
+  const ret = await _slideDeck(marp, containerId, source);
+  ret.meta = metaDeck(source).data; // ここではエラーは無視する(プレビューモードで検証する)
+  return ret;
 }
 
 export async function slideDeckOverview(

@@ -1,6 +1,6 @@
 import { join } from 'path';
 import matter from 'gray-matter';
-import { PageData, MetaData } from '../types/pageTypes';
+import { PageData, MetaData, DeckData } from '../types/pageTypes';
 import { getSlidePublicImagePath, getSlidePublicImageFilename } from './slide';
 import { ApiNameArticle } from '../types/apiName';
 
@@ -8,14 +8,8 @@ import { ApiNameArticle } from '../types/apiName';
 const metaDeckKeys = ['title', 'description', 'url', 'image'];
 type metaPageOpts = { apiName: ApiNameArticle } & Pick<
   PageData,
-  | 'id'
-  | 'updated'
-  | 'title'
-  | 'articleTitle'
-  | 'mainVisual'
-  | 'description'
-  | 'deck'
->;
+  'id' | 'updated' | 'title' | 'articleTitle' | 'mainVisual' | 'description'
+> & { deck: DeckData };
 
 function baseUrl(): string {
   const [githubUser, githubRepo] = process.env.GITHUB_REPOSITORY
@@ -66,7 +60,7 @@ export function metaDeck(source: string): MetaCommonResult {
 }
 
 export function metaPage(opts: metaPageOpts): MetaData {
-  let image = opts.deck.slide.meta.image || '';
+  let image = opts.deck.meta.image || '';
   if (image === '') {
     image = opts.mainVisual.url;
     if (opts.apiName === 'deck') {
@@ -77,11 +71,11 @@ export function metaPage(opts: metaPageOpts): MetaData {
   }
   let link = baseUrl() + join('/', opts.apiName, opts.id); // TODO: baseUrl が '' のときの対応
   return {
-    title: opts.deck.slide.meta.title || opts.articleTitle,
+    title: opts.deck.meta.title || opts.articleTitle,
     link,
     updated: opts.updated,
     keyword: [],
     image,
-    description: opts.deck.slide.meta.description || opts.description
+    description: opts.deck.meta.description || opts.description
   };
 }
