@@ -11,6 +11,8 @@ import NavPagination from '../../components/NavPagination';
 import { GetQuery } from '../../types/client/queryTypes';
 import { pageCountFromTotalCount } from '../../utils/pagination';
 import { writeFeed } from '../../lib/feed';
+import siteConfig from '../../src/site.config';
+import siteServerSideConfig from '../../src/site.server-side-config';
 
 const itemsPerPage = 12;
 const pagePath: string[] = [];
@@ -88,12 +90,15 @@ export const getStaticProps: GetStaticProps = async (context) => {
     q.filters = `category[contains]${curCategory}`;
   }
   const items = await getSortedIndexData('deck', q);
+  //  siteのデータは config から
+  // プレビューで除外
   console.log(
     await writeFeed(
       {
-        id: 'https://hankei6km.github.io/mardock',
-        title: 'mardock',
-        copyright: ''
+        id: siteServerSideConfig.baseUrl,
+        link: siteServerSideConfig.baseUrl,
+        title: siteConfig.siteName,
+        copyright: siteConfig.siteCopyright
       },
       items.contents.map(({ meta }) => meta),
       'deck'

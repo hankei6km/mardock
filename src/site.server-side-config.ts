@@ -1,9 +1,11 @@
 import { join } from 'path';
+import { getBaseUrl } from '../utils/baseUrl';
 import { ConfigImageSource } from './site.config';
 import draftlintConfig from './$draftlint-config.json';
 // サーバー側で使う設定.
 // ブラウザでは使わない or 見せたくない項目(セキュリティ的にの他にサイズ的な等
 type SiteServerSideConfig = {
+  baseUrl: string;
   allIdsLimit: number;
   // ビルド時のファイルシステムのパス.
   //  プロジェクトルート起点の相対パスで指定.
@@ -43,6 +45,7 @@ type SiteServerSideConfig = {
 };
 
 const siteServerSideConfig: SiteServerSideConfig = {
+  baseUrl: getBaseUrl(),
   // id が 1件で 40byte  と想定、 content-length が 5M 程度とのことなので、1000*1000*5 / 40 で余裕を見て決めた値。
   allIdsLimit: 120000,
   assets: {

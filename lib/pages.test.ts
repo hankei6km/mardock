@@ -14,17 +14,15 @@ import { queryParams } from '../test/testUtils';
 import { mockDataPagesIds } from '../test/testMockData';
 // https://github.com/jefflau/jest-fetch-mock/issues/83
 const fetchMock = fetch as FetchMock;
-const saveEnv = process.env;
 beforeEach(() => {
   fetchMock.resetMocks();
-  process.env = {
-    ...saveEnv
-  };
-  process.env.GITHUB_REPOSITORY = '';
 });
-afterEach(() => {
-  process.env = saveEnv;
-});
+
+// テスト別に切り替えるのは難しいか.
+jest.mock('../utils/baseUrl', () => ({
+  ...jest.requireActual('../utils/baseUrl'),
+  getBaseUrl: () => 'https://hankei6km.github.io/mardock'
+}));
 
 describe('getSortedPagesData()', () => {
   it('should returns contents array with out displayOnIndexPage filed', async () => {
@@ -150,7 +148,7 @@ describe('getPagesData()', () => {
       },
       meta: {
         title: 'Home',
-        link: '/pages/home',
+        link: 'https://hankei6km.github.io/mardock/pages/home',
         updated: '2020-12-27T04:04:30.107Z',
         keyword: [],
         description: 'description of draftlint',
@@ -186,7 +184,7 @@ describe('getPagesData()', () => {
       },
       meta: {
         title: 'slide1',
-        link: '/pages/slide1',
+        link: 'https://hankei6km.github.io/mardock/pages/slide1',
         updated: '2020-12-26T15:29:14.476Z',
         keyword: [],
         description: '',

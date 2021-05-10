@@ -7,7 +7,11 @@ export type ConfigImageSource = {
 type SiteConfig = {
   siteName: string;
   siteNameDecorated: { label: string; strong?: boolean }[];
+  // LICENSE とは別に定義する.
+  siteCopyright: string;
   siteIcon: ConfigImageSource;
+  // baseUrl は siteServerSideConfig に定義してある
+  // (組み合てに環境変数利用しているので、うかつに secret をしない保険)
   nav: {
     main: { label: string; href: string }[];
     breadcrumbs: { [key: string]: { label: string; href: string }[] };
@@ -22,6 +26,7 @@ const siteConfig: SiteConfig = {
     { label: 'doc', strong: true },
     { label: 'k' }
   ],
+  siteCopyright: 'Copyright (c) 2021 hankei6km',
   siteIcon: {
     url:
       'https://images.microcms-assets.io/assets/cc433627f35c4232b7cb97e0376507a7/da27ed4e87794f41af0f5bfdf79391f1/mardock-site-icon-3.png',

@@ -32,12 +32,18 @@ export async function writeFeed(
   name: string
 ): Promise<string> {
   let ret = getFeedsPublicPath(`${name}.xml`);
-  const p = getFeedsPath(`${name}.xml`);
-  const w = createWriteStream(p, { flags: 'wx', encoding: 'utf8' });
-  w.on('error', () => {
-    // 'wx' で上書き失敗したときのエラー
-  });
-  w.write(feed(options, metas));
-  w.close();
+  try {
+    const f = feed(options, metas);
+    const p = getFeedsPath(`${name}.xml`);
+    const w = createWriteStream(p, { flags: 'wx', encoding: 'utf8' });
+    w.on('error', () => {
+      // 'wx' で上書き失敗したときのエラー
+    });
+    w.write(f);
+    w.close();
+  } catch (err) {
+    console.error(err);
+    ret = '';
+  }
   return ret;
 }

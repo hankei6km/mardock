@@ -1,6 +1,7 @@
 import { join } from 'path';
 import matter from 'gray-matter';
 import { PageData, MetaData, DeckData } from '../types/pageTypes';
+import siteServerSideConfig from '../src/site.server-side-config';
 import { getSlidePublicImagePath, getSlidePublicImageFilename } from './slide';
 import { ApiNameArticle } from '../types/apiName';
 
@@ -11,23 +12,14 @@ type metaPageOpts = { apiName: ApiNameArticle } & Pick<
   'id' | 'updated' | 'title' | 'articleTitle' | 'mainVisual' | 'description'
 > & { deck: DeckData };
 
-function baseUrl(): string {
-  const [githubUser, githubRepo] = process.env.GITHUB_REPOSITORY
-    ? process.env.GITHUB_REPOSITORY.split('/', 2)
-    : ['', ''];
-  if (githubUser) {
-    const baseUrl = process.env.STAGING_DIR
-      ? join(githubRepo, process.env.STAGING_DIR)
-      : githubRepo;
-    return `https://${githubUser}.github.io/${baseUrl}`;
-  }
-  return '';
-}
-
 export type MetaCommonResult = {
   errMessage: string;
   data: { [key: string]: any };
 };
+
+export function getBaseUrl(): string {
+  return siteServerSideConfig.baseUrl;
+}
 
 export function metaOpen(source: string): MetaCommonResult {
   const ret: MetaCommonResult = {
@@ -65,11 +57,11 @@ export function metaPage(opts: metaPageOpts): MetaData {
     image = opts.mainVisual.url;
     if (opts.apiName === 'deck') {
       image =
-        baseUrl() +
+        getBaseUrl() +
         getSlidePublicImagePath(getSlidePublicImageFilename(opts.id));
     }
   }
-  let link = baseUrl() + join('/', opts.apiName, opts.id); // TODO: baseUrl が '' のときの対応
+  let link = getBaseUrl() + join('/', opts.apiName, opts.id); // TODO: getBaseUrl が '' のときの対応
   return {
     title: opts.deck.meta.title || opts.articleTitle,
     link,

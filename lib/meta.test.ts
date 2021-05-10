@@ -1,16 +1,11 @@
 import { metaOpen, metaDeck, metaPage } from './meta';
 import { blankDeckData } from '../types/pageTypes';
 
-const saveEnv = process.env;
-beforeEach(() => {
-  process.env = {
-    ...saveEnv
-  };
-  process.env.GITHUB_REPOSITORY = '';
-});
-afterEach(() => {
-  process.env = saveEnv;
-});
+// テスト別に切り替えるのは難しいか.
+jest.mock('../utils/baseUrl', () => ({
+  ...jest.requireActual('../utils/baseUrl'),
+  getBaseUrl: () => 'https://hankei6km.github.io/mardock'
+}));
 
 describe('metaOpen()', () => {
   it('should returns meta object from markdown', () => {
@@ -119,7 +114,7 @@ describe('metaPage()', () => {
     expect(metaPage({ ...baseMock })).toEqual({
       title: 'atitle1',
       updated: '2020-12-27T04:04:30.107Z',
-      link: '/docs/id1',
+      link: 'https://hankei6km.github.io/mardock/docs/id1',
       keyword: [],
       image: 'img1',
       description: 'desc1'
@@ -129,7 +124,7 @@ describe('metaPage()', () => {
     ).toEqual({
       title: 'atitle1',
       updated: '2020-12-27T04:04:30.107Z',
-      link: '/docs/id1',
+      link: 'https://hankei6km.github.io/mardock/docs/id1',
       keyword: [],
       image: '',
       description: 'desc1'
@@ -145,7 +140,7 @@ describe('metaPage()', () => {
     ).toEqual({
       title: 'deck title',
       updated: '2020-12-27T04:04:30.107Z',
-      link: '/docs/id1',
+      link: 'https://hankei6km.github.io/mardock/docs/id1',
       keyword: [],
       image: 'img1',
       description: 'deck desc'
@@ -167,32 +162,7 @@ describe('metaPage()', () => {
     ).toEqual({
       title: 'deck title',
       updated: '2020-12-27T04:04:30.107Z',
-      link: '/deck/id1',
-      keyword: [],
-      image: '/assets/images/id1.png',
-      description: 'deck desc'
-    });
-  });
-  it('should returns image url', () => {
-    process.env.GITHUB_REPOSITORY = 'hankei6km/mardock';
-    expect(
-      metaPage({
-        ...baseMock,
-        apiName: 'deck',
-        mainVisual: {
-          url: '',
-          width: 0,
-          height: 0
-        },
-        deck: {
-          ...baseMock.deck,
-          meta: { title: 'deck title', description: 'deck desc' }
-        }
-      })
-    ).toEqual({
-      title: 'deck title',
       link: 'https://hankei6km.github.io/mardock/deck/id1',
-      updated: '2020-12-27T04:04:30.107Z',
       keyword: [],
       image: 'https://hankei6km.github.io/mardock/assets/images/id1.png',
       description: 'deck desc'
