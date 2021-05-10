@@ -14,8 +14,16 @@ import { queryParams } from '../test/testUtils';
 import { mockDataPagesIds } from '../test/testMockData';
 // https://github.com/jefflau/jest-fetch-mock/issues/83
 const fetchMock = fetch as FetchMock;
+const saveEnv = process.env;
 beforeEach(() => {
   fetchMock.resetMocks();
+  process.env = {
+    ...saveEnv
+  };
+  process.env.GITHUB_REPOSITORY = '';
+});
+afterEach(() => {
+  process.env = saveEnv;
 });
 
 describe('getSortedPagesData()', () => {
