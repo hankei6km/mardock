@@ -142,6 +142,8 @@ describe('getPagesData()', () => {
       },
       meta: {
         title: 'Home',
+        link: '/pages/home',
+        updated: '2020-12-27T04:04:30.107Z',
         keyword: [],
         description: 'description of draftlint',
         image:
@@ -176,6 +178,8 @@ describe('getPagesData()', () => {
       },
       meta: {
         title: 'slide1',
+        link: '/pages/slide1',
+        updated: '2020-12-26T15:29:14.476Z',
         keyword: [],
         description: '',
         image:

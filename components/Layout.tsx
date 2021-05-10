@@ -442,7 +442,14 @@ const Layout = ({
   articleTitle,
   html: html = '',
   notification,
-  meta: pageMeta = { title: '', keyword: [], image: '', description: '' }, // blankMetaData は使わない
+  meta: pageMeta = {
+    title: '',
+    link: '',
+    updated: '',
+    keyword: [],
+    image: '',
+    description: ''
+  }, // blankMetaData は使わない
   headerHideOptions = {},
   classes: inClasses
 }: Props) => {

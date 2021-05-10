@@ -47,6 +47,8 @@ export type HtmlToc = {
 
 export type MetaData = {
   title: string;
+  link: string;
+  updated: string;
   keyword: string[]; // 今回は使わない、か category をコピーか.
   description: string;
   image: string; // Tewitter card 等のバリエーションは保持しない、利用時に生成する(imgix 前提)
@@ -96,7 +98,6 @@ export type IndexData = Omit<
   | 'htmlToc'
   | 'html'
   | 'deck'
-  | 'meta'
 > & { deck: DeckData };
 export type IndexList = ContentList<IndexData>;
 
@@ -115,6 +116,8 @@ export const blankDeckData = (): DeckData => ({
 
 export const blankMetaData = (): MetaData => ({
   title: '',
+  link: '',
+  updated: '', // 現在時刻を入れておくか？
   keyword: [],
   description: '',
   image: ''
@@ -160,7 +163,8 @@ export const blankIndexData = (): IndexData => ({
   articleTitle: '',
   deck: blankDeckData(),
   mainVisual: { url: '', width: 0, height: 0 },
-  description: ''
+  description: '',
+  meta: blankMetaData()
 });
 
 export const blankIndexList = (): IndexList => ({

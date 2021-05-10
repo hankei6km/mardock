@@ -8,7 +8,13 @@ import { ApiNameArticle } from '../types/apiName';
 const metaDeckKeys = ['title', 'description', 'url', 'image'];
 type metaPageOpts = { apiName: ApiNameArticle } & Pick<
   PageData,
-  'id' | 'title' | 'articleTitle' | 'mainVisual' | 'description' | 'deck'
+  | 'id'
+  | 'updated'
+  | 'title'
+  | 'articleTitle'
+  | 'mainVisual'
+  | 'description'
+  | 'deck'
 >;
 
 function baseUrl(): string {
@@ -69,8 +75,11 @@ export function metaPage(opts: metaPageOpts): MetaData {
         getSlidePublicImagePath(getSlidePublicImageFilename(opts.id));
     }
   }
+  let link = baseUrl() + join('/', opts.apiName, opts.id); // TODO: baseUrl が '' のときの対応
   return {
     title: opts.deck.slide.meta.title || opts.articleTitle,
+    link,
+    updated: opts.updated,
     keyword: [],
     image,
     description: opts.deck.slide.meta.description || opts.description

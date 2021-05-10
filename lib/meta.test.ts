@@ -108,6 +108,7 @@ describe('metaPage()', () => {
   const baseMock = {
     apiName: 'docs' as const,
     id: 'id1',
+    updated: '2020-12-27T04:04:30.107Z',
     title: 'title1',
     articleTitle: 'atitle1',
     mainVisual: { url: 'img1', width: 100, height: 100 },
@@ -120,6 +121,8 @@ describe('metaPage()', () => {
   it('should returns meta object from page data', () => {
     expect(metaPage({ ...baseMock })).toEqual({
       title: 'atitle1',
+      updated: '2020-12-27T04:04:30.107Z',
+      link: '/docs/id1',
       keyword: [],
       image: 'img1',
       description: 'desc1'
@@ -128,6 +131,8 @@ describe('metaPage()', () => {
       metaPage({ ...baseMock, mainVisual: { url: '', width: 0, height: 0 } })
     ).toEqual({
       title: 'atitle1',
+      updated: '2020-12-27T04:04:30.107Z',
+      link: '/docs/id1',
       keyword: [],
       image: '',
       description: 'desc1'
@@ -145,6 +150,8 @@ describe('metaPage()', () => {
       })
     ).toEqual({
       title: 'deck title',
+      updated: '2020-12-27T04:04:30.107Z',
+      link: '/docs/id1',
       keyword: [],
       image: 'img1',
       description: 'deck desc'
@@ -168,6 +175,8 @@ describe('metaPage()', () => {
       })
     ).toEqual({
       title: 'deck title',
+      updated: '2020-12-27T04:04:30.107Z',
+      link: '/deck/id1',
       keyword: [],
       image: '/assets/images/id1.png',
       description: 'deck desc'
@@ -194,6 +203,8 @@ describe('metaPage()', () => {
       })
     ).toEqual({
       title: 'deck title',
+      link: 'https://hankei6km.github.io/mardock/deck/id1',
+      updated: '2020-12-27T04:04:30.107Z',
       keyword: [],
       image: 'https://hankei6km.github.io/mardock/assets/images/id1.png',
       description: 'deck desc'
