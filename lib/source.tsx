@@ -7,6 +7,7 @@ import stringify from 'remark-stringify';
 import { Transformer } from 'unified';
 import { Node } from 'hast';
 // import visit from 'unist-util-visit';
+import splitParagraph from 'rehype-split-paragraph';
 import {
   PagesSourcePages,
   PagesSourcePageMarkdown,
@@ -20,142 +21,6 @@ import { codeDockHandler } from './codedock';
 import siteServerSideConfig from '../src/site.server-side-config';
 import { qrcodeToDataUrl } from './qrcode';
 var toText = require('hast-util-to-text');
-
-export function splitParagraphTransformer(): Transformer {
-  // 最上位の paragraph のみ対象。リストや引用、ネストは扱わない。
-  return function transformer(tree: Node): void {
-    // 連続 br
-    if (tree.type === 'root' && Array.isArray(tree.children)) {
-      const children: Node[] = [];
-      tree.children.forEach((c: Node) => {
-        if (
-          c.type === 'element' &&
-          c.tagName === 'p' &&
-          Array.isArray(c.children)
-        ) {
-          let pool: Node[] = [];
-          let brCnt = 0;
-          c.children.forEach((cc: Node, i) => {
-            if (cc.type === 'element' && cc.tagName === 'br') {
-              brCnt++;
-            } else {
-              if (brCnt === 0) {
-                pool.push(cc);
-              } else if (brCnt === 1) {
-                pool.push((c.children as Node[])[i - 1]);
-                pool.push(cc);
-                brCnt = 0;
-              } else {
-                children.push({ ...c, children: pool });
-                pool = [];
-                pool.push(cc);
-                brCnt = 0;
-              }
-            }
-          });
-          children.push({ ...c, children: pool });
-        } else {
-          children.push(c);
-        }
-      });
-      tree.children = children;
-    }
-    // img
-    if (tree.type === 'root' && Array.isArray(tree.children)) {
-      const children: Node[] = [];
-      tree.children.forEach((c: Node) => {
-        if (
-          c.type === 'element' &&
-          c.tagName === 'p' &&
-          Array.isArray(c.children)
-        ) {
-          let pool: Node[] = [];
-          c.children.forEach((cc: Node, i) => {
-            if (
-              cc.type === 'element' &&
-              cc.tagName === 'img' &&
-              Array.isArray(c.children)
-            ) {
-              if (
-                c.children[i - 1] &&
-                c.children[i - 1].type === 'element' &&
-                c.children[i - 1].tagName === 'br'
-              ) {
-                children.push({ ...c, children: pool }); // <br> が残るが他の transformer で除去している
-                pool = [];
-                pool.push(cc);
-              } else {
-                pool.push(cc);
-              }
-            }else if (
-              cc.type === 'element' &&
-              cc.tagName === 'br' &&
-              Array.isArray(c.children)
-            ) {
-              if (
-                c.children[i - 1] &&
-                c.children[i - 1].type === 'element' &&
-                c.children[i - 1].tagName === 'img'
-              ) {
-                children.push({ ...c, children: pool }); // <br> が残るが他の transformer で除去している
-                pool = [];
-                pool.push(cc);
-              } else {
-                pool.push(cc);
-              }
-            } else {
-              pool.push(cc);
-            }
-          });
-          children.push({ ...c, children: pool });
-        } else {
-          children.push(c);
-        }
-      });
-      tree.children = children;
-    }
-  };
-}
-
-export function removeBlankTransformer(): Transformer {
-  return function transformer(tree: Node): void {
-    if (tree.type === 'root' && Array.isArray(tree.children)) {
-      tree.children.forEach((c: Node) => {
-        if (
-          c.type === 'element' &&
-          c.tagName === 'p' &&
-          Array.isArray(c.children)
-        ) {
-          const top = c.children.findIndex((v: Node) => {
-            if (v.type === 'element' && v.tagName === 'br') {
-              return false;
-            }
-            return true;
-          });
-          let bottom = c.children.length - 1;
-          while (
-            bottom >= 0 &&
-            c.children[bottom].type === 'element' &&
-            c.children[bottom].tagName === 'br'
-          ) {
-            bottom--;
-          }
-          c.children = c.children.slice(
-            top >= 0 ? top : 0,
-            bottom >= 0 ? bottom + 1 : c.children.length - 1
-          );
-        }
-      });
-      tree.children = tree.children.filter((c: Node) => {
-        return (
-          Array.isArray(c.children) &&
-          c.children.length > 0 &&
-          !(c.type === 'element' && c.tagName === 'br')
-        );
-      });
-    }
-  };
-}
 
 const fenceToFrontMatterRegExp = /^---\n(.+)\n---\n*$/s;
 export function firstParagraphAsCodeDockTransformer(): Transformer {
@@ -195,8 +60,7 @@ export function firstParagraphAsCodeDockTransformer(): Transformer {
 const htmlToMarkdownProcessor = unified()
   .use(rehypeParse, { fragment: true })
   .use(firstParagraphAsCodeDockTransformer)
-  .use(splitParagraphTransformer)
-  .use(removeBlankTransformer)
+  .use(splitParagraph)
   .use(rehypeSanitize, { allowComments: true })
   .use(rehype2Remark, {
     //newlines: false,
@@ -325,7 +189,7 @@ export async function htmlToMarkdown(html: string): Promise<string> {
   });
   // console.log(md);
   // return md;
-   // console.log(await qrcodeToDataUrl(md));
+  // console.log(await qrcodeToDataUrl(md));
   return await qrcodeToDataUrl(md);
 }
 
