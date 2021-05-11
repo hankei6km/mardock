@@ -461,7 +461,7 @@ const Layout = ({
     bottomSection,
     classes: inClasses
   });
-  const { siteNameDecorated, siteIcon } = useContext(SiteContext);
+  const { siteNameDecorated, siteIcon,siteCopyright } = useContext(SiteContext);
   const [navOpen, setNavOpen] = useState(false);
   const maxWidth = 'lg';
   const theme = useTheme();
@@ -659,7 +659,7 @@ const Layout = ({
       </Box>
       <footer className={classes.footer}>
         <Container maxWidth={maxWidth} disableGutters>
-          <Typography variant="body1">Copyright (c) 2021 hankei6km</Typography>
+          <Typography variant="body1">{siteCopyright}</Typography>
           <IconButton
             aria-label="link to GitHub account"
             component={Link}
