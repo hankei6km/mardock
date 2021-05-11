@@ -41,9 +41,10 @@ export async function writeFeed(
     });
     w.write(f);
     w.close();
+    ret = `${siteServerSideConfig.baseUrl}${ret}`;
   } catch (err) {
     console.error(err);
     ret = '';
   }
-  return `${siteServerSideConfig.baseUrl}${ret}`;
+  return ret;
 }
