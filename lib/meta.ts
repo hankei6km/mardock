@@ -1,6 +1,7 @@
 import { join } from 'path';
 import matter from 'gray-matter';
-import { PageData, MetaData } from '../types/pageTypes';
+import { PageData, MetaData, DeckData } from '../types/pageTypes';
+import siteServerSideConfig from '../src/site.server-side-config';
 import { getSlidePublicImagePath, getSlidePublicImageFilename } from './slide';
 import { ApiNameArticle } from '../types/apiName';
 
@@ -8,26 +9,17 @@ import { ApiNameArticle } from '../types/apiName';
 const metaDeckKeys = ['title', 'description', 'url', 'image'];
 type metaPageOpts = { apiName: ApiNameArticle } & Pick<
   PageData,
-  'id' | 'title' | 'articleTitle' | 'mainVisual' | 'description' | 'deck'
->;
-
-function baseUrl(): string {
-  const [githubUser, githubRepo] = process.env.GITHUB_REPOSITORY
-    ? process.env.GITHUB_REPOSITORY.split('/', 2)
-    : ['', ''];
-  if (githubUser) {
-    const baseUrl = process.env.STAGING_DIR
-      ? join(githubRepo, process.env.STAGING_DIR)
-      : githubRepo;
-    return `https://${githubUser}.github.io/${baseUrl}`;
-  }
-  return '';
-}
+  'id' | 'updated' | 'title' | 'articleTitle' | 'mainVisual' | 'description'
+> & { deck: DeckData };
 
 export type MetaCommonResult = {
   errMessage: string;
   data: { [key: string]: any };
 };
+
+export function getBaseUrl(): string {
+  return siteServerSideConfig.baseUrl;
+}
 
 export function metaOpen(source: string): MetaCommonResult {
   const ret: MetaCommonResult = {
@@ -60,19 +52,22 @@ export function metaDeck(source: string): MetaCommonResult {
 }
 
 export function metaPage(opts: metaPageOpts): MetaData {
-  let image = opts.deck.slide.meta.image || '';
+  let image = opts.deck.meta.image || '';
   if (image === '') {
     image = opts.mainVisual.url;
     if (opts.apiName === 'deck') {
       image =
-        baseUrl() +
+        getBaseUrl() +
         getSlidePublicImagePath(getSlidePublicImageFilename(opts.id));
     }
   }
+  let link = getBaseUrl() + join('/', opts.apiName, opts.id); // TODO: getBaseUrl が '' のときの対応
   return {
-    title: opts.deck.slide.meta.title || opts.articleTitle,
+    title: opts.deck.meta.title || opts.articleTitle,
+    link,
+    updated: opts.updated,
     keyword: [],
     image,
-    description: opts.deck.slide.meta.description || opts.description
+    description: opts.deck.meta.description || opts.description
   };
 }

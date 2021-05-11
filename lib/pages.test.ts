@@ -18,6 +18,12 @@ beforeEach(() => {
   fetchMock.resetMocks();
 });
 
+// テスト別に切り替えるのは難しいか.
+jest.mock('../utils/baseUrl', () => ({
+  ...jest.requireActual('../utils/baseUrl'),
+  getBaseUrl: () => 'https://hankei6km.github.io/mardock'
+}));
+
 describe('getSortedPagesData()', () => {
   it('should returns contents array with out displayOnIndexPage filed', async () => {
     fetchMock.mockResponseOnce(JSON.stringify(mockDataPagesList));
@@ -142,11 +148,14 @@ describe('getPagesData()', () => {
       },
       meta: {
         title: 'Home',
+        link: 'https://hankei6km.github.io/mardock/pages/home',
+        updated: '2020-12-27T04:04:30.107Z',
         keyword: [],
         description: 'description of draftlint',
         image:
           'https://images.microcms-assets.io/assets/cc433627f35c4232b7cb97e0376507a7/eb84db7f1a7a4409bd20ffc27abe60e4/mardock-temp-image.png'
-      }
+      },
+      feedUrl: 'https://hankei6km.github.io/mardock/assets/feeds/deck.xml'
     });
   });
   it('should returns pageData contained deckData', async () => {
@@ -176,11 +185,14 @@ describe('getPagesData()', () => {
       },
       meta: {
         title: 'slide1',
+        link: 'https://hankei6km.github.io/mardock/pages/slide1',
+        updated: '2020-12-26T15:29:14.476Z',
         keyword: [],
         description: '',
         image:
           'https://images.microcms-assets.io/assets/cc433627f35c4232b7cb97e0376507a7/eb84db7f1a7a4409bd20ffc27abe60e4/mardock-temp-image.png'
-      }
+      },
+      feedUrl: 'https://hankei6km.github.io/mardock/assets/feeds/deck.xml'
     });
     expect(res.deck.slide.items[0].html).toContain('test1');
   });

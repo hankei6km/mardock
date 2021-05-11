@@ -130,7 +130,13 @@ export const getStaticProps: GetStaticProps = async (context) => {
   const q: GetQuery = {};
   q.limit = itemsPerPage;
   const items = await getSortedIndexData('deck', q);
-  return { props: { pageData, intro, items } };
+  return {
+    props: {
+      pageData,
+      intro,
+      items
+    }
+  };
 };
 
 export default IndexPage;

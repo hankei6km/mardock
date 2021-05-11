@@ -10,6 +10,9 @@ import { getPagesData, getSortedIndexData } from '../../lib/pages';
 import NavPagination from '../../components/NavPagination';
 import { GetQuery } from '../../types/client/queryTypes';
 import { pageCountFromTotalCount } from '../../utils/pagination';
+import { writeFeed } from '../../lib/feed';
+import siteConfig from '../../src/site.config';
+import siteServerSideConfig from '../../src/site.server-side-config';
 
 const itemsPerPage = 12;
 const pagePath: string[] = [];
@@ -23,9 +26,10 @@ const useStyles = makeStyles((theme) => ({
 type Props = {
   pageData: PageData;
   items: IndexList;
+  feedUrl: string;
 };
 
-const DeckPage = ({ pageData, items }: Props) => {
+const DeckPage = ({ pageData, items, feedUrl }: Props) => {
   const classes = useStyles();
   if (pageData === undefined || !pageData.title) {
     return <ErrorPage statusCode={404} />;
@@ -33,17 +37,9 @@ const DeckPage = ({ pageData, items }: Props) => {
   return (
     <Layout
       apiName={'pages'}
-      // topSection={
-      //   <NavCategory
-      //     all
-      //     categoryPath="/deck/category"
-      //     allCategory={pageData.allCategory}
-      //     category={pageData.category}
-      //     classes={classes}
-      //   />
-      // }
       {...pageData}
       notification={pageData.notification}
+      feedUrl={feedUrl}
     >
       <section>
         <Box className={classes['ListDeck-outer']}>
@@ -87,13 +83,25 @@ export const getStaticProps: GetStaticProps = async (context) => {
     q.filters = `category[contains]${curCategory}`;
   }
   const items = await getSortedIndexData('deck', q);
+  // プレビューで除外
+  const feedUrl = await writeFeed(
+    {
+      id: siteServerSideConfig.baseUrl,
+      link: siteServerSideConfig.baseUrl,
+      title: siteConfig.siteName,
+      copyright: siteConfig.siteFeedTitle
+    },
+    items.contents.map(({ meta }) => meta),
+    'deck'
+  );
   return {
     props: {
       pageData: {
         ...pageData,
         pageCount: pageCountFromTotalCount(items.totalCount, itemsPerPage)
       },
-      items
+      items,
+      feedUrl
     }
   };
 };

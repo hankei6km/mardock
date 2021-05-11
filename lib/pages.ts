@@ -125,6 +125,7 @@ export async function getSortedIndexData(
           }));
           ret.deck = d;
         }
+        ret.meta = metaPage({ apiName, ...ret });
         return ret;
       };
     });
@@ -318,14 +319,15 @@ export async function getPagesData(
       mainVisual: {
         ...mainVisual
       },
-      description: res.description || ''
+      description: res.description || '',
+      feedUrl: siteServerSideConfig.globalFeedUrl
     };
     ret.deck.slide = await slideDeckSlide(res.id, deckSlideSource);
     ret.deck.overview = await slideDeckOverview(
       res.id,
       deckOverviewSource || deckSlideSource
     );
-    ret.meta = metaPage({ apiName, ...ret });
+    ret.meta = metaPage({ apiName, ...ret, deck: ret.deck.slide });
     if (notification) {
       ret.notification = notification;
     }

@@ -442,8 +442,16 @@ const Layout = ({
   articleTitle,
   html: html = '',
   notification,
-  meta: pageMeta = { title: '', keyword: [], image: '', description: '' }, // blankMetaData は使わない
+  meta: pageMeta = {
+    title: '',
+    link: '',
+    updated: '',
+    keyword: [],
+    image: '',
+    description: ''
+  }, // blankMetaData は使わない
   headerHideOptions = {},
+  feedUrl,
   classes: inClasses
 }: Props) => {
   const classes = useStyles({
@@ -454,7 +462,12 @@ const Layout = ({
     bottomSection,
     classes: inClasses
   });
-  const { siteNameDecorated, siteIcon } = useContext(SiteContext);
+  const {
+    siteNameDecorated,
+    siteIcon,
+    siteFeedTitle,
+    siteCopyright
+  } = useContext(SiteContext);
   const [navOpen, setNavOpen] = useState(false);
   const maxWidth = 'lg';
   const theme = useTheme();
@@ -515,6 +528,14 @@ const Layout = ({
         {ogImageUrl && <meta property="og:image" content={ogImageUrl} />}
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="viewport" content="initial-scale=1.0, width=device-width" />
+        {feedUrl && (
+          <link
+            rel="alternate"
+            type="application/rss+xml"
+            title={siteFeedTitle}
+            href={feedUrl}
+          />
+        )}
       </Head>
       <HideOnScroll
         alwaysShowing={alwaysShowing}
@@ -652,7 +673,7 @@ const Layout = ({
       </Box>
       <footer className={classes.footer}>
         <Container maxWidth={maxWidth} disableGutters>
-          <Typography variant="body1">Copyright (c) 2021 hankei6km</Typography>
+          <Typography variant="body1">{siteCopyright}</Typography>
           <IconButton
             aria-label="link to GitHub account"
             component={Link}
