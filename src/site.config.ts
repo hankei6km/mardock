@@ -7,6 +7,7 @@ export type ConfigImageSource = {
 type SiteConfig = {
   siteName: string;
   siteNameDecorated: { label: string; strong?: boolean }[];
+  siteFeedTitle: string; // url は site.server-side-config.ts
   // LICENSE とは別に定義する.
   siteCopyright: string;
   siteIcon: ConfigImageSource;
@@ -26,6 +27,7 @@ const siteConfig: SiteConfig = {
     { label: 'doc', strong: true },
     { label: 'k' }
   ],
+  siteFeedTitle: 'mardock | static slide site',
   siteCopyright: 'Copyright (c) 2021 hankei6km',
   siteIcon: {
     url:

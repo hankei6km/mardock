@@ -1,6 +1,11 @@
 import * as fs from 'fs';
 import { writeFeed } from '../lib/feed';
 
+jest.mock('../utils/baseUrl', () => ({
+  ...jest.requireActual('../utils/baseUrl'),
+  getBaseUrl: () => 'https://hankei6km.github.io/mardock'
+}));
+
 jest.mock('fs', () => ({
   ...jest.requireActual('fs'),
   createWriteStream: jest
@@ -61,7 +66,7 @@ describe('writeFeed()', () => {
         [...baseMock],
         'deck'
       )
-    ).toEqual('/assets/feeds/deck.xml');
+    ).toEqual('https://hankei6km.github.io/mardock/assets/feeds/deck.xml');
     expect(createWriteStream).toHaveBeenCalledWith(
       'public/assets/feeds/deck.xml',
       {

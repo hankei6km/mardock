@@ -319,7 +319,8 @@ export async function getPagesData(
       mainVisual: {
         ...mainVisual
       },
-      description: res.description || ''
+      description: res.description || '',
+      feedUrl: siteServerSideConfig.globalFeedUrl
     };
     ret.deck.slide = await slideDeckSlide(res.id, deckSlideSource);
     ret.deck.overview = await slideDeckOverview(

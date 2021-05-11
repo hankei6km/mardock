@@ -26,9 +26,10 @@ const useStyles = makeStyles((theme) => ({
 type Props = {
   pageData: PageData;
   items: IndexList;
+  feedUrl: string;
 };
 
-const DeckPage = ({ pageData, items }: Props) => {
+const DeckPage = ({ pageData, items, feedUrl }: Props) => {
   const classes = useStyles();
   if (pageData === undefined || !pageData.title) {
     return <ErrorPage statusCode={404} />;
@@ -36,17 +37,9 @@ const DeckPage = ({ pageData, items }: Props) => {
   return (
     <Layout
       apiName={'pages'}
-      // topSection={
-      //   <NavCategory
-      //     all
-      //     categoryPath="/deck/category"
-      //     allCategory={pageData.allCategory}
-      //     category={pageData.category}
-      //     classes={classes}
-      //   />
-      // }
       {...pageData}
       notification={pageData.notification}
+      feedUrl={feedUrl}
     >
       <section>
         <Box className={classes['ListDeck-outer']}>
@@ -90,19 +83,16 @@ export const getStaticProps: GetStaticProps = async (context) => {
     q.filters = `category[contains]${curCategory}`;
   }
   const items = await getSortedIndexData('deck', q);
-  //  siteのデータは config から
   // プレビューで除外
-  console.log(
-    await writeFeed(
-      {
-        id: siteServerSideConfig.baseUrl,
-        link: siteServerSideConfig.baseUrl,
-        title: siteConfig.siteName,
-        copyright: siteConfig.siteCopyright
-      },
-      items.contents.map(({ meta }) => meta),
-      'deck'
-    )
+  const feedUrl = await writeFeed(
+    {
+      id: siteServerSideConfig.baseUrl,
+      link: siteServerSideConfig.baseUrl,
+      title: siteConfig.siteName,
+      copyright: siteConfig.siteFeedTitle
+    },
+    items.contents.map(({ meta }) => meta),
+    'deck'
   );
   return {
     props: {
@@ -110,7 +100,8 @@ export const getStaticProps: GetStaticProps = async (context) => {
         ...pageData,
         pageCount: pageCountFromTotalCount(items.totalCount, itemsPerPage)
       },
-      items
+      items,
+      feedUrl
     }
   };
 };

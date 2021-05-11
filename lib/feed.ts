@@ -45,5 +45,5 @@ export async function writeFeed(
     console.error(err);
     ret = '';
   }
-  return ret;
+  return `${siteServerSideConfig.baseUrl}${ret}`;
 }

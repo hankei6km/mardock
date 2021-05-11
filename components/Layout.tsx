@@ -451,6 +451,7 @@ const Layout = ({
     description: ''
   }, // blankMetaData は使わない
   headerHideOptions = {},
+  feedUrl,
   classes: inClasses
 }: Props) => {
   const classes = useStyles({
@@ -461,7 +462,12 @@ const Layout = ({
     bottomSection,
     classes: inClasses
   });
-  const { siteNameDecorated, siteIcon,siteCopyright } = useContext(SiteContext);
+  const {
+    siteNameDecorated,
+    siteIcon,
+    siteFeedTitle,
+    siteCopyright
+  } = useContext(SiteContext);
   const [navOpen, setNavOpen] = useState(false);
   const maxWidth = 'lg';
   const theme = useTheme();
@@ -522,6 +528,14 @@ const Layout = ({
         {ogImageUrl && <meta property="og:image" content={ogImageUrl} />}
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="viewport" content="initial-scale=1.0, width=device-width" />
+        {feedUrl && (
+          <link
+            rel="alternate"
+            type="application/rss+xml"
+            title={siteFeedTitle}
+            href={feedUrl}
+          />
+        )}
       </Head>
       <HideOnScroll
         alwaysShowing={alwaysShowing}

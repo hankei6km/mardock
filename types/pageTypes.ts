@@ -78,6 +78,7 @@ export type PageData = {
   };
   description: string;
   meta: MetaData;
+  feedUrl: string;
 };
 
 export type SlideData = {
@@ -98,6 +99,7 @@ export type IndexData = Omit<
   | 'htmlToc'
   | 'html'
   | 'deck'
+  | 'feedUrl'
 > & { deck: DeckData };
 export type IndexList = ContentList<IndexData>;
 
@@ -146,7 +148,8 @@ export const blankPageData = (): PageData => ({
   },
   mainVisual: { url: '', width: 0, height: 0 },
   description: '',
-  meta: blankMetaData()
+  meta: blankMetaData(),
+  feedUrl: ''
 });
 
 export const blankSlideData = (): SlideData => ({

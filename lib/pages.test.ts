@@ -154,7 +154,8 @@ describe('getPagesData()', () => {
         description: 'description of draftlint',
         image:
           'https://images.microcms-assets.io/assets/cc433627f35c4232b7cb97e0376507a7/eb84db7f1a7a4409bd20ffc27abe60e4/mardock-temp-image.png'
-      }
+      },
+      feedUrl: 'https://hankei6km.github.io/mardock/assets/feeds/deck.xml'
     });
   });
   it('should returns pageData contained deckData', async () => {
@@ -190,7 +191,8 @@ describe('getPagesData()', () => {
         description: '',
         image:
           'https://images.microcms-assets.io/assets/cc433627f35c4232b7cb97e0376507a7/eb84db7f1a7a4409bd20ffc27abe60e4/mardock-temp-image.png'
-      }
+      },
+      feedUrl: 'https://hankei6km.github.io/mardock/assets/feeds/deck.xml'
     });
     expect(res.deck.slide.items[0].html).toContain('test1');
   });

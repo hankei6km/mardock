@@ -6,6 +6,7 @@ import draftlintConfig from './$draftlint-config.json';
 // ブラウザでは使わない or 見せたくない項目(セキュリティ的にの他にサイズ的な等
 type SiteServerSideConfig = {
   baseUrl: string;
+  globalFeedUrl: string;
   allIdsLimit: number;
   // ビルド時のファイルシステムのパス.
   //  プロジェクトルート起点の相対パスで指定.
@@ -46,6 +47,7 @@ type SiteServerSideConfig = {
 
 const siteServerSideConfig: SiteServerSideConfig = {
   baseUrl: getBaseUrl(),
+  globalFeedUrl: `${getBaseUrl()}/assets/feeds/deck.xml`,
   // id が 1件で 40byte  と想定、 content-length が 5M 程度とのことなので、1000*1000*5 / 40 で余裕を見て決めた値。
   allIdsLimit: 120000,
   assets: {
