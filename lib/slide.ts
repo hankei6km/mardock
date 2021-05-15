@@ -1,8 +1,9 @@
-import { createWriteStream } from 'fs';
+import { createWriteStream, copyFileSync, mkdirSync, writeFileSync } from 'fs';
 // import { access, constants } from 'fs/promises';
 import { spawn } from 'child_process';
 import { join, format } from 'path';
 import { Writable, PassThrough } from 'stream';
+import { createHash } from 'crypto';
 import Marp from '@marp-team/marp-core';
 import cheerio from 'cheerio';
 import siteServerSideConfig from '../src/site.server-side-config';
@@ -31,8 +32,37 @@ const { Element } = require('@marp-team/marpit');
 // TODO: 絶対パスで取得
 const basePath = '.';
 export const slidePublicImageExt = 'png';
-export function getSlideImagePath(name: string): string {
-  return join(basePath, siteServerSideConfig.assets.imagesPath, name);
+export const slidePublicPdfExt = 'pdf';
+export const slidePublicPptxExt = 'pptx';
+export function getSlideCachePath(id: string, cacheKey: string): string {
+  return join(basePath, siteServerSideConfig.caches.deck, id, cacheKey);
+}
+export function getSlideCacheFilePath(
+  id: string,
+  cacheKey: string,
+  name: string
+): string {
+  return join(getSlideCachePath(id, cacheKey), name);
+}
+export function getSlideAssetsPath(id: string, cacheKey: string): string {
+  return join(basePath, siteServerSideConfig.assets.deck, id, cacheKey);
+}
+export function getSlideAssetsFilePath(
+  id: string,
+  cacheKey: string,
+  name: string
+): string {
+  return join(getSlideAssetsPath(id, cacheKey), name);
+}
+export function getSlidePublicPath(id: string, cacheKey: string): string {
+  return join(siteServerSideConfig.public.deck, id, cacheKey);
+}
+export function getSlidePublicFilePath(
+  id: string,
+  cacheKey: string,
+  name: string
+): string {
+  return join(getSlidePublicPath(id, cacheKey), name);
 }
 export function getSlidePublicImageFilename(id: string): string {
   return format({
@@ -40,20 +70,42 @@ export function getSlidePublicImageFilename(id: string): string {
     ext: `.${slidePublicImageExt}`
   });
 }
-export function getSlidePublicImagePath(name: string): string {
-  return join(siteServerSideConfig.public.imagesPath, name);
+export function getSlidePublicPdfFilename(id: string): string {
+  return format({
+    name: id,
+    ext: `.${slidePublicPdfExt}`
+  });
 }
-export function getSlidePdfPath(name: string): string {
-  return join(basePath, siteServerSideConfig.assets.pdfPath, name);
+export function getSlidePublicPptxFilename(id: string): string {
+  return format({
+    name: id,
+    ext: `.${slidePublicPptxExt}`
+  });
 }
-export function getSlidePublicPdfPath(name: string): string {
-  return join(siteServerSideConfig.public.pdfPath, name);
-}
-export function getSlidePptxPath(name: string): string {
-  return join(basePath, siteServerSideConfig.assets.pptxPath, name);
-}
-export function getSlidePublicPptxPath(name: string): string {
-  return join(siteServerSideConfig.public.pptxPath, name);
+
+export function slideCacheSetup(id: string, cacheKey: string): boolean {
+  try {
+    mkdirSync(getSlideAssetsPath(id, ''));
+  } catch (_err) {}
+  try {
+    mkdirSync(getSlideAssetsPath(id, cacheKey));
+  } catch (_err) {}
+
+  const cachePath = getSlideCachePath(id, '');
+  try {
+    mkdirSync(cachePath);
+  } catch (_err) {}
+  let path = getSlideCachePath(id, cacheKey);
+  try {
+    mkdirSync(path);
+    writeFileSync(join(cachePath, 'latest'), cacheKey);
+  } catch (err) {
+    // 作成できなかったときは既に存在していると仮定.
+    // TODO: エラーの内容チェック.
+    path = '';
+  }
+  console.log(`Cache path: ${id} ${path === ''}`);
+  return path !== '';
 }
 
 // console.log(basePath);
@@ -81,14 +133,36 @@ export function slideHtml(markdown: string, w: Writable): Promise<number> {
   });
 }
 
-export function slideVariantFile(
+export function slideCopyCacheToAssets(
+  id: string, // コンテンツの id
+  cacheKey: string, // 通常は HTML 化したときの hash
+  fileName: string // 拡張子きのファイル名(通常は id+拡張子)
+) {
+  const srcPath = getSlideCacheFilePath(id, cacheKey, fileName);
+  const dstPath = getSlideAssetsFilePath(id, cacheKey, fileName);
+  try {
+    copyFileSync(srcPath, dstPath);
+  } catch (err) {
+    console.error(err);
+  }
+}
+
+export async function slideVariantFile(
+  id: string, // コンテンツの id
+  cacheKey: string, // 通常は HTML 化したときの hash
   markdown: string,
-  w: Writable,
+  fileName: string, // 拡張子きのファイル名(通常は id+拡張子)
   formatOpts: string[] = ['--image', slidePublicImageExt, '--html'],
   options: { encoding?: string } = { encoding: 'binary' }
 ): Promise<number> {
-  // とりあえず。
-  return new Promise((resolve) => {
+  const w = createWriteStream(getSlideCacheFilePath(id, cacheKey, fileName), {
+    flags: 'wx',
+    encoding: 'binary'
+  });
+  w.on('error', () => {
+    // 'wx' で上書き失敗したときのエラー
+  });
+  const ret: number = await new Promise((resolve) => {
     const marpP = spawn(marpPath, formatOpts);
     if (marpP && marpP.stdout) {
       // marpP.stdout.setEncoding('base64');
@@ -103,107 +177,142 @@ export function slideVariantFile(
       marpP.stdin.end();
     }
   });
+  w.close();
+  slideCopyCacheToAssets(id, cacheKey, fileName);
+  return ret;
 }
 
 export async function slideImage(
+  id: string,
+  cacheKey: string,
   markdown: string,
-  w: Writable,
+  fileName: string,
   options: { encoding?: string } = { encoding: 'binary' }
 ): Promise<number> {
   return await slideVariantFile(
+    id,
+    cacheKey,
     markdown,
-    w,
+    fileName,
     ['--image', slidePublicImageExt, '--html'],
     options
   );
 }
 
 export async function slidePdf(
+  id: string,
+  cacheKey: string,
   markdown: string,
-  w: Writable,
+  fileName: string,
   options: { encoding?: string } = { encoding: 'binary' }
 ): Promise<number> {
-  // とりあえず。
-  return await slideVariantFile(markdown, w, ['--pdf', '--html'], options);
+  return await slideVariantFile(
+    id,
+    cacheKey,
+    markdown,
+    fileName,
+    ['--pdf', '--html'],
+    options
+  );
 }
 
 export async function slidePptx(
+  id: string,
+  cacheKey: string,
   markdown: string,
-  w: Writable,
+  fileName: string,
   options: { encoding?: string } = { encoding: 'binary' }
 ): Promise<number> {
-  // とりあえず。
-  return await slideVariantFile(markdown, w, ['--pptx', '--html'], options);
-}
-
-export async function slideWriteHtmlTo(
-  markdown: string,
-  slidePathHtml: string
-): Promise<{}> {
-  const w = createWriteStream(join('public', slidePathHtml));
-  await slideHtml(markdown, w);
-  // TOC を返すようにする予定(たぶん).
-  return {};
+  return await slideVariantFile(
+    id,
+    cacheKey,
+    markdown,
+    fileName,
+    ['--pptx', '--html'],
+    options
+  );
 }
 
 export async function writeSlideTitleImage(
-  source: string,
-  id: string
+  needWrite: boolean,
+  id: string,
+  cacheKey: string,
+  source: string
 ): Promise<PagesImage> {
   const ret: PagesImage = {
-    url: getSlidePublicImagePath(getSlidePublicImageFilename(id)),
+    url: getSlidePublicFilePath(id, cacheKey, getSlidePublicImageFilename(id)),
     width: 1280,
     height: 720
   };
-  const p = getSlideImagePath(getSlidePublicImageFilename(id));
-  const w = createWriteStream(p, { flags: 'wx', encoding: 'binary' });
-  w.on('error', () => {
-    // 'wx' で上書き失敗したときのエラー
-  });
-  const res = await slideImage(source, w).catch((err) => console.log(err));
-  if (res !== 0) {
-    // コマンド実行が失敗したのでテンポラリ画像(chrome が無い環境だと失敗する)
-    ret.url = siteServerSideConfig.slide.fallbackImage.url;
-    ret.width = siteServerSideConfig.slide.fallbackImage.width;
-    ret.height = siteServerSideConfig.slide.fallbackImage.height;
+  // const p = getSlideImagePath(getSlidePublicImageFilename(id));
+  if (needWrite) {
+    const res = await slideImage(
+      id,
+      cacheKey,
+      source,
+      getSlidePublicImageFilename(id)
+    ).catch((err) => console.log(err));
+    if (res !== 0) {
+      // コマンド実行が失敗したのでテンポラリ画像(chrome が無い環境だと失敗する)
+      ret.url = siteServerSideConfig.slide.fallbackImage.url;
+      ret.width = siteServerSideConfig.slide.fallbackImage.width;
+      ret.height = siteServerSideConfig.slide.fallbackImage.height;
+    }
+  } else {
+    slideCopyCacheToAssets(id, cacheKey, getSlidePublicImageFilename(id));
   }
-  w.close();
   return ret;
 }
 
 export async function writeSlidePdf(
-  source: string,
-  id: string
+  needWrite: boolean,
+  id: string,
+  cacheKey: string,
+  source: string
 ): Promise<string> {
-  let ret = getSlidePublicPdfPath(`${id}.pdf`);
-  const p = getSlidePdfPath(`${id}.pdf`);
-  const w = createWriteStream(p, { flags: 'wx', encoding: 'binary' });
-  w.on('error', () => {
-    // 'wx' で上書き失敗したときのエラー
-  });
-  const res = await slidePdf(source, w).catch(() => {});
-  if (res !== 0) {
-    ret = '';
+  let ret = getSlidePublicFilePath(id, cacheKey, getSlidePublicPdfFilename(id));
+  // const p = getSlidePdfPath(getSlidePublicPdfFilename(id));
+  if (needWrite) {
+    const res = await slidePdf(
+      id,
+      cacheKey,
+      source,
+      getSlidePublicPdfFilename(id)
+    ).catch(() => {});
+    if (res !== 0) {
+      ret = '';
+    }
+  } else {
+    slideCopyCacheToAssets(id, cacheKey, getSlidePublicPdfFilename(id));
   }
-  w.close();
   return ret;
 }
 
 export async function writeSlidePptx(
-  source: string,
-  id: string
+  needWrite: boolean,
+  id: string,
+  cacheKey: string,
+  source: string
 ): Promise<string> {
-  let ret = getSlidePublicPptxPath(`${id}.pptx`);
-  const p = getSlidePptxPath(`${id}.pptx`);
-  const w = createWriteStream(p, { flags: 'wx', encoding: 'binary' });
-  w.on('error', () => {
-    // 'wx' で上書き失敗したときのエラー
-  });
-  const res = await slidePptx(source, w).catch(() => {});
-  if (res !== 0) {
-    ret = '';
+  let ret = getSlidePublicFilePath(
+    id,
+    cacheKey,
+    getSlidePublicPptxFilename(id)
+  );
+  // const p = getSlidePptxPath(getSlidePublicPptxFilename(id));
+  if (needWrite) {
+    const res = await slidePptx(
+      id,
+      cacheKey,
+      source,
+      getSlidePublicPptxFilename(id)
+    ).catch(() => {});
+    if (res !== 0) {
+      ret = '';
+    }
+  } else {
+    slideCopyCacheToAssets(id, cacheKey, getSlidePublicPdfFilename(id));
   }
-  w.close();
   return ret;
 }
 
@@ -263,7 +372,8 @@ export async function _slideDeck(
         html: v
       })),
       source,
-      meta: {}
+      meta: {},
+      hash: ''
     };
   }
   return blankDeckData();
@@ -289,6 +399,8 @@ export async function slideDeckSlide(
   });
   const ret = await _slideDeck(marp, containerId, source);
   ret.meta = metaDeck(source).data; // ここではエラーは無視する(プレビューモードで検証する)
+  const hash = createHash('sha256');
+  ret.hash = hash.update(JSON.stringify(ret), 'utf8').digest().toString('hex');
   return ret;
 }
 export async function slideDeckIndex(

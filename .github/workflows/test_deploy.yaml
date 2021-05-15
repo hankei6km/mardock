@@ -52,6 +52,19 @@ jobs:
         path: ${{ github.workspace }}/.next/cache
         key: ${{ runner.os }}-nextjs-staging-${{ hashFiles('**/yarn.lock') }}
 
+    # mardock の build キャッシュ.
+    # key は月単位で更新される(月が変わったら破棄する)
+    # 強制的に破棄する場合は environment の secrets.BUILD_CACHE_KEY にランダムな文字列を設定.
+    - name: Cache mardock build key
+      run: 'echo DEVELOP_CACHE_MOTHLY_KEY=$(date "+%U") >> $GITHUB_ENV'
+    - name: Cache mardock build
+      uses: actions/cache@v2
+      env:
+        BUILD_CACHE_KEY: ${{ secrets.BUILD_CACHE_KEY }}
+      with:
+        path: ${{ github.workspace }}/.mardock/cache
+        key: ${{ runner.os }}-mardock-cache-${{ env.BUILD_CACHE_KEY }}-${{ env.DEVELOP_CACHE_MOTHLY_KEY }} 
+
     - name: Install modules
       run: yarn install
 

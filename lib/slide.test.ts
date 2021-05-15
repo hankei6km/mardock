@@ -11,7 +11,10 @@ jest.mock('fs', () => ({
   ...jest.requireActual('fs'),
   createWriteStream: jest
     .fn()
-    .mockImplementation(jest.requireActual('fs').createWriteStream)
+    .mockImplementation(jest.requireActual('fs').createWriteStream),
+  copyFileSync: jest
+    .fn()
+    .mockImplementation(jest.requireActual('fs').copyFileSync)
 }));
 jest.mock('child_process', () => {
   return {
@@ -29,6 +32,9 @@ afterEach(() => {
   jest
     .spyOn(fs, 'createWriteStream')
     .mockImplementation(jest.requireActual('fs').createWriteStream);
+  jest
+    .spyOn(fs, 'copyFileSync')
+    .mockImplementation(jest.requireActual('fs').copyFileSync);
   jest
     .spyOn(child_process, 'spawn')
     .mockImplementation(jest.requireActual('child_process').spawn);
@@ -66,6 +72,7 @@ describe('writeSlideTitleImage()', () => {
           close
         } as unknown) as fs.WriteStream;
       });
+    const copyFileSync = jest.spyOn(fs, 'copyFileSync').mockImplementation();
     const setEncoding = jest.fn();
     const execFile = jest
       .spyOn(child_process, 'spawn')
@@ -89,12 +96,14 @@ describe('writeSlideTitleImage()', () => {
         } as unknown) as child_process.ChildProcess;
       });
     const res = await writeSlideTitleImage(
-      '---\ntitle: slide1\n---\n#test1 \n\n---\n- item1\n- item2',
-      'test-deck'
+      true,
+      'test-deck',
+      'test-hash',
+      '---\ntitle: slide1\n---\n#test1 \n\n---\n- item1\n- item2'
     );
     // expect(s.mock.calls).toEqual(['public/assets/images/test-deck.png']);
     expect(createWriteStream).toHaveBeenCalledWith(
-      'public/assets/images/test-deck.png',
+      '.mardock/cache/deck/test-deck/test-hash/test-deck.png',
       {
         flags: 'wx',
         encoding: 'binary'
@@ -105,8 +114,12 @@ describe('writeSlideTitleImage()', () => {
     expect(setEncoding.mock.calls[0][0]).toEqual('binary');
     expect(write.mock.calls[0][0].toString('utf8')).toEqual('ok');
     expect(close).toHaveBeenCalledTimes(1);
+    expect(copyFileSync.mock.calls[0]).toEqual([
+      '.mardock/cache/deck/test-deck/test-hash/test-deck.png',
+      'public/assets/deck/test-deck/test-hash/test-deck.png'
+    ]);
     expect(res).toEqual({
-      url: '/assets/images/test-deck.png',
+      url: '/assets/deck/test-deck/test-hash/test-deck.png',
       width: 1280,
       height: 720
     });

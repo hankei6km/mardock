@@ -33,7 +33,8 @@ import { getAllPagesIds, getPagesData } from '../../lib/pages';
 import {
   writeSlideTitleImage,
   writeSlidePdf,
-  writeSlidePptx
+  writeSlidePptx,
+  slideCacheSetup
 } from '../../lib/slide';
 import NavCategory from '../../components/NavCategory';
 import ButtonSelect from '../../components/ButtonSelect';
@@ -535,22 +536,35 @@ export const getStaticPaths: GetStaticPaths = async () => {
 
 export const getStaticProps: GetStaticProps = async (context) => {
   const { html, ...others } = await getPagesData('deck', context);
-  // const items = await getSortedIndexData('deck', {
-  // filters: 'displayOnIndexPage[equals]true'
-  // });
-  // 画像作成、ここで作成するのは最適?
-  await writeSlideTitleImage(
-    others.deck.slide.source,
-    context.params?.id as string
-  );
-  const pdfPath = await writeSlidePdf(
-    others.deck.slide.source,
-    context.params?.id as string
-  );
-  const pptxPath = await writeSlidePptx(
-    others.deck.slide.source,
-    context.params?.id as string
-  );
+  let pdfPath = '';
+  let pptxPath = '';
+  const fallback = process.env.USE_FALLBACK ? true : false;
+  if (!fallback) {
+    // 静的に生成されるときだけ実行.
+    // 画像作成、ここで作成するのは最適?
+    const needWrite = slideCacheSetup(
+      context.params?.id as string,
+      others.deck.slide.hash
+    );
+    await writeSlideTitleImage(
+      needWrite,
+      context.params?.id as string,
+      others.deck.slide.hash,
+      others.deck.slide.source
+    );
+    pdfPath = await writeSlidePdf(
+      needWrite,
+      context.params?.id as string,
+      others.deck.slide.hash,
+      others.deck.slide.source
+    );
+    pptxPath = await writeSlidePptx(
+      needWrite,
+      context.params?.id as string,
+      others.deck.slide.hash,
+      others.deck.slide.source
+    );
+  }
   return {
     props: {
       pageData: { ...others },

@@ -25,6 +25,7 @@ export type DeckData = {
   items: DeckItem[];
   source: string;
   meta: { [key: string]: string };
+  hash: string;
 };
 
 export type Notification = {
@@ -113,7 +114,8 @@ export const blankDeckData = (): DeckData => ({
   css: '',
   script: [],
   source: '',
-  meta: {}
+  meta: {},
+  hash: ''
 });
 
 export const blankMetaData = (): MetaData => ({

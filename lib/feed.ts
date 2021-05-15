@@ -5,10 +5,10 @@ import siteServerSideConfig from '../src/site.server-side-config';
 import { MetaData } from '../types/pageTypes';
 
 export function getFeedsPublicPath(name: string): string {
-  return join(siteServerSideConfig.public.feedsPath, name);
+  return join(siteServerSideConfig.public.feeds, name);
 }
 export function getFeedsPath(name: string): string {
-  return join(siteServerSideConfig.assets.feedsPath, name);
+  return join(siteServerSideConfig.assets.feeds, name);
 }
 
 export function feed(options: FeedOptions, metas: MetaData[]) {

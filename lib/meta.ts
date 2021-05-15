@@ -2,7 +2,7 @@ import { join } from 'path';
 import matter from 'gray-matter';
 import { PageData, MetaData, DeckData } from '../types/pageTypes';
 import siteServerSideConfig from '../src/site.server-side-config';
-import { getSlidePublicImagePath, getSlidePublicImageFilename } from './slide';
+import { getSlidePublicFilePath, getSlidePublicImageFilename } from './slide';
 import { ApiNameArticle } from '../types/apiName';
 
 // https://github.com/marp-team/marp-cli#metadata
@@ -58,7 +58,11 @@ export function metaPage(opts: metaPageOpts): MetaData {
     if (opts.apiName === 'deck') {
       image =
         getBaseUrl() +
-        getSlidePublicImagePath(getSlidePublicImageFilename(opts.id));
+        getSlidePublicFilePath(
+          opts.id,
+          opts.deck.hash,
+          getSlidePublicImageFilename(opts.id)
+        );
     }
   }
   let link = getBaseUrl() + join('/', opts.apiName, opts.id); // TODO: getBaseUrl が '' のときの対応

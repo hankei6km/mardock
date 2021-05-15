@@ -10,7 +10,7 @@
     "config:fetch": "sh scripts/fetch_config.sh",
     "pre": "yarn api:build && yarn dirs:build && yarn copy:scripts && yarn config:fetch",
     "dev": "yarn pre && next",
-    "build": "yarn pre && next build",
+    "build": "yarn pre && next build && node scripts/purge_cache.js && find .mardock/cache -name '*.png'",
     "build:vercel": "yarn pre && yum install zip -y && yarn licenses:build && yarn build",
     "export": "next export",
     "start": "yarn pre && next start",

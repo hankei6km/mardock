@@ -1,15 +1,21 @@
 #!/bin/sh
 set -e
 
+MARDOCK_PATH=".mardock"
+CACHE_PATH="${MARDOCK_PATH}/cache"
+CACHE_DECK_PATH="${CACHE_PATH}/deck"
+
+# .mardock は存在していたら出来る限り再利用する.
+test -d "${MARDOCK_PATH}" || mkdir "${MARDOCK_PATH}"
+test -d "${CACHE_PATH}" || mkdir "${CACHE_PATH}" 
+test -d "${CACHE_DECK_PATH}" || mkdir "${CACHE_DECK_PATH}" 
+
+
 ASSETS_PATH="public/assets"
-WORK_PATH="work"
+ASSETS_DECK_PATH="public/assets/deck"
+ASSETS_FEEDS_PATH="public/assets/feeds"
 
+# public/assets はビルド毎に再作成する.
 test -d "${ASSETS_PATH}" && rm -r "${ASSETS_PATH}"
-mkdir -p "${ASSETS_PATH}/images" 
-mkdir -p "${ASSETS_PATH}/pdf" 
-mkdir -p "${ASSETS_PATH}/pptx" 
-
-mkdir -p "${ASSETS_PATH}/feeds" 
-
-test -d "${WORK_PATH}" && rm -r "${WORK_PATH}"
-mkdir -p "${WORK_PATH}/images" 
+mkdir -p "${ASSETS_DECK_PATH}" 
+mkdir -p "${ASSETS_FEEDS_PATH}" 
