@@ -108,7 +108,7 @@ describe('metaPage()', () => {
     articleTitle: 'atitle1',
     mainVisual: { url: 'img1', width: 100, height: 100 },
     description: 'desc1',
-    deck: blankDeckData()
+    deck: { ...blankDeckData(), hash: 'hash1' }
   };
   it('should returns meta object from page data', () => {
     expect(metaPage({ ...baseMock })).toEqual({
@@ -164,7 +164,8 @@ describe('metaPage()', () => {
       updated: '2020-12-27T04:04:30.107Z',
       link: 'https://hankei6km.github.io/mardock/deck/id1',
       keyword: [],
-      image: 'https://hankei6km.github.io/mardock/assets/images/id1.png',
+      image:
+        'https://hankei6km.github.io/mardock/assets/deck/id1/hash1/id1.png',
       description: 'deck desc'
     });
   });

@@ -30,6 +30,7 @@ yarn-error.log*
 /src/$*
 
 .vercel
+/.mardock
 /tmp
 /work
 /open_source_licenses.*
