@@ -5738,10 +5738,10 @@ md5@^2.3.0:
     crypt "0.0.2"
     is-buffer "~1.1.6"
 
-mdast-qrcode@^0.1.0:
-  version "0.1.0"
-  resolved "https://registry.yarnpkg.com/mdast-qrcode/-/mdast-qrcode-0.1.0.tgz#e3af0319e3666dbb5c031f0b9b86fa36f992a820"
-  integrity sha512-zK2Bu9039d/MZPEvzJLxUTiNqoTaR2vFhC5DE66Nlu1pfcaFkoekF1RcObErAJ/+/cYkG4UViYO5jQD1qz7WvA==
+mdast-qrcode@0.2.0:
+  version "0.2.0"
+  resolved "https://registry.yarnpkg.com/mdast-qrcode/-/mdast-qrcode-0.2.0.tgz#5b03bd66447ffd326ab429958fb9e02c83e5d7f8"
+  integrity sha512-KHmkh/3qnIpHxaOWNpczPM8nbe8jJfHYhONQigG0MXT+KE/kLOEUJtxFarRFLz8xYZ9055ETem6JifNPX37UgA==
   dependencies:
     mdast-util-from-markdown "^0.8.5"
     mdast-util-frontmatter "^0.2.0"
