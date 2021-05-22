@@ -1,4 +1,10 @@
-import { createWriteStream, copyFileSync, mkdirSync, writeFileSync } from 'fs';
+import {
+  createWriteStream,
+  copyFileSync,
+  mkdirSync,
+  writeFileSync,
+  statSync
+} from 'fs';
 // import { access, constants } from 'fs/promises';
 import { spawn } from 'child_process';
 import { join, format } from 'path';
@@ -113,18 +119,23 @@ const marpPath = join(basePath, 'node_modules', '.bin', 'marp');
 
 export function slideHtml(markdown: string, w: Writable): Promise<number> {
   // とりあえず。
-  return new Promise((resolve) => {
-    // spawn で stdout.pipe を使うと後ろのデータがドロップしてしまう
-    // (GitHub Actions のときに 8 割りくらい確率で)
-    // しかたないので stdout の内容をべたで扱う.
-    // image と pdf の書き出しだとドロップしない?
-    // 理由が判明: Writable の扱い方を間違っていた. 完全に自分のミス.
+  return new Promise((resolve, reject) => {
+    let errMsg = '';
     const marpP = spawn(marpPath, ['--html']);
     if (marpP && marpP.stdout) {
       marpP.stdout.pipe(w);
     }
+    if (marpP && marpP.stderr) {
+      marpP.stderr.on('data', (d) => {
+        errMsg = errMsg + d.toString('utf8');
+      });
+    }
     marpP.on('close', (code) => {
-      resolve(code);
+      if (code === 0 && errMsg.match(/^\[ ERROR \] /m) === null) {
+        resolve(code);
+      } else {
+        reject(`slideHtml error: code: ${code} err: ${errMsg}`);
+      }
     });
     if (marpP && marpP.stdin) {
       marpP.stdin.write(markdown);
@@ -137,14 +148,20 @@ export function slideCopyCacheToAssets(
   id: string, // コンテンツの id
   cacheKey: string, // 通常は HTML 化したときの hash
   fileName: string // 拡張子きのファイル名(通常は id+拡張子)
-) {
+): Error | null {
+  let ret: Error | null = null;
   const srcPath = getSlideCacheFilePath(id, cacheKey, fileName);
   const dstPath = getSlideAssetsFilePath(id, cacheKey, fileName);
   try {
     copyFileSync(srcPath, dstPath);
+    if (statSync(dstPath).size === 0) {
+      ret = new Error(`slideCopyCacheToAssets error: size of ${fileName} is 0`);
+    }
   } catch (err) {
-    console.error(err);
+    ret = err;
+    // console.error(err);
   }
+  return ret;
 }
 
 export async function slideVariantFile(
@@ -162,15 +179,24 @@ export async function slideVariantFile(
   w.on('error', () => {
     // 'wx' で上書き失敗したときのエラー
   });
-  const ret: number = await new Promise((resolve) => {
+  let errMsg = '';
+  const ret: number = await new Promise((resolve, reject) => {
     const marpP = spawn(marpPath, formatOpts);
     if (marpP && marpP.stdout) {
-      // marpP.stdout.setEncoding('base64');
       marpP.stdout.setEncoding(options.encoding || 'binary');
       marpP.stdout.pipe(w);
     }
+    if (marpP && marpP.stderr) {
+      marpP.stderr.on('data', (d) => {
+        errMsg = errMsg + d.toString('utf8');
+      });
+    }
     marpP.on('close', (code) => {
-      resolve(code);
+      if (code === 0 && errMsg.match(/^\[ ERROR \] /m) === null) {
+        resolve(code);
+      } else {
+        reject(`slideVariantFile error: code: ${code} err: ${errMsg}`);
+      }
     });
     if (marpP && marpP.stdin) {
       marpP.stdin.write(markdown);
@@ -196,7 +222,9 @@ export async function slideImage(
     fileName,
     ['--image', slidePublicImageExt, '--html'],
     options
-  );
+  ).catch((err) => {
+    throw new Error(`slideImage error: ${err}`);
+  });
 }
 
 export async function slidePdf(
@@ -213,7 +241,9 @@ export async function slidePdf(
     fileName,
     ['--pdf', '--html'],
     options
-  );
+  ).catch((err) => {
+    throw new Error(`slidePdf error: ${err}`);
+  });
 }
 
 export async function slidePptx(
@@ -230,7 +260,9 @@ export async function slidePptx(
     fileName,
     ['--pptx', '--html'],
     options
-  );
+  ).catch((err) => {
+    throw new Error(`slidePptx error: ${err}`);
+  });
 }
 
 export async function writeSlideTitleImage(
@@ -251,7 +283,7 @@ export async function writeSlideTitleImage(
       cacheKey,
       source,
       getSlidePublicImageFilename(id)
-    ).catch((err) => console.log(err));
+    );
     if (res !== 0) {
       // コマンド実行が失敗したのでテンポラリ画像(chrome が無い環境だと失敗する)
       ret.url = siteServerSideConfig.slide.fallbackImage.url;
@@ -259,7 +291,14 @@ export async function writeSlideTitleImage(
       ret.height = siteServerSideConfig.slide.fallbackImage.height;
     }
   } else {
-    slideCopyCacheToAssets(id, cacheKey, getSlidePublicImageFilename(id));
+    const err = slideCopyCacheToAssets(
+      id,
+      cacheKey,
+      getSlidePublicImageFilename(id)
+    );
+    if (err) {
+      throw err;
+    }
   }
   return ret;
 }
@@ -278,12 +317,17 @@ export async function writeSlidePdf(
       cacheKey,
       source,
       getSlidePublicPdfFilename(id)
-    ).catch(() => {});
+    );
     if (res !== 0) {
       ret = '';
     }
   } else {
-    slideCopyCacheToAssets(id, cacheKey, getSlidePublicPdfFilename(id));
+    if (
+      slideCopyCacheToAssets(id, cacheKey, getSlidePublicPdfFilename(id)) !==
+      null
+    ) {
+      ret = '';
+    }
   }
   return ret;
 }
@@ -306,12 +350,17 @@ export async function writeSlidePptx(
       cacheKey,
       source,
       getSlidePublicPptxFilename(id)
-    ).catch(() => {});
+    );
     if (res !== 0) {
       ret = '';
     }
   } else {
-    slideCopyCacheToAssets(id, cacheKey, getSlidePublicPdfFilename(id));
+    if (
+      slideCopyCacheToAssets(id, cacheKey, getSlidePublicPdfFilename(id)) !==
+      null
+    ) {
+      ret = '';
+    }
   }
   return ret;
 }
@@ -455,7 +504,9 @@ export async function getSlideData(source: string): Promise<SlideData> {
   s.on('data', (d) => {
     html = html + d;
   });
-  await slideHtml(source, s);
+  await slideHtml(source, s).catch((err) => {
+    throw new Error(`getSlideData error:${err}`);
+  });
   // test で実行したときで 64659 となるので、
   // (style やら script ご殆どだろうから)普通に使っている分にはそれほど増えないかな。
   // console.log(html.length);
