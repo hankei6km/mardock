@@ -20,7 +20,7 @@ import TimelineSeparator from '@material-ui/lab/TimelineSeparator';
 import TimelineConnector from '@material-ui/lab/TimelineConnector';
 import TimelineContent from '@material-ui/lab/TimelineContent';
 // import TimelineDot from '@material-ui/lab/TimelineDot';
-import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
+import DetailsIcon from '@material-ui/icons/Details';
 import LayoutDeck from '../../components/LayoutDeck';
 import { appBarHeight } from '../../components/Layout';
 import { animateScroll as scroll } from 'react-scroll';
@@ -76,9 +76,6 @@ const useStyles = makeStyles((theme) => ({
     margin: theme.spacing(0, 0, 1, 0),
     '& h2': {
       ...theme.typography.h5
-    },
-    [theme.breakpoints.up('sm')]: {
-      justifyContent: 'center'
     }
   },
   'DeckInfo-toggle-button': {
@@ -178,8 +175,9 @@ type Props = {
 export default function Deck({ pageData, comment, pdfPath, pptxPath }: Props) {
   const classes = useStyles();
   const theme = useTheme();
-  const downLg = useMediaQuery(theme.breakpoints.down('sm'));
-  const [navOpen, setNavOpen] = useState(true);
+  const sectionShowingEnabled = useMediaQuery(theme.breakpoints.down('sm'));
+  const toggleButtonEnabled = useMediaQuery(theme.breakpoints.down('xs'));
+  const [navOpen, setNavOpen] = useState(false);
   // (index を 1 つにまとめるとボタンのダブルクリックなどでループになる)
   const [curPageIdx, setCurPageIdx] = useState(0); // 変更する index
   const [pageIdx, setPageIdx] = useState(0); // 変更された index
@@ -187,11 +185,11 @@ export default function Deck({ pageData, comment, pdfPath, pptxPath }: Props) {
   const [sectionShowing, _setSectionShowing] = useState(false);
   const setSectionShowing = useCallback(
     (v: boolean) => {
-      if (downLg) {
+      if (sectionShowingEnabled) {
         _setSectionShowing(v);
       }
     },
-    [downLg]
+    [sectionShowingEnabled]
   );
   const [sectionStickyTop, setSectionStickyTop] = useState(0);
   const [pageElm, setPageElm] = useState<Element | null>(null);
@@ -310,18 +308,27 @@ export default function Deck({ pageData, comment, pdfPath, pptxPath }: Props) {
         <>
           <Box component="section" className={classes['DeckInfo-root']}>
             <Box component="h2" className={classes['DeckInfo-header']}>
-              <IconButton
-                aria-label="toggle deck info area"
-                className={`${classes['DeckInfo-toggle-button']}${
-                  navOpen ? 'Deckinfo-menu-expanded' : ''
-                }`}
+              {toggleButtonEnabled ? (
+                <IconButton
+                  aria-label="toggle deck info area"
+                  className={`${classes['DeckInfo-toggle-button']}${
+                    navOpen ? ' Deckinfo-menu-expanded' : ''
+                  }`}
+                  onClick={() => setNavOpen(!navOpen)}
+                >
+                  <DetailsIcon />
+                </IconButton>
+              ) : (
+                ''
+              )}
+              <ButtonSelect
+                disabled={!toggleButtonEnabled}
                 onClick={() => setNavOpen(!navOpen)}
               >
-                <ExpandMoreIcon />
-              </IconButton>
-              <Typography className={classes['DeckInfo-header-title']}>
-                {pageData.articleTitle}
-              </Typography>
+                <Typography className={classes['DeckInfo-header-title']}>
+                  {pageData.articleTitle}
+                </Typography>
+              </ButtonSelect>
             </Box>
             <Box
               className={`${classes['DeckInfo']}${
@@ -452,7 +459,9 @@ export default function Deck({ pageData, comment, pdfPath, pptxPath }: Props) {
       section={
         <div ref={measuredRef} className={classes['Page-root']}>
           <Paper
-            elevation={trigger && downLg && sectionShowing ? 2 : 0}
+            elevation={
+              trigger && sectionShowingEnabled && sectionShowing ? 2 : 0
+            }
             className={classes['Page-paper']}
           >
             <article id={pageData.deck.slide.id}>
@@ -473,10 +482,13 @@ export default function Deck({ pageData, comment, pdfPath, pptxPath }: Props) {
                         overviewElms && overviewElms.length >= index
                           ? overviewElms[index]
                           : null;
-                      if (to && (downLg === false || sectionShowing)) {
+                      if (
+                        to &&
+                        (sectionShowingEnabled === false || sectionShowing)
+                      ) {
                         //to.scrollIntoView({ behavior: 'smooth' });
                         const { top, bottom } = to.getBoundingClientRect();
-                        const topOffset = downLg
+                        const topOffset = sectionShowingEnabled
                           ? pageElm?.getBoundingClientRect().bottom || 0
                           : appBarHeight + theme.spacing(2); // .Page-root の top と合わせる.
                         if (top < topOffset) {
