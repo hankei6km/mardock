@@ -20,7 +20,7 @@ import TimelineSeparator from '@material-ui/lab/TimelineSeparator';
 import TimelineConnector from '@material-ui/lab/TimelineConnector';
 import TimelineContent from '@material-ui/lab/TimelineContent';
 // import TimelineDot from '@material-ui/lab/TimelineDot';
-import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
+import DetailsIcon from '@material-ui/icons/Details';
 import LayoutDeck from '../../components/LayoutDeck';
 import { appBarHeight } from '../../components/Layout';
 import { animateScroll as scroll } from 'react-scroll';
@@ -310,15 +310,19 @@ export default function Deck({ pageData, comment, pdfPath, pptxPath }: Props) {
         <>
           <Box component="section" className={classes['DeckInfo-root']}>
             <Box component="h2" className={classes['DeckInfo-header']}>
-              <IconButton
-                aria-label="toggle deck info area"
-                className={`${classes['DeckInfo-toggle-button']}${
-                  navOpen ? 'Deckinfo-menu-expanded' : ''
-                }`}
-                onClick={() => setNavOpen(!navOpen)}
-              >
-                <ExpandMoreIcon />
-              </IconButton>
+              {downLg ? (
+                <IconButton
+                  aria-label="toggle deck info area"
+                  className={`${classes['DeckInfo-toggle-button']}${
+                    navOpen ? ' Deckinfo-menu-expanded' : ''
+                  }`}
+                  onClick={() => setNavOpen(!navOpen)}
+                >
+                  <DetailsIcon />
+                </IconButton>
+              ) : (
+                ''
+              )}
               <Typography className={classes['DeckInfo-header-title']}>
                 {pageData.articleTitle}
               </Typography>
