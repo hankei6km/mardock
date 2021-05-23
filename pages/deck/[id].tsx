@@ -177,7 +177,7 @@ export default function Deck({ pageData, comment, pdfPath, pptxPath }: Props) {
   const theme = useTheme();
   const sectionShowingEnabled = useMediaQuery(theme.breakpoints.down('sm'));
   const toggleButtonEnabled = useMediaQuery(theme.breakpoints.down('xs'));
-  const [navOpen, setNavOpen] = useState(true);
+  const [navOpen, setNavOpen] = useState(false);
   // (index を 1 つにまとめるとボタンのダブルクリックなどでループになる)
   const [curPageIdx, setCurPageIdx] = useState(0); // 変更する index
   const [pageIdx, setPageIdx] = useState(0); // 変更された index
