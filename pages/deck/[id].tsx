@@ -542,7 +542,7 @@ export const getStaticPaths: GetStaticPaths = async () => {
   }));
   return {
     paths,
-    fallback: process.env.USE_FALLBACK ? true : false
+    fallback: process.env.STATIC_BUILD ? false : true
   };
 };
 
@@ -550,7 +550,7 @@ export const getStaticProps: GetStaticProps = async (context) => {
   const { html, ...others } = await getPagesData('deck', context);
   let pdfPath = '';
   let pptxPath = '';
-  const fallback = process.env.USE_FALLBACK ? true : false;
+  const fallback = process.env.STATIC_BUILD ? false : true;
   if (!fallback) {
     // 静的に生成されるときだけ実行.
     // 画像作成、ここで作成するのは最適?
