@@ -38,7 +38,7 @@ import {
 } from '../../lib/slide';
 import NavCategory from '../../components/NavCategory';
 import ButtonSelect from '../../components/ButtonSelect';
-// import ListDeck from '../../components/ListDeck';
+import { buildAssets } from '../../utils/assets';
 
 const useStyles = makeStyles((theme) => ({
   'Page-root': {
@@ -542,7 +542,7 @@ export const getStaticPaths: GetStaticPaths = async () => {
   }));
   return {
     paths,
-    fallback: process.env.USE_FALLBACK ? true : false
+    fallback: process.env.STATIC_BUILD ? false : true
   };
 };
 
@@ -550,8 +550,13 @@ export const getStaticProps: GetStaticProps = async (context) => {
   const { html, ...others } = await getPagesData('deck', context);
   let pdfPath = '';
   let pptxPath = '';
-  const fallback = process.env.USE_FALLBACK ? true : false;
-  if (!fallback) {
+  if (
+    buildAssets(
+      process.env.BUILD_ASSETS_DECK || '',
+      process.env.STATIC_BUILD || '',
+      context.preview || false
+    )
+  ) {
     // 静的に生成されるときだけ実行.
     // 画像作成、ここで作成するのは最適?
     const needWrite = slideCacheSetup(

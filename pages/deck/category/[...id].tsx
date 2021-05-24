@@ -80,7 +80,7 @@ export const getStaticPaths: GetStaticPaths = async () => {
 
   return {
     paths,
-    fallback: process.env.USE_FALLBACK ? true : false
+    fallback: process.env.STATIC_BUILD ? false : true
   };
 };
 

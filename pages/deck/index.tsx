@@ -13,6 +13,7 @@ import { pageCountFromTotalCount } from '../../utils/pagination';
 import { writeFeed } from '../../lib/feed';
 import siteConfig from '../../src/site.config';
 import siteServerSideConfig from '../../src/site.server-side-config';
+import { buildAssets } from '../../utils/assets';
 
 const itemsPerPage = 12;
 const pagePath: string[] = [];
@@ -84,16 +85,25 @@ export const getStaticProps: GetStaticProps = async (context) => {
   }
   const items = await getSortedIndexData('deck', q);
   // プレビューで除外
-  const feedUrl = await writeFeed(
-    {
-      id: siteServerSideConfig.baseUrl,
-      link: siteServerSideConfig.baseUrl,
-      title: siteConfig.siteName,
-      copyright: siteConfig.siteFeedTitle
-    },
-    items.contents.map(({ meta }) => meta),
-    'deck'
-  );
+  let feedUrl = '';
+  if (
+    buildAssets(
+      process.env.BUILD_ASSETS_FEEDS || '',
+      process.env.STATIC_BUILD || '',
+      context.preview || false
+    )
+  ) {
+    feedUrl = await writeFeed(
+      {
+        id: siteServerSideConfig.baseUrl,
+        link: siteServerSideConfig.baseUrl,
+        title: siteConfig.siteName,
+        copyright: siteConfig.siteFeedTitle
+      },
+      items.contents.map(({ meta }) => meta),
+      'deck'
+    );
+  }
   return {
     props: {
       pageData: {
