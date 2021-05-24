@@ -18,11 +18,6 @@ module.exports = (phase) => {
   console.log(`isDev:${isDev}  isProd:${isProd}   isStaging:${isStaging}`);
 
   const env = {
-    USE_MOCK_CLIENT: (() => {
-      //  $USE_MOCK_CLIENT_FORCE を定義すると強制的に mock client を使う .
-      if (isDev && process.env.DISABLE_MOCK_CLIENT !== 'true') return 'true';
-      return '';
-    })(),
     STATIC_BUILD: (() => {
       // fallback 等の利用可能判定を行うためのフラグ.
       // 今回は GitHub 上で実行されていたら pages に export されるという想定.
