@@ -48,6 +48,7 @@ RUN apk update \
        font-noto-cjk \
        grep \
        nodejs \
+       su-exec \
        yarn \
     && adduser -S -g "${USER_GID}" --uid "${USER_ID}" "${USER}"
 

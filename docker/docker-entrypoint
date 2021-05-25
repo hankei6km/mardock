@@ -1,3 +1,3 @@
 #!/bin/ash
 
-exec yarn --cwd /home/mardock/mardock dev
+exec su-exec "${MARDOCK_USER}" yarn --cwd /home/mardock/mardock dev
