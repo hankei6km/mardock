@@ -52,6 +52,8 @@ RUN apk update \
        yarn \
     && adduser -S -g "${USER_GID}" --uid "${USER_ID}" "${USER}"
 
+ENV MARDOCK_USER "${USER}:$USER_GID}"
+
 USER "${USER}"
 ENV IS_DOCKER true
 COPY --from=builder "/docker-entrypoint" "/docker-entrypoint"
