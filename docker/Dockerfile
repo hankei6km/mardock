@@ -8,8 +8,6 @@ ARG USER
 ARG USER_ID
 ARG USER_GID
 
-ARG BRANCH=main
-
 SHELL ["/bin/ash", "-o", "pipefail", "-c"]
 
 RUN apk update \
@@ -23,7 +21,11 @@ RUN apk update \
 COPY --chown="${USER}":"${USER_GID}" docker-entrypoint /
 
 USER "${USER}"
-RUN git clone --depth 1 --branch "${BRANCH#refs/heads/}"  https://github.com/hankei6km/mardock.git "/home/${USER}/mardock" \
+
+ARG NO_CACHE_CLONE=1
+ARG BRANCH=main
+RUN echo "${NO_CACHE_CLONE}" \
+    && git clone --depth 1 --branch "${BRANCH#refs/heads/}"  https://github.com/hankei6km/mardock.git "/home/${USER}/mardock" \
     && yarn --cwd "/home/${USER}/mardock" install --no-cache --frozen-lockfile \
     && yarn --cwd "/home/${USER}/mardock" licenses:build \
     && yarn --cwd "/home/${USER}/mardock" dirs:build \
