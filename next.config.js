@@ -32,10 +32,14 @@ module.exports = (phase) => {
   let _assetPrefix = process.env.GITHUB_REPOSITORY
     ? `/${process.env.GITHUB_REPOSITORY.split('/', 2)[1]}`
     : '';
-  const assetPrefix =
+  _assetPrefix =
     isStaging && process.env.STAGING_DIR
       ? path.join(_assetPrefix, process.env.STAGING_DIR)
       : _assetPrefix;
+  if (process.env.ASSET_PREFIX && process.env.ASSET_PREFIX.startsWith('/')) {
+    _assetPrefix = process.env.ASSET_PREFIX;
+  }
+  const assetPrefix = _assetPrefix;
   // util/baseUrl.ts 内で baseUrl を独自に設定しているので注意
   const basePath = assetPrefix;
 
