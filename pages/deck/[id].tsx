@@ -1,4 +1,4 @@
-import React, { useEffect, useCallback, useState, KeyboardEvent } from 'react';
+import React, { useEffect, useCallback, useState } from 'react';
 import { GetStaticProps, GetStaticPaths } from 'next';
 import { makeStyles } from '@material-ui/core/styles';
 import { useTheme } from '@material-ui/core/styles';
@@ -24,6 +24,7 @@ import DetailsIcon from '@material-ui/icons/Details';
 import LayoutDeck from '../../components/LayoutDeck';
 import { appBarHeight } from '../../components/Layout';
 import { animateScroll as scroll } from 'react-scroll';
+import { useHotkeys } from 'react-hotkeys-hook';
 import Link from '../../components/Link';
 import Carousel from 'react-material-ui-carousel';
 import SlideshowIcon from '@material-ui/icons/Slideshow';
@@ -272,29 +273,35 @@ export default function Deck({ pageData, comment, pdfPath, pptxPath }: Props) {
     }
   }, [pageSwitched]);
 
-  useEffect(() => {
-    const lastPageIdx = overviewElms.length - 1;
-    const handleKeyup = (e: Event) => {
-      const key = ((e as unknown) as KeyboardEvent).key;
-      if (key === 'ArrowLeft') {
-        if (pageIdx > 0) {
-          setCurPageIdx(pageIdx - 1);
-        } else {
-          setCurPageIdx(lastPageIdx);
-        }
-      } else if (key === 'ArrowRight') {
-        if (pageIdx < lastPageIdx) {
-          setCurPageIdx(pageIdx + 1);
-        } else {
-          setCurPageIdx(0);
-        }
+  useHotkeys(
+    'left',
+    () => {
+      if (pageIdx > 0) {
+        setCurPageIdx(pageIdx - 1);
+      } else {
+        setCurPageIdx(overviewElms.length - 1);
       }
-    };
-    document.addEventListener('keyup', handleKeyup);
-    return () => {
-      document.removeEventListener('keyup', handleKeyup);
-    };
-  }, [overviewElms.length, pageIdx]);
+    },
+    [overviewElms.length, pageIdx]
+  );
+
+  useHotkeys('ctrl+left', () => setCurPageIdx(0), []);
+
+  useHotkeys(
+    'right',
+    () => {
+      if (pageIdx < overviewElms.length - 1) {
+        setCurPageIdx(pageIdx + 1);
+      } else {
+        setCurPageIdx(0);
+      }
+    },
+    [overviewElms.length, pageIdx]
+  );
+
+  useHotkeys('ctrl+right', () => setCurPageIdx(overviewElms.length - 1), [
+    overviewElms.length
+  ]);
 
   if (pageData === undefined || !pageData.title) {
     return <ErrorPage statusCode={404} />;
