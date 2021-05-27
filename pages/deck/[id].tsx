@@ -285,6 +285,8 @@ export default function Deck({ pageData, comment, pdfPath, pptxPath }: Props) {
     [overviewElms.length, pageIdx]
   );
 
+  useHotkeys('ctrl+left', () => setCurPageIdx(0), []);
+
   useHotkeys(
     'right',
     () => {
@@ -296,6 +298,10 @@ export default function Deck({ pageData, comment, pdfPath, pptxPath }: Props) {
     },
     [overviewElms.length, pageIdx]
   );
+
+  useHotkeys('ctrl+right', () => setCurPageIdx(overviewElms.length - 1), [
+    overviewElms.length
+  ]);
 
   if (pageData === undefined || !pageData.title) {
     return <ErrorPage statusCode={404} />;
