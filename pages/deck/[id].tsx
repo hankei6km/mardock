@@ -370,11 +370,10 @@ export default function Deck({
               <Box className={classes['DeckInfo-Buttons-outer']}>
                 <Button
                   className="MuiButton-outlinedPrimary"
-                  //variant="outlined"
                   component={Link}
                   href={htmlPath}
                   startIcon={<SlideshowIcon />}
-                  // color="primary"
+                  disabled={htmlPath === ''}
                 >
                   <Typography component="span">プレゼンテーション</Typography>
                 </Button>
