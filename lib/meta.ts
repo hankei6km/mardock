@@ -10,7 +10,7 @@ const metaDeckKeys = ['title', 'description', 'url', 'image'];
 type metaPageOpts = { apiName: ApiNameArticle } & Pick<
   PageData,
   'id' | 'updated' | 'title' | 'articleTitle' | 'mainVisual' | 'description'
-> & { deck: DeckData };
+> & { deck: DeckData } & { hash: string };
 
 export type MetaCommonResult = {
   errMessage: string;
@@ -60,7 +60,7 @@ export function metaPage(opts: metaPageOpts): MetaData {
         getBaseUrl() +
         getSlidePublicFilePath(
           opts.id,
-          opts.deck.hash,
+          opts.hash,
           getSlidePublicImageFilename(opts.id)
         );
     }

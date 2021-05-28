@@ -121,9 +121,7 @@ describe('getPagesData()', () => {
           css: '',
           script: [],
           source: '',
-          meta: {},
-          hash:
-            'dff3e0cbe4f9989deb51a47267b223da0e934d1170dd3b838e60a497cd30e043'
+          meta: {}
         },
         overview: {
           id: '',
@@ -135,8 +133,12 @@ describe('getPagesData()', () => {
           css: '',
           script: [],
           source: '',
-          meta: {},
-          hash: ''
+          meta: {}
+        },
+        html: {
+          html: '',
+          hash:
+            'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855'
         }
       },
       htmlToc: {

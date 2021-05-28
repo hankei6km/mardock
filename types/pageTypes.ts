@@ -1,6 +1,7 @@
 import { ContentList, PagesCategory } from './client/contentTypes';
 
-export type SlideHeadData = {
+export type SlideHeadData_bk = {
+  // 後で消す、名前が被っているにで一時変更:
   tagName: string;
   attribs: { [name: string]: string };
   html: string;
@@ -9,8 +10,12 @@ export type SlideHeadData = {
 // export type SlideBodyData = {
 //   style: { [name: string]: string };
 // } & SlideHeadData;
-export type SlideBodyData = SlideHeadData;
+export type SlideBodyData = SlideHeadData_bk;
 
+export type SlideHtmlData = {
+  html: string;
+  hash: string;
+};
 export type DeckItem = {
   html: string;
 };
@@ -25,7 +30,6 @@ export type DeckData = {
   items: DeckItem[];
   source: string;
   meta: { [key: string]: string };
-  hash: string;
 };
 
 export type Notification = {
@@ -71,6 +75,7 @@ export type PageData = {
   deck: {
     slide: DeckData;
     overview: DeckData;
+    html: SlideHtmlData;
   };
   mainVisual: {
     url: string;
@@ -84,7 +89,7 @@ export type PageData = {
 
 export type SlideData = {
   notification?: Notification;
-  head: SlideHeadData[];
+  head: SlideHeadData_bk[];
   body: SlideBodyData[];
   meta: { [key: string]: string };
 };
@@ -114,8 +119,7 @@ export const blankDeckData = (): DeckData => ({
   css: '',
   script: [],
   source: '',
-  meta: {},
-  hash: ''
+  meta: {}
 });
 
 export const blankMetaData = (): MetaData => ({
@@ -146,6 +150,10 @@ export const blankPageData = (): PageData => ({
     },
     overview: {
       ...blankDeckData()
+    },
+    html: {
+      html: '',
+      hash: ''
     }
   },
   mainVisual: { url: '', width: 0, height: 0 },

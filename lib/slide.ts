@@ -17,7 +17,8 @@ import {
   SlideData,
   blankSlideData,
   DeckData,
-  blankDeckData
+  blankDeckData,
+  SlideHtmlData
 } from '../types/pageTypes';
 import { PagesImage } from '../types/client/contentTypes';
 import { metaDeck } from './meta';
@@ -172,10 +173,7 @@ export function slideHtml(markdown: string, w: Writable): Promise<number> {
 }
 export async function getSlideHtmlWithHash(
   source: string
-): Promise<{
-  html: string;
-  hash: string;
-}> {
+): Promise<SlideHtmlData> {
   const hash = createHash('sha256');
   // source + 変換された HTMNL で hash 確認.
   // source が変更されても HTML は変わらないこともあるので.
@@ -480,8 +478,7 @@ export async function _slideDeck(
         html: v
       })),
       source,
-      meta: {},
-      hash: ''
+      meta: {}
     };
   }
   return blankDeckData();
@@ -507,8 +504,6 @@ export async function slideDeckSlide(
   });
   const ret = await _slideDeck(marp, containerId, source);
   ret.meta = metaDeck(source).data; // ここではエラーは無視する(プレビューモードで検証する)
-  const hash = createHash('sha256');
-  ret.hash = hash.update(JSON.stringify(ret), 'utf8').digest().toString('hex');
   return ret;
 }
 export async function slideDeckIndex(

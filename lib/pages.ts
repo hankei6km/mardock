@@ -36,7 +36,8 @@ import {
   slideDeckSlide,
   slideDeckIndex,
   slideDeckRemoveId,
-  slideDeckOverview
+  slideDeckOverview,
+  getSlideHtmlWithHash
 } from './slide';
 import { htmlToMarkdown, sourceSetMarkdown } from './source';
 import { metaPage } from './meta';
@@ -110,22 +111,23 @@ export async function getSortedIndexData(
           },
           description: res.description || ''
         };
+        let hash = '';
         if (res.source || res.sourceContents || res.sourcePages) {
-          const d = await slideDeckIndex(
-            res.id,
-            await sourceSetMarkdown({
-              sourceContents: res.sourceContents,
-              sourcePages: res.sourcePages,
-              source: res.source
-            })
-          );
+          const source = await sourceSetMarkdown({
+            sourceContents: res.sourceContents,
+            sourcePages: res.sourcePages,
+            source: res.source
+          });
+          const d = await slideDeckIndex(res.id, source);
           d.items = d.items.map((v) => ({
             ...v,
             html: slideDeckRemoveId(v.html)
           }));
           ret.deck = d;
+          const { hash: h } = await getSlideHtmlWithHash(source);
+          hash = h;
         }
-        ret.meta = metaPage({ apiName, ...ret });
+        ret.meta = metaPage({ apiName, ...ret, hash });
         return ret;
       };
     });
@@ -327,7 +329,13 @@ export async function getPagesData(
       res.id,
       deckOverviewSource || deckSlideSource
     );
-    ret.meta = metaPage({ apiName, ...ret, deck: ret.deck.slide });
+    ret.deck.html = await getSlideHtmlWithHash(deckSlideSource);
+    ret.meta = metaPage({
+      apiName,
+      ...ret,
+      deck: ret.deck.slide,
+      hash: ret.deck.html.hash
+    });
     if (notification) {
       ret.notification = notification;
     }

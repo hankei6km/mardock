@@ -108,7 +108,8 @@ describe('metaPage()', () => {
     articleTitle: 'atitle1',
     mainVisual: { url: 'img1', width: 100, height: 100 },
     description: 'desc1',
-    deck: { ...blankDeckData(), hash: 'hash1' }
+    deck: { ...blankDeckData() },
+    hash: 'hash1'
   };
   it('should returns meta object from page data', () => {
     expect(metaPage({ ...baseMock })).toEqual({
