@@ -566,9 +566,7 @@ export const getStaticProps: GetStaticProps = async (context) => {
   let htmlPath = '';
   let pdfPath = '';
   let pptxPath = '';
-  const { html: htmlSource, hash } = await getSlideHtmlWithHash(
-    others.deck.slide.source
-  );
+  const hash = await getSlideHtmlWithHash(others.deck.slide.source);
   if (
     buildAssets(
       process.env.BUILD_ASSETS_DECK || '',
@@ -583,7 +581,7 @@ export const getStaticProps: GetStaticProps = async (context) => {
       needWrite,
       context.params?.id as string,
       hash,
-      htmlSource
+      others.deck.slide.source
     );
     await writeSlideTitleImage(
       needWrite,

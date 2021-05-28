@@ -1,12 +1,9 @@
 import * as fs from 'fs';
 import * as child_process from 'child_process';
-import { PassThrough } from 'stream';
 import {
   slideCacheSetup,
-  slideHtml,
   slideCopyCacheToAssets,
   slideDeckRemoveId,
-  getSlideData,
   writeSlideTitleImage
 } from './slide';
 jest.mock('fs', () => ({
@@ -95,22 +92,6 @@ describe('slideCacheSetup()', () => {
       '.mardock/cache/deck/test-id/test-key'
     );
     expect(writeFileSync.mock.calls.length).toEqual(0);
-  });
-});
-
-describe('slideHtml()', () => {
-  it('should convert slide to html', async () => {
-    let b = '';
-    const w = new PassThrough();
-    w.on('data', (data) => {
-      b = b + data.toString();
-    });
-    //const copyFileSync = jest.spyOn(fs, 'copyFileSync').mockImplementation();
-    expect(await slideHtml('#test1 \n\n---\n- item1\n- item2', w)).toEqual(0);
-    expect(b).toContain('html');
-    b = '';
-    expect(await slideHtml('', w)).toEqual(0);
-    expect(b).toContain('');
   });
 });
 
@@ -307,15 +288,5 @@ describe('slideDecRemoveId()', () => {
     ).toEqual(
       '<svg><foreignObject><section>page1</section></foreignObject></svg>'
     );
-  });
-});
-
-describe('getSlideData()', () => {
-  it('should convert slide source to slideData', async () => {
-    const slideData = await getSlideData(
-      '---\ntitle: slide1\n---\n#test1 \n\n---\n- item1\n- item2'
-    );
-    expect(JSON.stringify(slideData.head)).toContain('slide1');
-    expect(JSON.stringify(slideData.body)).toContain('item1');
   });
 });

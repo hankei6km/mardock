@@ -8,18 +8,11 @@ import {
 // import { access, constants } from 'fs/promises';
 import { spawn } from 'child_process';
 import { join, format } from 'path';
-import { Writable, PassThrough } from 'stream';
 import { createHash } from 'crypto';
 import Marp from '@marp-team/marp-core';
 import cheerio from 'cheerio';
 import siteServerSideConfig from '../src/site.server-side-config';
-import {
-  SlideData,
-  blankSlideData,
-  DeckData,
-  blankDeckData,
-  SlideHtmlData
-} from '../types/pageTypes';
+import { DeckData, blankDeckData } from '../types/pageTypes';
 import { PagesImage } from '../types/client/contentTypes';
 import { metaDeck } from './meta';
 import themes from '../src/marp-theme';
@@ -142,85 +135,7 @@ export function slideCopyCacheToAssets(
   return ret;
 }
 
-// console.log(basePath);
 const marpPath = join(basePath, 'node_modules', '.bin', 'marp');
-
-export function slideHtml(markdown: string, w: Writable): Promise<number> {
-  // とりあえず。
-  return new Promise((resolve, reject) => {
-    let errMsg = '';
-    const marpP = spawn(marpPath, ['--html']);
-    if (marpP && marpP.stdout) {
-      marpP.stdout.pipe(w);
-    }
-    if (marpP && marpP.stderr) {
-      marpP.stderr.on('data', (d) => {
-        errMsg = errMsg + d.toString('utf8');
-      });
-    }
-    marpP.on('close', (code) => {
-      if (code === 0 && errMsg.match(/^\[ ERROR \] /m) === null) {
-        resolve(code);
-      } else {
-        reject(`slideHtml error: code: ${code} err: ${errMsg}`);
-      }
-    });
-    if (marpP && marpP.stdin) {
-      marpP.stdin.write(markdown);
-      marpP.stdin.end();
-    }
-  });
-}
-export async function getSlideHtmlWithHash(
-  source: string
-): Promise<SlideHtmlData> {
-  const hash = createHash('sha256');
-  // source + 変換された HTMNL で hash 確認.
-  // source が変更されても HTML は変わらないこともあるので.
-  hash.update(source);
-
-  let html = '';
-  const s = new PassThrough();
-  s.on('data', (d) => {
-    hash.update(d);
-    html = html + d;
-  });
-  const res = await slideHtml(source, s);
-  if (res !== 0) {
-    throw new Error(`getSlideHtmlWithHash error: code:${res}`);
-  }
-  return {
-    html,
-    hash: hash.digest().toString('hex')
-  };
-}
-export async function writeSlideHtml(
-  needWrite: boolean,
-  id: string,
-  cacheKey: string,
-  html: string
-): Promise<string> {
-  let ret = getSlidePublicFilePath(
-    id,
-    cacheKey,
-    getSlidePublicHtmlFilename(id)
-  );
-  // const p = getSlidePdfPath(getSlidePublicPdfFilename(id));
-  if (needWrite) {
-    writeFileSync(
-      getSlideCacheFilePath(id, cacheKey, getSlidePublicHtmlFilename(id)),
-      html
-    );
-  }
-  if (
-    slideCopyCacheToAssets(id, cacheKey, getSlidePublicHtmlFilename(id)) !==
-    null
-  ) {
-    ret = '';
-  }
-  return ret;
-}
-
 export async function slideVariantFile(
   id: string, // コンテンツの id
   cacheKey: string, // 通常は HTML 化したときの hash
@@ -284,6 +199,24 @@ export async function slideImage(
   });
 }
 
+export async function slideHtml(
+  id: string,
+  cacheKey: string,
+  markdown: string,
+  fileName: string,
+  options: { encoding?: string } = { encoding: 'binary' }
+): Promise<number> {
+  return await slideVariantFile(
+    id,
+    cacheKey,
+    markdown,
+    fileName,
+    ['--html'],
+    options
+  ).catch((err) => {
+    throw new Error(`slideHtml error: ${err}`);
+  });
+}
 export async function slidePdf(
   id: string,
   cacheKey: string,
@@ -355,6 +288,38 @@ export async function writeSlideTitleImage(
     );
     if (err) {
       throw err;
+    }
+  }
+  return ret;
+}
+
+export async function writeSlideHtml(
+  needWrite: boolean,
+  id: string,
+  cacheKey: string,
+  source: string
+): Promise<string> {
+  let ret = getSlidePublicFilePath(
+    id,
+    cacheKey,
+    getSlidePublicHtmlFilename(id)
+  );
+  if (needWrite) {
+    const res = await slideHtml(
+      id,
+      cacheKey,
+      source,
+      getSlidePublicHtmlFilename(id)
+    );
+    if (res !== 0) {
+      ret = '';
+    }
+  } else {
+    if (
+      slideCopyCacheToAssets(id, cacheKey, getSlidePublicHtmlFilename(id)) !==
+      null
+    ) {
+      ret = '';
     }
   }
   return ret;
@@ -552,81 +517,14 @@ export async function slideDeckOverview(
   return await _slideDeck(marp, containerId, source);
 }
 
-export async function getSlideData(source: string): Promise<SlideData> {
-  let html = '';
-  const s = new PassThrough();
-  s.on('data', (d) => {
-    html = html + d;
+export async function getSlideHtmlWithHash(source: string): Promise<string> {
+  const marp = new Marp({
+    inlineSVG: true,
+    html: true,
+    script: false
   });
-  await slideHtml(source, s).catch((err) => {
-    throw new Error(`getSlideData error:${err}`);
-  });
-  // test で実行したときで 64659 となるので、
-  // (style やら script ご殆どだろうから)普通に使っている分にはそれほど増えないかな。
-  // console.log(html.length);
-
-  const ret = blankSlideData();
-  const $ = cheerio.load(html);
-  $('head')
-    .children()
-    .each((_idx, elm) => {
-      if (elm.type === 'tag') {
-        const attribs = elm.attribs ? { ...elm.attribs } : {};
-        if (elm.attribs.class) {
-          attribs.className = elm.attribs.class;
-          delete attribs.class;
-        }
-        ret.head.push({
-          tagName: elm.tagName,
-          attribs: attribs,
-          html: $(elm).html() || ''
-        });
-      } else if ((elm.type as any) === 'style') {
-        if ((elm as any).children) {
-          (elm as any).children.forEach((c: any) => {
-            ret.head.push({
-              tagName: 'style',
-              attribs: {},
-              html: c.data || ''
-            });
-          });
-        }
-      }
-    });
-  $('body')
-    .children()
-    .each((_idx, elm) => {
-      if (elm.type === 'tag') {
-        const attribs = elm.attribs ? { ...elm.attribs } : {};
-        // if (elm.attribs.class) {
-        //   attribs.className = elm.attribs.class;
-        //   delete attribs.class;
-        // }
-        ret.body.push({
-          tagName: elm.tagName,
-          attribs: attribs,
-          html: $(elm).html() || ''
-        });
-      } else if ((elm.type as any) === 'script') {
-        // fitting の script は取り込まれない.
-        // Layout の方で observer を読み込んでいる(ダメだった下記のコメントアウトの方に戻す:)
-        if ((elm as any).children) {
-          (elm as any).children.forEach((c: any) => {
-            ret.body.push({
-              tagName: 'script',
-              attribs: {},
-              html: c.data || ''
-            });
-          });
-        }
-      }
-    });
-  // $('script').each((_idx, elm) => {
-  //   ret.body.push({
-  //     tagName: 'script',
-  //     attribs: {},
-  //     html: $(elm).html() || ''
-  //   });
-  // });
-  return ret;
+  const deck = await _slideDeck(marp, '', source);
+  deck.meta = metaDeck(source).data; // ここではエラーは無視する(プレビューモードで検証する)
+  const hash = createHash('sha256');
+  return hash.update(JSON.stringify(deck), 'utf8').digest().toString('hex');
 }

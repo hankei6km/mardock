@@ -14,8 +14,6 @@ import {
   Notification,
   PageData,
   blankPageData,
-  SlideData,
-  blankSlideData,
   IndexData,
   blankIndexData,
   IndexList,
@@ -32,7 +30,6 @@ import {
   pageCountFromTotalCount
 } from '../utils/pagination';
 import {
-  getSlideData,
   slideDeckSlide,
   slideDeckIndex,
   slideDeckRemoveId,
@@ -124,8 +121,7 @@ export async function getSortedIndexData(
             html: slideDeckRemoveId(v.html)
           }));
           ret.deck = d;
-          const { hash: h } = await getSlideHtmlWithHash(source);
-          hash = h;
+          hash = await getSlideHtmlWithHash(source);
         }
         ret.meta = metaPage({ apiName, ...ret, hash });
         return ret;
@@ -329,12 +325,12 @@ export async function getPagesData(
       res.id,
       deckOverviewSource || deckSlideSource
     );
-    ret.deck.html = await getSlideHtmlWithHash(deckSlideSource);
+    ret.deck.hash = await getSlideHtmlWithHash(deckSlideSource);
     ret.meta = metaPage({
       apiName,
       ...ret,
       deck: ret.deck.slide,
-      hash: ret.deck.html.hash
+      hash: ret.deck.hash
     });
     if (notification) {
       ret.notification = notification;
@@ -345,79 +341,4 @@ export async function getPagesData(
     console.error(`getPagesData error: ${err}`);
   }
   return blankPageData();
-}
-
-export async function getPagesSlideData(
-  apiName: ApiNameArticle,
-  {
-    params = { id: '' },
-    preview = false,
-    previewData = {}
-  }: GetStaticPropsContext<ParsedUrlQuery>,
-  _options: PageDataGetOptions = {
-    itemsPerPage: 10
-  }
-): Promise<SlideData> {
-  try {
-    const [id, query] = applyPreviewDataToIdQuery<GetContentQuery>(
-      preview,
-      previewData,
-      apiName,
-      params.id as string,
-      {
-        fields:
-          'id,createdAt,updatedAt,publishedAt,revisedAt,title,sourceContents,sourcePages,source,category,mainVisual,description'
-      }
-    );
-    const res = await client[apiName]._id(id).$get({
-      query: query,
-      config: fetchConfig
-    });
-    // params.previewDemo は boolean ではない
-    // if (preview || params.previewDemo === 'true') {
-    //   ret.notification = {
-    //     title: '[DRAFT]',
-    //     messageHtml: '<p><a href="/api/exit-preview">プレビュー終了</a></p>',
-    //     serverity: 'info'
-    //   };
-    //   const { html, messages, list } = await textLintInHtml(
-    //     ret.html,
-    //     params.previewDemo !== 'true'
-    //       ? undefined
-    //       : getTextlintKernelOptions({
-    //           presets: [
-    //             {
-    //               presetId: 'ja-technical-writing',
-    //               preset: require('textlint-rule-preset-ja-technical-writing')
-    //             }
-    //           ],
-    //           rules: {
-    //             ruleId: 'ja-space-between-half-and-full-width',
-    //             rule: require('textlint-rule-ja-space-between-half-and-full-width'),
-    //             options: {
-    //               space: 'always'
-    //             }
-    //           }
-    //         })
-    //   );
-    //   if (messages.length > 0) {
-    //     ret.html = html;
-    //     ret.notification.messageHtml = `${ret.notification.messageHtml}${list}`;
-    //     ret.notification.serverity = 'warning';
-    //   }
-    // }
-    let ret = await getSlideData(
-      await sourceSetMarkdown({
-        sourceContents: res.sourceContents,
-        sourcePages: res.sourcePages,
-        source: res.source
-      })
-    );
-
-    return ret;
-  } catch (err) {
-    // console.error(`getPagesData error: ${err.name}`);
-    console.error(`getPagesSlideData error: ${err}`);
-  }
-  return blankSlideData();
 }

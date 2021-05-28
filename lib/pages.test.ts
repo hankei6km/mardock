@@ -4,12 +4,7 @@ import {
   mockDataDeckSlide1
 } from '../test/testMockData';
 import { FetchMock } from 'jest-fetch-mock';
-import {
-  getSortedPagesData,
-  getAllPagesIds,
-  getPagesData,
-  getPagesSlideData
-} from './pages';
+import { getSortedPagesData, getAllPagesIds, getPagesData } from './pages';
 import { queryParams } from '../test/testUtils';
 import { mockDataPagesIds } from '../test/testMockData';
 // https://github.com/jefflau/jest-fetch-mock/issues/83
@@ -135,11 +130,7 @@ describe('getPagesData()', () => {
           source: '',
           meta: {}
         },
-        html: {
-          html: '',
-          hash:
-            'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855'
-        }
+        hash: '9ae0b35999ae89826d0557231180e105f0e1f573d65aac9ef41336329590812d'
       },
       htmlToc: {
         items: []
@@ -200,19 +191,5 @@ describe('getPagesData()', () => {
       feedUrl: 'https://hankei6km.github.io/mardock/assets/feeds/deck.xml'
     });
     expect(res.deck.slide.items[0].html).toContain('test1');
-  });
-});
-
-describe('getPagesSlideData()', () => {
-  it('should returns slideData', async () => {
-    fetchMock.mockResponseOnce(JSON.stringify(mockDataDeckSlide1));
-    const res = await getPagesSlideData('deck', { params: { id: 'slide1' } });
-    expect(fetchMock.mock.calls[0][0]).toContain('/deck/slide1');
-    expect(queryParams(String(fetchMock.mock.calls[0][0]))).toStrictEqual({
-      fields:
-        'id,createdAt,updatedAt,publishedAt,revisedAt,title,sourceContents,sourcePages,source,category,mainVisual,description'
-    });
-    expect(JSON.stringify(res.head)).toContain('slide1');
-    expect(JSON.stringify(res.body)).toContain('item1');
   });
 });
