@@ -2,6 +2,7 @@ import {
   createWriteStream,
   copyFileSync,
   mkdirSync,
+  readFileSync,
   writeFileSync,
   statSync
 } from 'fs';
@@ -45,8 +46,11 @@ export function getSlideCacheFilePath(
 ): string {
   return join(getSlideCachePath(id, cacheKey), name);
 }
-export function getSlideAssetsPath(id: string, cacheKey: string): string {
-  return join(basePath, siteServerSideConfig.assets.deck, id, cacheKey);
+export function getSlideAssetsPath(id: string, _cacheKey: string): string {
+  // return join(basePath, siteServerSideConfig.assets.deck, id, cacheKey);
+  // 現状では cachekey は使用しない。
+  // 設定などで cacheky 付きと切り替えるようにするかもしれない.
+  return join(basePath, siteServerSideConfig.assets.deck, id);
 }
 export function getSlideAssetsFilePath(
   id: string,
@@ -55,8 +59,11 @@ export function getSlideAssetsFilePath(
 ): string {
   return join(getSlideAssetsPath(id, cacheKey), name);
 }
-export function getSlidePublicPath(id: string, cacheKey: string): string {
-  return join(siteServerSideConfig.public.deck, id, cacheKey);
+export function getSlidePublicPath(id: string, _cacheKey: string): string {
+  //return join(siteServerSideConfig.public.deck, id, cacheKey);
+  // 現状では cachekey は使用しない。
+  // 設定などで cacheky 付きと切り替えるようにするかもしれない.
+  return join(siteServerSideConfig.public.deck, id);
 }
 export function getSlidePublicFilePath(
   id: string,
@@ -89,6 +96,9 @@ export function getSlidePublicPptxFilename(id: string): string {
     ext: `.${slidePublicPptxExt}`
   });
 }
+export function getSlideLatestFilePath(id: string): string {
+  return join(getSlideCachePath(id, ''), 'latest');
+}
 
 export function slideCacheSetup(id: string, cacheKey: string): boolean {
   try {
@@ -98,14 +108,13 @@ export function slideCacheSetup(id: string, cacheKey: string): boolean {
     mkdirSync(getSlideAssetsPath(id, cacheKey));
   } catch (_err) {}
 
-  const cachePath = getSlideCachePath(id, '');
   try {
-    mkdirSync(cachePath);
+    mkdirSync(getSlideCachePath(id, ''));
   } catch (_err) {}
   let path = getSlideCachePath(id, cacheKey);
   try {
     mkdirSync(path);
-    writeFileSync(join(cachePath, 'latest'), cacheKey);
+    writeFileSync(getSlideLatestFilePath(id), cacheKey);
   } catch (err) {
     // 作成できなかったときは既に存在していると仮定.
     // TODO: エラーの内容チェック.
@@ -121,12 +130,21 @@ export function slideCopyCacheToAssets(
   fileName: string // 拡張子きのファイル名(通常は id+拡張子)
 ): Error | null {
   let ret: Error | null = null;
-  const srcPath = getSlideCacheFilePath(id, cacheKey, fileName);
-  const dstPath = getSlideAssetsFilePath(id, cacheKey, fileName);
   try {
-    copyFileSync(srcPath, dstPath);
-    if (statSync(dstPath).size === 0) {
-      ret = new Error(`slideCopyCacheToAssets error: size of ${fileName} is 0`);
+    if (
+      readFileSync(getSlideLatestFilePath(id)).toString('utf-8') === cacheKey
+    ) {
+      const srcPath = getSlideCacheFilePath(id, cacheKey, fileName);
+      const dstPath = getSlideAssetsFilePath(id, cacheKey, fileName);
+
+      copyFileSync(srcPath, dstPath);
+      if (statSync(dstPath).size === 0) {
+        ret = new Error(
+          `slideCopyCacheToAssets error: size of ${fileName} is 0`
+        );
+      }
+    } else {
+      ret = new Error(`slideCopyCacheToAssets error: not latest cache`);
     }
   } catch (err) {
     ret = err;
@@ -152,7 +170,7 @@ export async function slideVariantFile(
     // 'wx' で上書き失敗したときのエラー
   });
   let errMsg = '';
-  const ret: number = await new Promise((resolve, reject) => {
+  let ret: number = await new Promise((resolve, reject) => {
     const marpP = spawn(marpPath, formatOpts);
     if (marpP && marpP.stdout) {
       marpP.stdout.setEncoding(options.encoding || 'binary');
@@ -176,7 +194,9 @@ export async function slideVariantFile(
     }
   });
   w.close();
-  slideCopyCacheToAssets(id, cacheKey, fileName);
+  if (slideCopyCacheToAssets(id, cacheKey, fileName) !== null) {
+    ret = 1;
+  }
   return ret;
 }
 
@@ -286,9 +306,17 @@ export async function writeSlideTitleImage(
       cacheKey,
       getSlidePublicImageFilename(id)
     );
-    if (err) {
+    if (
+      err !== null &&
+      err.message !==
+        new Error(`slideCopyCacheToAssets error: not latest cache`).message
+    ) {
       throw err;
     }
+    // latest でなかった場合はテンポラリ画像.
+    ret.url = siteServerSideConfig.slide.fallbackImage.url;
+    ret.width = siteServerSideConfig.slide.fallbackImage.width;
+    ret.height = siteServerSideConfig.slide.fallbackImage.height;
   }
   return ret;
 }

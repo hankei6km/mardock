@@ -166,7 +166,7 @@ describe('metaPage()', () => {
       link: 'https://hankei6km.github.io/mardock/deck/id1',
       keyword: [],
       image:
-        'https://hankei6km.github.io/mardock/assets/deck/id1/hash1/id1.png',
+        'https://hankei6km.github.io/mardock/assets/deck/id1/id1.png',
       description: 'deck desc'
     });
   });
