@@ -37,6 +37,7 @@ const { Element } = require('@marp-team/marpit');
 // とりあえず相対パス:
 // TODO: 絶対パスで取得
 const basePath = '.';
+export const slidePublicHtmlExt = 'html';
 export const slidePublicImageExt = 'png';
 export const slidePublicPdfExt = 'pdf';
 export const slidePublicPptxExt = 'pptx';
@@ -69,6 +70,12 @@ export function getSlidePublicFilePath(
   name: string
 ): string {
   return join(getSlidePublicPath(id, cacheKey), name);
+}
+export function getSlidePublicHtmlFilename(id: string): string {
+  return format({
+    name: id,
+    ext: `.${slidePublicHtmlExt}`
+  });
 }
 export function getSlidePublicImageFilename(id: string): string {
   return format({
@@ -114,6 +121,26 @@ export function slideCacheSetup(id: string, cacheKey: string): boolean {
   return path !== '';
 }
 
+export function slideCopyCacheToAssets(
+  id: string, // コンテンツの id
+  cacheKey: string, // 通常は HTML 化したときの hash
+  fileName: string // 拡張子きのファイル名(通常は id+拡張子)
+): Error | null {
+  let ret: Error | null = null;
+  const srcPath = getSlideCacheFilePath(id, cacheKey, fileName);
+  const dstPath = getSlideAssetsFilePath(id, cacheKey, fileName);
+  try {
+    copyFileSync(srcPath, dstPath);
+    if (statSync(dstPath).size === 0) {
+      ret = new Error(`slideCopyCacheToAssets error: size of ${fileName} is 0`);
+    }
+  } catch (err) {
+    ret = err;
+    // console.error(err);
+  }
+  return ret;
+}
+
 // console.log(basePath);
 const marpPath = join(basePath, 'node_modules', '.bin', 'marp');
 
@@ -143,23 +170,55 @@ export function slideHtml(markdown: string, w: Writable): Promise<number> {
     }
   });
 }
+export async function getSlideHtmlWithHash(
+  source: string
+): Promise<{
+  html: string;
+  hash: string;
+}> {
+  const hash = createHash('sha256');
+  // source + 変換された HTMNL で hash 確認.
+  // source が変更されても HTML は変わらないこともあるので.
+  hash.update(source);
 
-export function slideCopyCacheToAssets(
-  id: string, // コンテンツの id
-  cacheKey: string, // 通常は HTML 化したときの hash
-  fileName: string // 拡張子きのファイル名(通常は id+拡張子)
-): Error | null {
-  let ret: Error | null = null;
-  const srcPath = getSlideCacheFilePath(id, cacheKey, fileName);
-  const dstPath = getSlideAssetsFilePath(id, cacheKey, fileName);
-  try {
-    copyFileSync(srcPath, dstPath);
-    if (statSync(dstPath).size === 0) {
-      ret = new Error(`slideCopyCacheToAssets error: size of ${fileName} is 0`);
-    }
-  } catch (err) {
-    ret = err;
-    // console.error(err);
+  let html = '';
+  const s = new PassThrough();
+  s.on('data', (d) => {
+    hash.update(d);
+    html = html + d;
+  });
+  const res = await slideHtml(source, s);
+  if (res !== 0) {
+    throw new Error(`getSlideHtmlWithHash error: code:${res}`);
+  }
+  return {
+    html,
+    hash: hash.digest().toString('hex')
+  };
+}
+export async function writeSlideHtml(
+  needWrite: boolean,
+  id: string,
+  cacheKey: string,
+  html: string
+): Promise<string> {
+  let ret = getSlidePublicFilePath(
+    id,
+    cacheKey,
+    getSlidePublicHtmlFilename(id)
+  );
+  // const p = getSlidePdfPath(getSlidePublicPdfFilename(id));
+  if (needWrite) {
+    writeFileSync(
+      getSlideCacheFilePath(id, cacheKey, getSlidePublicHtmlFilename(id)),
+      html
+    );
+  }
+  if (
+    slideCopyCacheToAssets(id, cacheKey, getSlidePublicHtmlFilename(id)) !==
+    null
+  ) {
+    ret = '';
   }
   return ret;
 }
@@ -168,7 +227,7 @@ export async function slideVariantFile(
   id: string, // コンテンツの id
   cacheKey: string, // 通常は HTML 化したときの hash
   markdown: string,
-  fileName: string, // 拡張子きのファイル名(通常は id+拡張子)
+  fileName: string, // 拡張子付きのファイル名(通常は id+拡張子)
   formatOpts: string[] = ['--image', slidePublicImageExt, '--html'],
   options: { encoding?: string } = { encoding: 'binary' }
 ): Promise<number> {
