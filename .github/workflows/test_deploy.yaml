@@ -108,8 +108,8 @@ jobs:
     steps:
       - id: prep
         run: |
-          TAG1="ghcr.io/${GITHUB_REPOSITORY}_develop:latest"
-          TAG2="ghcr.io/${GITHUB_REPOSITORY}_develop:$(date "+%Y-%m")-$(echo ${GITHUB_REF} | sed -e 's/refs\/heads\///; s/\//-/g')"
+          TAG1="ghcr.io/${GITHUB_REPOSITORY}:develop"
+          TAG2="ghcr.io/${GITHUB_REPOSITORY}:$(date "+%Y-%m")-$(echo ${GITHUB_REF} | sed -e 's/refs\/heads\///; s/\//-/g')"
           echo "::set-output name=tags::${TAG1}%0A${TAG2}"
 
       - name: Check out the repo
