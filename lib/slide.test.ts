@@ -1,12 +1,9 @@
 import * as fs from 'fs';
 import * as child_process from 'child_process';
-import { PassThrough } from 'stream';
 import {
   slideCacheSetup,
-  slideHtml,
   slideCopyCacheToAssets,
   slideDeckRemoveId,
-  getSlideData,
   writeSlideTitleImage
 } from './slide';
 jest.mock('fs', () => ({
@@ -15,6 +12,9 @@ jest.mock('fs', () => ({
     .fn()
     .mockImplementation(jest.requireActual('fs').createWriteStream),
   mkdirSync: jest.fn().mockImplementation(jest.requireActual('fs').mkdirSync),
+  readFileSync: jest
+    .fn()
+    .mockImplementation(jest.requireActual('fs').readFileSync),
   writeFileSync: jest
     .fn()
     .mockImplementation(jest.requireActual('fs').writeFileSync),
@@ -49,6 +49,9 @@ afterEach(() => {
     .spyOn(fs, 'statSync')
     .mockImplementation(jest.requireActual('fs').statSync);
   jest
+    .spyOn(fs, 'readFileSync')
+    .mockImplementation(jest.requireActual('fs').readFileSync);
+  jest
     .spyOn(fs, 'writeFileSync')
     .mockImplementation(jest.requireActual('fs').writeFileSync);
   jest
@@ -67,9 +70,7 @@ describe('slideCacheSetup()', () => {
     expect(slideCacheSetup('test-id', 'test-key')).toBe(true);
     expect(mkdirSync.mock.calls.length).toEqual(4);
     expect(mkdirSync.mock.calls[0][0]).toEqual('public/assets/deck/test-id');
-    expect(mkdirSync.mock.calls[1][0]).toEqual(
-      'public/assets/deck/test-id/test-key'
-    );
+    expect(mkdirSync.mock.calls[1][0]).toEqual('public/assets/deck/test-id');
     expect(mkdirSync.mock.calls[2][0]).toEqual('.mardock/cache/deck/test-id');
     expect(mkdirSync.mock.calls[3][0]).toEqual(
       '.mardock/cache/deck/test-id/test-key'
@@ -87,30 +88,12 @@ describe('slideCacheSetup()', () => {
     expect(slideCacheSetup('test-id', 'test-key')).toBe(false);
     expect(mkdirSync.mock.calls.length).toEqual(4);
     expect(mkdirSync.mock.calls[0][0]).toEqual('public/assets/deck/test-id');
-    expect(mkdirSync.mock.calls[1][0]).toEqual(
-      'public/assets/deck/test-id/test-key'
-    );
+    expect(mkdirSync.mock.calls[1][0]).toEqual('public/assets/deck/test-id');
     expect(mkdirSync.mock.calls[2][0]).toEqual('.mardock/cache/deck/test-id');
     expect(mkdirSync.mock.calls[3][0]).toEqual(
       '.mardock/cache/deck/test-id/test-key'
     );
     expect(writeFileSync.mock.calls.length).toEqual(0);
-  });
-});
-
-describe('slideHtml()', () => {
-  it('should convert slide to html', async () => {
-    let b = '';
-    const w = new PassThrough();
-    w.on('data', (data) => {
-      b = b + data.toString();
-    });
-    //const copyFileSync = jest.spyOn(fs, 'copyFileSync').mockImplementation();
-    expect(await slideHtml('#test1 \n\n---\n- item1\n- item2', w)).toEqual(0);
-    expect(b).toContain('html');
-    b = '';
-    expect(await slideHtml('', w)).toEqual(0);
-    expect(b).toContain('');
   });
 });
 
@@ -120,15 +103,21 @@ describe('slideCopyCacheToAssets()', () => {
     const statSync = jest
       .spyOn(fs, 'statSync')
       .mockReturnValue({ size: 1 } as any);
+    const readFileSync = jest
+      .spyOn(fs, 'readFileSync')
+      .mockReturnValue('test-key');
     expect(slideCopyCacheToAssets('test-id', 'test-key', 'test-id.pdf')).toBe(
       null
     );
     expect(copyFileSync.mock.calls[0]).toEqual([
       '.mardock/cache/deck/test-id/test-key/test-id.pdf',
-      'public/assets/deck/test-id/test-key/test-id.pdf'
+      'public/assets/deck/test-id/test-id.pdf'
     ]);
     expect(statSync.mock.calls[0]).toEqual([
-      'public/assets/deck/test-id/test-key/test-id.pdf'
+      'public/assets/deck/test-id/test-id.pdf'
+    ]);
+    expect(readFileSync.mock.calls[0]).toEqual([
+      '.mardock/cache/deck/test-id/latest'
     ]);
   });
   it('should return error when abnormal end', () => {
@@ -137,12 +126,18 @@ describe('slideCopyCacheToAssets()', () => {
       .mockImplementation(() => {
         throw new Error('test-err');
       });
+    const readFileSync = jest
+      .spyOn(fs, 'readFileSync')
+      .mockReturnValue('test-key');
     expect(
       slideCopyCacheToAssets('test-id', 'test-key', 'test-id.pdf')
     ).not.toBe(null);
     expect(copyFileSync.mock.calls[0]).toEqual([
       '.mardock/cache/deck/test-id/test-key/test-id.pdf',
-      'public/assets/deck/test-id/test-key/test-id.pdf'
+      'public/assets/deck/test-id/test-id.pdf'
+    ]);
+    expect(readFileSync.mock.calls[0]).toEqual([
+      '.mardock/cache/deck/test-id/latest'
     ]);
   });
   it('should return error when file size = 0', () => {
@@ -150,15 +145,34 @@ describe('slideCopyCacheToAssets()', () => {
     const statSync = jest
       .spyOn(fs, 'statSync')
       .mockReturnValue({ size: 0 } as any);
+    const readFileSync = jest
+      .spyOn(fs, 'readFileSync')
+      .mockReturnValue('test-key');
     expect(
       slideCopyCacheToAssets('test-id', 'test-key', 'test-id.pdf')
     ).not.toBe(null);
     expect(copyFileSync.mock.calls[0]).toEqual([
       '.mardock/cache/deck/test-id/test-key/test-id.pdf',
-      'public/assets/deck/test-id/test-key/test-id.pdf'
+      'public/assets/deck/test-id/test-id.pdf'
     ]);
     expect(statSync.mock.calls[0]).toEqual([
-      'public/assets/deck/test-id/test-key/test-id.pdf'
+      'public/assets/deck/test-id/test-id.pdf'
+    ]);
+    expect(readFileSync.mock.calls[0]).toEqual([
+      '.mardock/cache/deck/test-id/latest'
+    ]);
+  });
+  it('should return error when cache is not latest', () => {
+    const copyFileSync = jest.spyOn(fs, 'copyFileSync').mockImplementation();
+    const readFileSync = jest
+      .spyOn(fs, 'readFileSync')
+      .mockReturnValue('another-key');
+    expect(
+      slideCopyCacheToAssets('test-id', 'test-key', 'test-id.pdf')
+    ).not.toBe(null);
+    expect(copyFileSync.mock.calls.length).toEqual(0);
+    expect(readFileSync.mock.calls[0]).toEqual([
+      '.mardock/cache/deck/test-id/latest'
     ]);
   });
 });
@@ -180,6 +194,9 @@ describe('writeSlideTitleImage()', () => {
     const statSync = jest
       .spyOn(fs, 'statSync')
       .mockReturnValue({ size: 1 } as any);
+    const readFileSync = jest
+      .spyOn(fs, 'readFileSync')
+      .mockReturnValue('test-hash');
     const setEncoding = jest.fn();
     const execFile = jest
       .spyOn(child_process, 'spawn')
@@ -223,13 +240,16 @@ describe('writeSlideTitleImage()', () => {
     expect(close).toHaveBeenCalledTimes(1);
     expect(copyFileSync.mock.calls[0]).toEqual([
       '.mardock/cache/deck/test-deck/test-hash/test-deck.png',
-      'public/assets/deck/test-deck/test-hash/test-deck.png'
+      'public/assets/deck/test-deck/test-deck.png'
     ]);
     expect(statSync.mock.calls[0]).toEqual([
-      'public/assets/deck/test-deck/test-hash/test-deck.png'
+      'public/assets/deck/test-deck/test-deck.png'
+    ]);
+    expect(readFileSync.mock.calls[0]).toEqual([
+      '.mardock/cache/deck/test-deck/latest'
     ]);
     expect(res).toEqual({
-      url: '/assets/deck/test-deck/test-hash/test-deck.png',
+      url: '/assets/deck/test-deck/test-deck.png',
       width: 1280,
       height: 720
     });
@@ -307,15 +327,5 @@ describe('slideDecRemoveId()', () => {
     ).toEqual(
       '<svg><foreignObject><section>page1</section></foreignObject></svg>'
     );
-  });
-});
-
-describe('getSlideData()', () => {
-  it('should convert slide source to slideData', async () => {
-    const slideData = await getSlideData(
-      '---\ntitle: slide1\n---\n#test1 \n\n---\n- item1\n- item2'
-    );
-    expect(JSON.stringify(slideData.head)).toContain('slide1');
-    expect(JSON.stringify(slideData.body)).toContain('item1');
   });
 });

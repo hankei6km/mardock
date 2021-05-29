@@ -35,7 +35,9 @@ import {
   writeSlideTitleImage,
   writeSlidePdf,
   writeSlidePptx,
-  slideCacheSetup
+  slideCacheSetup,
+  writeSlideHtml,
+  getSlideHtmlWithHash
 } from '../../lib/slide';
 import NavCategory from '../../components/NavCategory';
 import ButtonSelect from '../../components/ButtonSelect';
@@ -168,12 +170,19 @@ const useStyles = makeStyles((theme) => ({
 type Props = {
   pageData: PageData;
   comment: string;
+  htmlPath: string;
   pdfPath: string;
   pptxPath: string;
   // items: IndexList;
 };
 
-export default function Deck({ pageData, comment, pdfPath, pptxPath }: Props) {
+export default function Deck({
+  pageData,
+  comment,
+  htmlPath,
+  pdfPath,
+  pptxPath
+}: Props) {
   const classes = useStyles();
   const theme = useTheme();
   const sectionShowingEnabled = useMediaQuery(theme.breakpoints.down('sm'));
@@ -361,12 +370,10 @@ export default function Deck({ pageData, comment, pdfPath, pptxPath }: Props) {
               <Box className={classes['DeckInfo-Buttons-outer']}>
                 <Button
                   className="MuiButton-outlinedPrimary"
-                  //variant="outlined"
                   component={Link}
-                  href="/slides[id]"
-                  as={`/slides/${pageData.id}`}
+                  href={htmlPath}
                   startIcon={<SlideshowIcon />}
-                  // color="primary"
+                  disabled={htmlPath === ''}
                 >
                   <Typography component="span">プレゼンテーション</Typography>
                 </Button>
@@ -555,8 +562,10 @@ export const getStaticPaths: GetStaticPaths = async () => {
 
 export const getStaticProps: GetStaticProps = async (context) => {
   const { html, ...others } = await getPagesData('deck', context);
+  let htmlPath = '';
   let pdfPath = '';
   let pptxPath = '';
+  const hash = await getSlideHtmlWithHash(others.deck.slide.source);
   if (
     buildAssets(
       process.env.BUILD_ASSETS_DECK || '',
@@ -566,26 +575,29 @@ export const getStaticProps: GetStaticProps = async (context) => {
   ) {
     // 静的に生成されるときだけ実行.
     // 画像作成、ここで作成するのは最適?
-    const needWrite = slideCacheSetup(
+    const needWrite = slideCacheSetup(context.params?.id as string, hash);
+    htmlPath = await writeSlideHtml(
+      needWrite,
       context.params?.id as string,
-      others.deck.slide.hash
+      hash,
+      others.deck.slide.source
     );
     await writeSlideTitleImage(
       needWrite,
       context.params?.id as string,
-      others.deck.slide.hash,
+      hash,
       others.deck.slide.source
     );
     pdfPath = await writeSlidePdf(
       needWrite,
       context.params?.id as string,
-      others.deck.slide.hash,
+      hash,
       others.deck.slide.source
     );
     pptxPath = await writeSlidePptx(
       needWrite,
       context.params?.id as string,
-      others.deck.slide.hash,
+      hash,
       others.deck.slide.source
     );
   }
@@ -593,6 +605,7 @@ export const getStaticProps: GetStaticProps = async (context) => {
     props: {
       pageData: { ...others },
       comment: others.meta.description || html,
+      htmlPath,
       pdfPath,
       pptxPath
       //items

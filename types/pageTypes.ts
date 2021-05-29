@@ -1,16 +1,5 @@
 import { ContentList, PagesCategory } from './client/contentTypes';
 
-export type SlideHeadData = {
-  tagName: string;
-  attribs: { [name: string]: string };
-  html: string;
-};
-// 今回は style 無し(扱う場合は starter の方から変換処理持ってくる).
-// export type SlideBodyData = {
-//   style: { [name: string]: string };
-// } & SlideHeadData;
-export type SlideBodyData = SlideHeadData;
-
 export type DeckItem = {
   html: string;
 };
@@ -25,7 +14,6 @@ export type DeckData = {
   items: DeckItem[];
   source: string;
   meta: { [key: string]: string };
-  hash: string;
 };
 
 export type Notification = {
@@ -71,6 +59,7 @@ export type PageData = {
   deck: {
     slide: DeckData;
     overview: DeckData;
+    hash: string;
   };
   mainVisual: {
     url: string;
@@ -80,13 +69,6 @@ export type PageData = {
   description: string;
   meta: MetaData;
   feedUrl: string;
-};
-
-export type SlideData = {
-  notification?: Notification;
-  head: SlideHeadData[];
-  body: SlideBodyData[];
-  meta: { [key: string]: string };
 };
 
 // リストの項目用. この辺はもう少しきちんと作り直す/
@@ -114,8 +96,7 @@ export const blankDeckData = (): DeckData => ({
   css: '',
   script: [],
   source: '',
-  meta: {},
-  hash: ''
+  meta: {}
 });
 
 export const blankMetaData = (): MetaData => ({
@@ -146,18 +127,13 @@ export const blankPageData = (): PageData => ({
     },
     overview: {
       ...blankDeckData()
-    }
+    },
+    hash: ''
   },
   mainVisual: { url: '', width: 0, height: 0 },
   description: '',
   meta: blankMetaData(),
   feedUrl: ''
-});
-
-export const blankSlideData = (): SlideData => ({
-  head: [],
-  body: [],
-  meta: {}
 });
 
 export const blankIndexData = (): IndexData => ({
