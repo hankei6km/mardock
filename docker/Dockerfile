@@ -13,6 +13,7 @@ SHELL ["/bin/ash", "-o", "pipefail", "-c"]
 RUN apk update \
     && apk add --no-cache --virtual .build-deps \
        git \
+       libc6-compat \
        nodejs \
        yarn \
        zip \
@@ -41,7 +42,7 @@ RUN chmod u+x /docker-entrypoint \
 
 USER "${USER}"
 
-FROM alpine:edge
+FROM alpine:edge as runner
 
 ARG USER
 ARG USER_ID
@@ -53,6 +54,7 @@ RUN apk update \
        curl \
        font-noto-cjk \
        grep \
+       libc6-compat \
        nodejs \
        su-exec \
        yarn \
