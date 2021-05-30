@@ -20,7 +20,9 @@ RUN apk update \
     && adduser -S -g "${USER_GID}" --uid "${USER_ID}" "${USER}"
 
 COPY --chown="${USER}":"${USER_GID}" docker-entrypoint /
+COPY --chown="${USER}":"${USER_GID}" docker-entrypoint-start.sh /
 COPY --chown="${USER}":"${USER_GID}" docker-entrypoint-build.sh /
+COPY --chown="${USER}":"${USER_GID}" docker-entrypoint-export.sh /
 COPY --chown="${USER}":"${USER_GID}" docker-entrypoint-develop.sh /
 
 USER "${USER}"
@@ -36,7 +38,9 @@ RUN echo "${NO_CACHE_CLONE}" \
 
 USER root
 RUN chmod u+x /docker-entrypoint \
+    && chmod u+x /docker-entrypoint-start.sh \
     && chmod u+x /docker-entrypoint-build.sh \
+    && chmod u+x /docker-entrypoint-export.sh \
     && chmod u+x /docker-entrypoint-develop.sh \
     && apk del --force-broken-world .build-deps
 
@@ -65,7 +69,9 @@ ENV MARDOCK_USER "${USER}:$USER_GID}"
 USER "${USER}"
 ENV IS_DOCKER true
 COPY --from=builder "/docker-entrypoint" "/docker-entrypoint"
+COPY --from=builder "/docker-entrypoint"-start.sh "/docker-entrypoint-start.sh"
 COPY --from=builder "/docker-entrypoint"-build.sh "/docker-entrypoint-build.sh"
+COPY --from=builder "/docker-entrypoint"-export.sh "/docker-entrypoint-export.sh"
 COPY --from=builder "/docker-entrypoint"-develop.sh "/docker-entrypoint-develop.sh"
 COPY --from=builder --chown="${USER}:${USER_GID}" "/home/${USER}/mardock" "/home/${USER}/mardock"
 
