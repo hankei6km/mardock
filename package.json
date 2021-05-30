@@ -12,6 +12,7 @@
     "dev": "yarn pre && next",
     "build": "yarn pre && next build && node scripts/purge_cache.js && find .mardock/cache -name '*.png'",
     "build:vercel": "yarn pre && yum install zip -y && yarn licenses:build && yarn build",
+    "preexport": "yarn build",
     "export": "next export",
     "start": "yarn pre && next start",
     "type-check": "tsc",

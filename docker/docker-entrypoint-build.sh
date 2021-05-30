@@ -1,9 +1,9 @@
 #!/bin/ash
 
-MARDOCK_CWD="/home/mardock/mardock"
+SCRIPT_NAME="build"
 
 if test "$(id -u)" -eq 0; then
-  exec su-exec "${MARDOCK_USER}" sh -c 'yarn --cwd "${MARDOCK_CWD}" build && yarn --cwd "${MARDOCK_CWD}" export && touch "${MARDOCK_CWD}/out/.nojekyll"' 
+  exec su-exec "${MARDOCK_USER}" yarn --cwd "${MARDOCK_CWD}" "${SCRIPT_NAME}"
 else
-  exec sh -c 'yarn --cwd "${MARDOCK_CWD}" build && yarn --cwd "${MARDOCK_CWD}" export && touch "${MARDOCK_CWD}/out/.nojekyll"' 
+  exec sh -c yarn --cwd "${MARDOCK_CWD}" "${SCRIPT_NAME}"
 fi
