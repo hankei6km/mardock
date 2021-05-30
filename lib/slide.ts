@@ -406,7 +406,7 @@ export async function writeSlidePptx(
     }
   } else {
     if (
-      slideCopyCacheToAssets(id, cacheKey, getSlidePublicPdfFilename(id)) !==
+      slideCopyCacheToAssets(id, cacheKey, getSlidePublicPptxFilename(id)) !==
       null
     ) {
       ret = '';
