@@ -1,79 +1,90 @@
-ARG USER=mardock
-ARG USER_ID=1000
-ARG USER_GID=users
-
-FROM alpine:edge as builder
-
-ARG USER
-ARG USER_ID
-ARG USER_GID
+FROM alpine:edge as base
 
 SHELL ["/bin/ash", "-o", "pipefail", "-c"]
 
-RUN apk update \
-    && apk add --no-cache --virtual .build-deps \
-       git \
+RUN apk --no-cache add \
        libc6-compat \
        nodejs \
        yarn \
+    && adduser -S -g "users" --uid "1000" "mardock" \
+    && mkdir "/home/mardock/mardock" \
+    && chown "mardock:users" "/home/mardock/mardock"
+
+
+FROM base as modules
+
+SHELL ["/bin/ash", "-o", "pipefail", "-c"]
+
+RUN apk add --no-cache \
        zip \
-    && adduser -S -g "${USER_GID}" --uid "${USER_ID}" "${USER}"
+    && mkdir -p /tmp/mardock/scripts
+COPY package.json yarn.lock LICENSE /tmp/mardock/
+COPY scripts/open_source_licenses_build.sh /tmp/mardock/scripts/open_source_licenses_build.sh
 
-COPY --chown="${USER}":"${USER_GID}" docker-entrypoint /
-COPY --chown="${USER}":"${USER_GID}" docker-entrypoint-start.sh /
-COPY --chown="${USER}":"${USER_GID}" docker-entrypoint-build.sh /
-COPY --chown="${USER}":"${USER_GID}" docker-entrypoint-export.sh /
-COPY --chown="${USER}":"${USER_GID}" docker-entrypoint-develop.sh /
+RUN INST_PATH="/tmp/mardock" \
+    && yarn --cwd "${INST_PATH}" install --no-cache --production --frozen-lockfile \
+    && yarn --cwd "${INST_PATH}" licenses:build \
+    && yarn --cwd "${INST_PATH}" cache clean
 
-USER "${USER}"
+
+FROM modules as builder
+
+SHELL ["/bin/ash", "-o", "pipefail", "-c"]
+
+COPY docker-entrypoint* /
+
+RUN apk add --no-cache \
+       git \
+    && chmod u+x /docker-entrypoint \
+    && chmod u+x /docker-entrypoint-start.sh \
+    && chmod u+x /docker-entrypoint-build.sh \
+    && chmod u+x /docker-entrypoint-export.sh \
+    && chmod u+x /docker-entrypoint-develop.sh
+
+USER "mardock"
 
 ARG NO_CACHE_CLONE=1
 ARG BRANCH=main
 RUN echo "${NO_CACHE_CLONE}" \
-    && git clone --depth 1 --branch "${BRANCH#refs/heads/}"  https://github.com/hankei6km/mardock.git "/home/${USER}/mardock" \
-    && yarn --cwd "/home/${USER}/mardock" install --no-cache --frozen-lockfile \
-    && yarn --cwd "/home/${USER}/mardock" licenses:build \
-    && yarn --cwd "/home/${USER}/mardock" dirs:build \
-    && yarn --cwd "/home/${USER}/mardock" cache clean
+    && INST_PATH="/home/mardock/mardock" \
+    && mkdir "$INST_PATH}" \
+    && git clone --depth 1 --branch "${BRANCH#refs/heads/}"  https://github.com/hankei6km/mardock.git "${INST_PATH}" \
+    && cp -r /tmp/mardock/node_modules "${INST_PATH}/node_modules" \
+    && yarn --cwd "${INST_PATH}" dirs:build \
+    && rm  -rf "${INST_PATH}"/.git* \
+         "${INST_PATH}/node_modules" \
+         "${INST_PATH}/.vercelignore" \
+         "${INST_PATH}/.prettierrc" \
+         "${INST_PATH}/README.md" \
+         "${INST_PATH}/docker" \
+         "${INST_PATH}/jest.config.js" \
+         "${INST_PATH}/vercel.json" \
+         "${INST_PATH}/sandbox.config.json" \
+         "${INST_PATH}/setupTests.ts" \
+         "${INST_PATH}/test" \
+    && find "${INST_PATH}" -name "*.test.ts*" -type f -print0 | xargs -0 rm
 
-USER root
-RUN chmod u+x /docker-entrypoint \
-    && chmod u+x /docker-entrypoint-start.sh \
-    && chmod u+x /docker-entrypoint-build.sh \
-    && chmod u+x /docker-entrypoint-export.sh \
-    && chmod u+x /docker-entrypoint-develop.sh \
-    && apk del --force-broken-world .build-deps
 
-USER "${USER}"
 
-FROM alpine:edge as runner
+FROM base as runner
 
-ARG USER
-ARG USER_ID
-ARG USER_GID
-
-RUN apk update \
-    && apk add --no-cache \
+RUN apk add --no-cache \
        chromium  \
        curl \
        font-noto-cjk \
        grep \
-       libc6-compat \
-       nodejs \
-       su-exec \
-       yarn \
-    && adduser -S -g "${USER_GID}" --uid "${USER_ID}" "${USER}"
+       su-exec
 
-ENV MARDOCK_USER "${USER}:$USER_GID}"
+ENV MARDOCK_USER "mardock:users"
 
-USER "${USER}"
+USER "mardock"
 ENV IS_DOCKER true
-COPY --from=builder "/docker-entrypoint" "/docker-entrypoint"
-COPY --from=builder "/docker-entrypoint"-start.sh "/docker-entrypoint-start.sh"
-COPY --from=builder "/docker-entrypoint"-build.sh "/docker-entrypoint-build.sh"
-COPY --from=builder "/docker-entrypoint"-export.sh "/docker-entrypoint-export.sh"
-COPY --from=builder "/docker-entrypoint"-develop.sh "/docker-entrypoint-develop.sh"
-COPY --from=builder --chown="${USER}:${USER_GID}" "/home/${USER}/mardock" "/home/${USER}/mardock"
+WORKDIR "/home/mardock/mardock"
 
-WORKDIR "/home/${USER}/mardock"
+COPY --from=modules "/tmp/mardock/node_modules" "/home/mardock/mardock/node_modules"
+COPY --from=modules "/tmp/mardock/open_source_licenses.zip" "/home/mardock/mardock/open_source_licenses.zip"
+
+COPY --from=builder "/docker-entrypoint*" "/"
+COPY --from=builder --chown="mardock:users" "/home/mardock/mardock/" "/home/mardock/mardock/"
+
 ENTRYPOINT ["/docker-entrypoint"]

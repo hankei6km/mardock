@@ -1,12 +1,8 @@
 #!/bin/sh
 set -e
 
-PUBLIC_PATH="public"
 LICENSES_TXT="open_source_licenses.txt"
-LICENSES_ZIP="${PUBLIC_PATH}/open_source_licenses.zip"
-
-test -d "${PUBLIC_PATH}" || mkdir "${PUBLIC_PATH}" 
-test -e "${LICENSES_ZIP}" && rm "${LICENSES_ZIP}"
+LICENSES_ZIP="open_source_licenses.zip"
 
 cat LICENSE > "${LICENSES_TXT}"
 echo "" >> "${LICENSES_TXT}"
