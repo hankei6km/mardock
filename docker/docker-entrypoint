@@ -1,7 +1,5 @@
 #!/bin/ash
 
-MARDOCK_CWD="/home/mardock/mardock"
-
 case "${1}" in
   "start") exec /docker-entrypoint-start.sh ;;
   "build") exec /docker-entrypoint-build.sh ;;

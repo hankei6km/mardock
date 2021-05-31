@@ -11,6 +11,8 @@ RUN apk --no-cache add \
     && chown "mardock:users" "/home/mardock/mardock"
 
 
+# https://nextjs.org/docs/deployment#docker-image
+# 上記を参考にするが、1つの image で build と start も対応させる予定.
 FROM base as modules
 
 SHELL ["/bin/ash", "-o", "pipefail", "-c"]
@@ -21,8 +23,6 @@ RUN apk add --no-cache \
 COPY package.json yarn.lock LICENSE /tmp/mardock/
 COPY scripts/open_source_licenses_build.sh /tmp/mardock/scripts/open_source_licenses_build.sh
 
-# https://nextjs.org/docs/deployment#docker-image
-# next build と next start 用に image を分けるということ?
 RUN INST_PATH="/tmp/mardock" \
     # && yarn --cwd "${INST_PATH}" install --no-cache --production --frozen-lockfile \
     && yarn --cwd "${INST_PATH}" install --no-cache --frozen-lockfile \
@@ -84,6 +84,7 @@ RUN apk add --no-cache \
        su-exec
 
 ENV MARDOCK_USER "mardock:users"
+ENV MARDOCK_CWD "/home/mardock/mardock"
 
 USER "mardock"
 ENV IS_DOCKER true
