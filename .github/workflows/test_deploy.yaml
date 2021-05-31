@@ -115,7 +115,7 @@ jobs:
       - name: Check out the repo
         uses: actions/checkout@v2
 
-      - name: Copy package.json yarn.lock to docker
+      - name: Copy files to docker
         run: cp -r package.json yarn.lock LICENSE scripts docker/
 
       - name: Set up Docker Buildx
