@@ -21,8 +21,16 @@ RUN apk add --no-cache \
 COPY package.json yarn.lock LICENSE /tmp/mardock/
 COPY scripts/open_source_licenses_build.sh /tmp/mardock/scripts/open_source_licenses_build.sh
 
+# https://nextjs.org/docs/deployment#docker-image
+# next build と next start 用に image を分けるということ?
 RUN INST_PATH="/tmp/mardock" \
-    && yarn --cwd "${INST_PATH}" install --no-cache --production --frozen-lockfile \
+    # && yarn --cwd "${INST_PATH}" install --no-cache --production --frozen-lockfile \
+    && yarn --cwd "${INST_PATH}" install --no-cache --frozen-lockfile \
+    && yarn --cwd "${INST_PATH}" remove jest \
+       @testing-library/jest-dom \
+       @testing-library/react \
+       jest-fetch-mock \
+       jest-watch-typeahead \
     && yarn --cwd "${INST_PATH}" licenses:build \
     && yarn --cwd "${INST_PATH}" cache clean
 
