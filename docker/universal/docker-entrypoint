@@ -7,4 +7,6 @@ case "${1}" in
   "develop") exec /docker-entrypoint-develop.sh ;;
 esac
 
+test "${MARDOCK_KEEP_SERVICE}" = "keep" && tail -f /dev/null
+
 exec echo "docker run [OPTIONS] mardock:latest [start | build | export | develop]"
