@@ -34,7 +34,10 @@ module.exports = (phase) => {
     ? `/${process.env.GITHUB_REPOSITORY.split('/', 2)[1]}`
     : '';
   _assetPrefix =
-    isStaging && process.env.STAGING_DIR
+    // next start 等では PHASE_PRODUCTION_BUILD がセットされないようなので
+    // mardock の独自仕様として STAGING_DIR だけで変更する.
+    // isStaging && process.env.STAGING_DIR
+    process.env.STAGING_DIR
       ? path.join(_assetPrefix, process.env.STAGING_DIR)
       : _assetPrefix;
   if (process.env.ASSET_PREFIX && process.env.ASSET_PREFIX.startsWith('/')) {
