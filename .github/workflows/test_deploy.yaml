@@ -167,6 +167,8 @@ jobs:
 
     name: Deploy site to GitHub Pages
     needs: [prep, set_ids]
+    # スキップは継続させるが、落ちている(出力が無い)場合は継続しない.
+    if: ${{ needs.set_ids.outputs.universal_image_id != '' && always() }}
     runs-on: ubuntu-latest
     environment: pages-staging
     services:
@@ -242,6 +244,8 @@ jobs:
 
     name: Push mardock site image to GitHub Container Registry
     needs: [prep, set_ids, deploy_site_to_gh_pages]
+    # スキップは継続させるが、落ちている(出力が無い)場合は継続しない.
+    if: ${{ needs.set_ids.outputs.universal_image_id != '' && always() }}
     runs-on: ubuntu-latest
     strategy:
       # 各 variant(stage) で共通のデータもあるり(public ディレクトリ等)、
