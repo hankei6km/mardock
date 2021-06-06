@@ -33,7 +33,7 @@ jobs:
       universal_image_digest: ${{ steps.push_universal_image.outputs.digest }}
       universal_prod_image_digest: ${{ steps.push_universal_prod_image.outputs.digest }}
     runs-on: ubuntu-latest
-    # matrix に分割すると develop と develop_prod で runner_base の layer が
+    # matrix に分割すると edge と edge_prod で runner_base の layer が
     # 共有されない. 今回は共有されることを優先した.
     # strategy:
     #   matrix:
@@ -42,13 +42,13 @@ jobs:
       - id: prep
         run: |
           TAG1="ghcr.io/${GITHUB_REPOSITORY}:$(date "+%Y-%m")-$(echo ${GITHUB_REF} | sed -e 's/refs\/heads\///; s/\//-/g')"
-          TAG2="ghcr.io/${GITHUB_REPOSITORY}:develop"
+          TAG2="ghcr.io/${GITHUB_REPOSITORY}:edge"
           echo "::set-output name=tags::${TAG1}%0A${TAG2}"
 
       - id: prep_prod
         run: |
           TAG1="ghcr.io/${GITHUB_REPOSITORY}:$(date "+%Y-%m")-$(echo ${GITHUB_REF} | sed -e 's/refs\/heads\///; s/\//-/g')_prod"
-          TAG2="ghcr.io/${GITHUB_REPOSITORY}:develop_prod"
+          TAG2="ghcr.io/${GITHUB_REPOSITORY}:edge_prod"
           echo "::set-output name=tags::${TAG1}%0A${TAG2}"
 
       - name: Check out the repo
@@ -100,7 +100,7 @@ jobs:
           tags: ${{ steps.prep.outputs.tags }}
             #cache-from: type=local,src=/tmp/.buildx-cache
             #cache-to: type=local,dest=/tmp/.buildx-cache-new
-          cache-from: type=registry,ref=ghcr.io/${{ github.repository}}:develop
+          cache-from: type=registry,ref=ghcr.io/${{ github.repository}}:edge
           cache-to: type=inline
             #cache-to: type=local,dest=/tmp/.buildx-cache-new
 
@@ -117,7 +117,7 @@ jobs:
           tags: ${{ steps.prep_prod.outputs.tags }}
             #cache-from: type=local,src=/tmp/.buildx-cache
             #cache-to: type=local,dest=/tmp/.buildx-cache-new
-          cache-from: type=registry,ref=ghcr.io/${{ github.repository}}:develop_prod
+          cache-from: type=registry,ref=ghcr.io/${{ github.repository}}:edge_prod
           cache-to: type=inline
             #cache-to: type=local,dest=/tmp/.buildx-cache-new
 
@@ -217,7 +217,7 @@ jobs:
       - id: prep
         run: |
           TAG1="ghcr.io/${GITHUB_REPOSITORY}_site:$(date "+%Y-%m")-$(echo ${GITHUB_REF} | sed -e 's/refs\/heads\///; s/\//-/g')${VARIANT_SUFFIX}"
-          TAG2="ghcr.io/${GITHUB_REPOSITORY}_site:develop${VARIANT_SUFFIX}"
+          TAG2="ghcr.io/${GITHUB_REPOSITORY}_site:edge${VARIANT_SUFFIX}"
           echo "::set-output name=tags::${TAG1}%0A${TAG2}"
         env:
           VARIANT_SUFFIX: ${{ matrix.variant_suffix }}
@@ -260,5 +260,5 @@ jobs:
           tags: ${{ steps.prep.outputs.tags }}
             #cache-from: type=local,src=/tmp/.buildx-cache
             #cache-to: type=local,dest=/tmp/.buildx-cache-new
-          cache-from: type=registry,ref=ghcr.io/${{ github.repository}}_site:develop${{ matrix.variant_suffix }}
+          cache-from: type=registry,ref=ghcr.io/${{ github.repository}}_site:edge${{ matrix.variant_suffix }}
           cache-to: type=inline
