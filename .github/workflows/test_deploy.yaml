@@ -252,7 +252,10 @@ jobs:
       # stage もある程度考慮しているが、matrix で build しているので
       # layer が共通されない. 今回は諦めた.
       matrix:
-        variant_suffix: ["", "_with_cache", "_only_cache"]
+        variant:
+          - suffix: ""
+          - suffix: "_with_cache"
+          - suffix: "_only_cache"
     steps:
       - id: prep
         run: |
@@ -264,7 +267,7 @@ jobs:
             || TAGS="${TAG1}%0A${TAG2}"
           echo "::set-output name=tags::${TAGS}"
         env:
-          VARIANT_SUFFIX: ${{ matrix.variant_suffix }}
+          VARIANT_SUFFIX: ${{ matrix.variant.suffix }}
 
       - name: Check out the repo
         uses: actions/checkout@v2
@@ -300,9 +303,9 @@ jobs:
           build-args: |
             BASE_IMAGE=ghcr.io/${{ github.repository }}${{ needs.set_ids.outputs.universal_prod_image_id }}
           push: true
-          target: site_runner${{ matrix.variant_suffix }}
+          target: site_runner${{ matrix.variant.suffix }}
           tags: ${{ steps.prep.outputs.tags }}
             #cache-from: type=local,src=/tmp/.buildx-cache
             #cache-to: type=local,dest=/tmp/.buildx-cache-new
-          cache-from: type=registry,ref=ghcr.io/${{ github.repository}}_site:edge${{ matrix.variant_suffix }}
+          cache-from: type=registry,ref=ghcr.io/${{ github.repository}}_site:edge${{ matrix.variant.suffix }}
           cache-to: type=inline
