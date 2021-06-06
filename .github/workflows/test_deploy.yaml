@@ -28,7 +28,7 @@ jobs:
 
     name: Push mardock universal image to GitHub Container Registry
     needs: prep
-    if: "startsWith(github.ref, 'refs/heads/')"
+    if: ${{ github.event_name == 'push' && startsWith(github.ref, 'refs/heads/') }}
     outputs:
       universal_image_digest: ${{ steps.push_universal_image.outputs.digest }}
       universal_prod_image_digest: ${{ steps.push_universal_prod_image.outputs.digest }}
