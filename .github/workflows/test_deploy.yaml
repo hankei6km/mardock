@@ -129,15 +129,35 @@ jobs:
           rm -rf /tmp/.buildx-cache
           mv /tmp/.buildx-cache-new /tmp/.buildx-cache
 
+  set_ids:
+
+    name: Set image ids from digest or tag
+    needs: [ push_universal_image_to_ghcr]
+    if: always() 
+    outputs:
+      universal_image_id: ${{ steps.formatter.outputs.id }}
+      universal_prod_image_id: ${{ steps.formatter.outputs.prod_id }}
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Set digest to outputs with prefix('@' or ':')
+        id: formatter
+        run: |
+          echo "::set-output name=id::@${DIGEST}"
+          echo "::set-output name=prod_id::@${PROD_DIGEST}"
+        env:
+          DIGEST: ${{ needs.push_universal_image_to_ghcr.outputs.universal_image_digest }}
+          PROD_DIGEST: ${{ needs.push_universal_image_to_ghcr.outputs.universal_prod_image_digest }}
+
   deploy_site_to_gh_pages:
 
     name: Deploy site to GitHub Pages
-    needs: [prep, push_universal_image_to_ghcr]
+    needs: [prep, set_ids]
     runs-on: ubuntu-latest
     environment: pages-staging
     services:
       mardock_builder:
-        image: ghcr.io/${{ github.repository }}@${{ needs.push_universal_image_to_ghcr.outputs.universal_image_digest }}
+        image: ghcr.io/${{ github.repository }}${{ needs.set_ids.outputs.universal_image_id }}
         volumes:
           - /tmp/next:/home/mardock/mardock/.next
           - /tmp/public:/home/mardock/mardock/public
@@ -153,11 +173,13 @@ jobs:
           STAGING_DIR: ${{ secrets.STAGING_DIR }}
 
     steps:
-      - name: check digest
+      - name: check image id
         run: |
-          echo "${DIGEST}"
+          echo "$IMAGE_ID}"
+          echo "$PROD_IMAGE_ID}"
         env:
-          DIGEST: ${{ needs.push_universal_image_to_ghcr.outputs.universal_image_digest }}
+          IMAGE_ID: ${{ needs.set_ids.outputs.universal_image_id }}
+          PROD_IMAGE_ID: ${{ needs.set_ids.outputs.universal_image_id }}
 
       # mardock の site build キャッシュ.
       # key と restore-key の階層を一致させないことで毎回キャッシュを更新させる.
@@ -205,7 +227,7 @@ jobs:
   push_site_image_to_ghcr:
 
     name: Push mardock site image to GitHub Container Registry
-    needs: [prep, push_universal_image_to_ghcr, deploy_site_to_gh_pages]
+    needs: [prep, set_ids, deploy_site_to_gh_pages]
     runs-on: ubuntu-latest
     strategy:
       # 各 variant(stage) で共通のデータもあるり(public ディレクトリ等)、
@@ -254,7 +276,7 @@ jobs:
         with:
           context: ./docker/site
           build-args: |
-            BASE_IMAGE=ghcr.io/${{ github.repository }}@${{ needs.push_universal_image_to_ghcr.outputs.universal_prod_image_digest }}
+            BASE_IMAGE=ghcr.io/${{ github.repository }}${{ needs.set_ids.outputs.universal_prod_image_id }}
           push: true
           target: site_runner${{ matrix.variant_suffix }}
           tags: ${{ steps.prep.outputs.tags }}
