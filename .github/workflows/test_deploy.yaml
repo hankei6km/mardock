@@ -43,13 +43,21 @@ jobs:
         run: |
           TAG1="ghcr.io/${GITHUB_REPOSITORY}:$(date "+%Y-%m")-$(echo ${GITHUB_REF} | sed -e 's/refs\/heads\///; s/\//-/g')"
           TAG2="ghcr.io/${GITHUB_REPOSITORY}:edge"
-          echo "::set-output name=tags::${TAG1}%0A${TAG2}"
+          TAG3="ghcr.io/${GITHUB_REPOSITORY}:main"
+          test "${GITHUB_REF}" = "refs/heads/main" \
+            && TAGS="${TAG1}%0A${TAG2}%0A${TAG3}" \
+            || TAGS="${TAG1}%0A${TAG2}"
+          echo "::set-output name=tags::${TAGS}"
 
       - id: prep_prod
         run: |
           TAG1="ghcr.io/${GITHUB_REPOSITORY}:$(date "+%Y-%m")-$(echo ${GITHUB_REF} | sed -e 's/refs\/heads\///; s/\//-/g')_prod"
           TAG2="ghcr.io/${GITHUB_REPOSITORY}:edge_prod"
-          echo "::set-output name=tags::${TAG1}%0A${TAG2}"
+          TAG3="ghcr.io/${GITHUB_REPOSITORY}:main_prod"
+          test "${GITHUB_REF}" = "refs/heads/main" \
+            && TAGS="${TAG1}%0A${TAG2}%0A${TAG3}" \
+            || TAGS="${TAG1}%0A${TAG2}"
+          echo "::set-output name=tags::${TAGS}"
 
       - name: Check out the repo
         uses: actions/checkout@v2
@@ -179,7 +187,7 @@ jobs:
           echo "$PROD_IMAGE_ID}"
         env:
           IMAGE_ID: ${{ needs.set_ids.outputs.universal_image_id }}
-          PROD_IMAGE_ID: ${{ needs.set_ids.outputs.universal_image_id }}
+          PROD_IMAGE_ID: ${{ needs.set_ids.outputs.universal_prod_image_id }}
 
       # mardock の site build キャッシュ.
       # key と restore-key の階層を一致させないことで毎回キャッシュを更新させる.
@@ -240,7 +248,11 @@ jobs:
         run: |
           TAG1="ghcr.io/${GITHUB_REPOSITORY}_site:$(date "+%Y-%m")-$(echo ${GITHUB_REF} | sed -e 's/refs\/heads\///; s/\//-/g')${VARIANT_SUFFIX}"
           TAG2="ghcr.io/${GITHUB_REPOSITORY}_site:edge${VARIANT_SUFFIX}"
-          echo "::set-output name=tags::${TAG1}%0A${TAG2}"
+          TAG3="ghcr.io/${GITHUB_REPOSITORY}_site:main${VARIANT_SUFFIX}"
+          test "${GITHUB_REF}" = "refs/heads/main" \
+            && TAGS="${TAG1}%0A${TAG2}%0A${TAG3}" \
+            || TAGS="${TAG1}%0A${TAG2}"
+          echo "::set-output name=tags::${TAGS}"
         env:
           VARIANT_SUFFIX: ${{ matrix.variant_suffix }}
 
