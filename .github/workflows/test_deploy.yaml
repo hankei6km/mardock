@@ -151,8 +151,14 @@ jobs:
       - name: Set digest to outputs with prefix('@' or ':')
         id: formatter
         run: |
-          echo "::set-output name=id::@${DIGEST}"
-          echo "::set-output name=prod_id::@${PROD_DIGEST}"
+          test "${GITHUB_EVENT_NAME}" = "push" \
+            && ID="@${DIGEST}" \
+            || ID=":main"
+          echo "::set-output name=id::${ID}"
+          test "${GITHUB_EVENT_NAME}" = "push" \
+            && PROD_ID="@${PROD_DIGEST}" \
+            || PROD_ID=":main_prod"
+          echo "::set-output name=prod_id::${PROD_ID}"
         env:
           DIGEST: ${{ needs.push_universal_image_to_ghcr.outputs.universal_image_digest }}
           PROD_DIGEST: ${{ needs.push_universal_image_to_ghcr.outputs.universal_prod_image_digest }}
