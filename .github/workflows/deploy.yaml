@@ -175,7 +175,7 @@ jobs:
     outputs:
       success: ${{ steps.status.outputs.success }}
     runs-on: ubuntu-latest
-    environment: pages-staging
+    environment: ${{ github.ref == 'refs/heads/main'  && 'pages' || 'pages-staging' }}
     services:
       mardock_builder:
         image: ghcr.io/${{ github.repository }}${{ needs.set_ids.outputs.universal_image_id }}
