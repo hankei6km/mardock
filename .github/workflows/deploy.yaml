@@ -1,9 +1,6 @@
 name: test_deplpoy
 on:
   push:
-    branches-ignore:
-      - master
-      - main
   repository_dispatch:
     types: [deploy_push]
 
