@@ -15,7 +15,8 @@ ASSETS_PATH="public/assets"
 ASSETS_DECK_PATH="public/assets/deck"
 ASSETS_FEEDS_PATH="public/assets/feeds"
 
-# public/assets はビルド毎に再作成する.
-test -d "${ASSETS_PATH}" && rm -r "${ASSETS_PATH}"
-mkdir -p "${ASSETS_DECK_PATH}" 
-mkdir -p "${ASSETS_FEEDS_PATH}" 
+# public/assets は next build 等では "rebuild" 指定され、
+# 再作成する
+test "${1}" = "rebuild" && test -d "${ASSETS_PATH}" && rm -r "${ASSETS_PATH}"
+test -d  "${ASSETS_DECK_PATH}" || mkdir -p "${ASSETS_DECK_PATH}" 
+test -d  "${ASSETS_DECK_PATH}" || mkdir -p "${ASSETS_FEEDS_PATH}" 

@@ -1,7 +1,0 @@
-#!/bin/ash
-
-if test "$(id -u)" -eq 0; then
-  exec su-exec "${MARDOCK_USER}" yarn --cwd /home/mardock/mardock dev
-else
-  exec yarn --cwd /home/mardock/mardock dev
-fi

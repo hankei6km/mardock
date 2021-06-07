@@ -1,0 +1,12 @@
+#!/bin/ash
+
+case "${1}" in
+  "start") exec /docker-entrypoint-start.sh ;;
+  "build") exec /docker-entrypoint-build.sh ;;
+  "export") exec /docker-entrypoint-export.sh ;;
+  "develop") exec /docker-entrypoint-develop.sh ;;
+esac
+
+test "${MARDOCK_KEEP_SERVICE}" = "keep" && tail -f /dev/null
+
+exec echo "docker run [OPTIONS] mardock:latest [start | build | export | develop]"

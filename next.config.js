@@ -23,6 +23,7 @@ module.exports = (phase) => {
       // 今回は GitHub 上で実行されていたら pages に export されるという想定.
       // Pages with `fallback` enabled in `getStaticPaths` can not be exported.
       // See more info here: https://err.sh/next.js/ssg-fallback-true-export
+      if (process.env.STATIC_BUILD) return 'true';
       if (process.env.GITHUB_REPOSITORY) return 'true';
       return '';
     })()
@@ -33,7 +34,10 @@ module.exports = (phase) => {
     ? `/${process.env.GITHUB_REPOSITORY.split('/', 2)[1]}`
     : '';
   _assetPrefix =
-    isStaging && process.env.STAGING_DIR
+    // next start 等では PHASE_PRODUCTION_BUILD がセットされないようなので
+    // mardock の独自仕様として STAGING_DIR だけで変更する.
+    // isStaging && process.env.STAGING_DIR
+    process.env.STAGING_DIR
       ? path.join(_assetPrefix, process.env.STAGING_DIR)
       : _assetPrefix;
   if (process.env.ASSET_PREFIX && process.env.ASSET_PREFIX.startsWith('/')) {
@@ -44,6 +48,7 @@ module.exports = (phase) => {
   const basePath = assetPrefix;
 
   console.log(`assetPrefix:${assetPrefix}`);
+  console.log(`env:\n${JSON.stringify(env, null, ' ')}`);
 
   // className がサーバーとブラウザーでずれる対策?
   // https://github.com/Learus/react-material-ui-carousel/issues/2
