@@ -141,7 +141,7 @@ jobs:
 
     name: Set image ids from digest or tag
     needs: [ push_universal_image_to_ghcr]
-    if: always() 
+    if: ${{ always() && !cancelled() }}
     outputs:
       universal_image_id: ${{ steps.formatter.outputs.id }}
       universal_prod_image_id: ${{ steps.formatter.outputs.prod_id }}
@@ -168,7 +168,7 @@ jobs:
     name: Deploy site to GitHub Pages
     needs: [prep, set_ids]
     # スキップは継続させるが、落ちている(出力が無い)場合は継続しない.
-    if: ${{ needs.set_ids.outputs.universal_prod_image_id != '' && always() }}
+    if: ${{ needs.set_ids.outputs.universal_prod_image_id != '' && always() && !cancelled() }}
     outputs:
       success: ${{ steps.status.outputs.success }}
     runs-on: ubuntu-latest
@@ -251,7 +251,7 @@ jobs:
     name: Push mardock site image to GitHub Container Registry
     needs: [prep, set_ids, deploy_site_to_gh_pages]
     # スキップは継続させるが、落ちている(出力が無い)場合は継続しない.
-    if: ${{ needs.deploy_site_to_gh_pages.outputs.success != '' && always() }}
+    if: ${{ needs.deploy_site_to_gh_pages.outputs.success != '' && always() && !cancelled() }}
     runs-on: ubuntu-latest
     strategy:
       # 各 variant(stage) で共通のデータもあるり(public ディレクトリ等)、
