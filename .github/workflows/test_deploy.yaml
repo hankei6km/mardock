@@ -169,6 +169,8 @@ jobs:
     needs: [prep, set_ids]
     # スキップは継続させるが、落ちている(出力が無い)場合は継続しない.
     if: ${{ needs.set_ids.outputs.universal_image_id != '' && always() }}
+    outputs:
+      success: ${{ steps.status.outputs.success }}
     runs-on: ubuntu-latest
     environment: pages-staging
     services:
@@ -239,13 +241,17 @@ jobs:
           publish_branch: gh-pages
           destination_dir: ${{ secrets.STAGING_DIR }}
 
+      - name: Set success to outputs
+        id: status
+        run: echo "::set-output name=success::true"
+
 
   push_site_image_to_ghcr:
 
     name: Push mardock site image to GitHub Container Registry
     needs: [prep, set_ids, deploy_site_to_gh_pages]
     # スキップは継続させるが、落ちている(出力が無い)場合は継続しない.
-    if: ${{ needs.set_ids.outputs.universal_image_id != '' && always() }}
+    if: ${{ needs.deploy_site_to_gh_pages.outputs.success != '' && always() }}
     runs-on: ubuntu-latest
     strategy:
       # 各 variant(stage) で共通のデータもあるり(public ディレクトリ等)、
