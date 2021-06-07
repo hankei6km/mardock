@@ -243,6 +243,7 @@ jobs:
           publish_dir: /tmp/mardock/out
           publish_branch: gh-pages
           destination_dir: ${{ secrets.STAGING_DIR }}
+          force_orphan: ${{ github.ref == 'refs/heads/main' }}
 
       - name: Set success to outputs
         id: status
