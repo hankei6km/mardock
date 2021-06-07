@@ -180,8 +180,6 @@ jobs:
       mardock_builder:
         image: ghcr.io/${{ github.repository }}${{ needs.set_ids.outputs.universal_image_id }}
         volumes:
-          - /tmp/next:/home/mardock/mardock/.next
-          - /tmp/public:/home/mardock/mardock/public
           - /tmp/mardock:/home/mardock/mardock/.mardock
         options: --init
         env:
@@ -190,7 +188,7 @@ jobs:
           LANG: ja_JP.UTF-8
           API_BASE_URL: ${{ secrets.API_BASE_URL }}
           GET_API_KEY: ${{ secrets.GET_API_KEY }}
-          STAGING: "1"
+          STAGING: ${{ github.ref == 'refs/heads/main' && '' || '1' }}
           STAGING_DIR: ${{ secrets.STAGING_DIR }}
 
     steps:
@@ -216,7 +214,7 @@ jobs:
       - name: Restore mardock builder cahce into service container
         run: |
           docker exec -u root "${{ job.services.mardock_builder.id }}" apk --no-cache add  tar
-          docker exec -u root "${{ job.services.mardock_builder.id }}" chown 1000 .next public .mardock
+          docker exec -u root "${{ job.services.mardock_builder.id }}" chown 1000 .mardock
           test -f /tmp/cache/cache.tar.gz && cat /tmp/cache/cache.tar.gz |  docker exec -i -u root "${{ job.services.mardock_builder.id }}" tar -zx -- || true
 
       - name: Build site inside service container
