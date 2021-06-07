@@ -164,11 +164,15 @@ jobs:
           PROD_DIGEST: ${{ needs.push_universal_image_to_ghcr.outputs.universal_prod_image_digest }}
 
   deploy_site_to_gh_pages:
-
     name: Deploy site to GitHub Pages
     needs: [prep, set_ids]
     # スキップは継続させるが、落ちている(出力が無い)場合は継続しない.
     if: ${{ needs.set_ids.outputs.universal_prod_image_id != '' && always() && !cancelled() }}
+    # CMS からのトリガーが重複(記事を手動で連続して公開した等)
+    # した場合を想定.
+    concurrency: 
+      group: ${{ needs.set_ids.outputs.universal_image_id }}
+      cancel-in-progress: true
     outputs:
       success: ${{ steps.status.outputs.success }}
     runs-on: ubuntu-latest
