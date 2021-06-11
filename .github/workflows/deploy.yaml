@@ -50,9 +50,9 @@ jobs:
 
       - id: prep_prod
         run: |
-          TAG1="ghcr.io/${GITHUB_REPOSITORY}:$(date "+%Y-%m")-$(echo ${GITHUB_REF} | sed -e 's/refs\/heads\///; s/\//-/g')_prod"
-          TAG2="ghcr.io/${GITHUB_REPOSITORY}:edge_prod"
-          TAG3="ghcr.io/${GITHUB_REPOSITORY}:main_prod"
+          TAG1="ghcr.io/${GITHUB_REPOSITORY}:$(date "+%Y-%m")-$(echo ${GITHUB_REF} | sed -e 's/refs\/heads\///; s/\//-/g')-prod"
+          TAG2="ghcr.io/${GITHUB_REPOSITORY}:edge-prod"
+          TAG3="ghcr.io/${GITHUB_REPOSITORY}:main-prod"
           test "${GITHUB_REF}" = "refs/heads/main" \
             && TAGS="${TAG1}%0A${TAG2}%0A${TAG3}" \
             || TAGS="${TAG1}%0A${TAG2}"
@@ -125,7 +125,7 @@ jobs:
           # universal は edge をキャッシュとして使う.
           # main とそれ以外のブランチで build されるので layer が共有
           # されると期待.
-          cache-from: type=registry,ref=ghcr.io/${{ github.repository}}:edge_prod
+          cache-from: type=registry,ref=ghcr.io/${{ github.repository}}:edge-prod
           cache-to: type=inline
 
       # Temp fix
@@ -156,7 +156,7 @@ jobs:
           echo "::set-output name=id::${ID}"
           test "${GITHUB_EVENT_NAME}" = "push" \
             && PROD_ID="@${PROD_DIGEST}" \
-            || PROD_ID=":main_prod"
+            || PROD_ID=":main-prod"
           echo "::set-output name=prod_id::${PROD_ID}"
         env:
           DIGEST: ${{ needs.push_universal_image_to_ghcr.outputs.universal_image_digest }}
@@ -196,8 +196,8 @@ jobs:
     steps:
       - name: check image id
         run: |
-          echo "$IMAGE_ID}"
-          echo "$PROD_IMAGE_ID}"
+          echo "${IMAGE_ID}"
+          echo "${PROD_IMAGE_ID}"
         env:
           IMAGE_ID: ${{ needs.set_ids.outputs.universal_image_id }}
           PROD_IMAGE_ID: ${{ needs.set_ids.outputs.universal_prod_image_id }}
@@ -265,9 +265,9 @@ jobs:
         variant:
           - suffix: ""
             base_image_id: ${{ needs.set_ids.outputs.universal_prod_image_id }}
-          - suffix: "_with_cache"
+          - suffix: "-with-cache"
             base_image_id: ${{ needs.set_ids.outputs.universal_prod_image_id }}
-          - suffix: "_only_cache"
+          - suffix: "-only-cache"
             base_image_id: ${{ needs.set_ids.outputs.universal_image_id }}
     steps:
       - id: prep
