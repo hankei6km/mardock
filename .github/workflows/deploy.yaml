@@ -196,8 +196,8 @@ jobs:
     steps:
       - name: check image id
         run: |
-          echo "$IMAGE_ID}"
-          echo "$PROD_IMAGE_ID}"
+          echo "${IMAGE_ID}"
+          echo "${PROD_IMAGE_ID}"
         env:
           IMAGE_ID: ${{ needs.set_ids.outputs.universal_image_id }}
           PROD_IMAGE_ID: ${{ needs.set_ids.outputs.universal_prod_image_id }}
