@@ -125,7 +125,7 @@ jobs:
           # universal は edge をキャッシュとして使う.
           # main とそれ以外のブランチで build されるので layer が共有
           # されると期待.
-          cache-from: type=registry,ref=ghcr.io/${{ github.repository}}:edge_prod
+          cache-from: type=registry,ref=ghcr.io/${{ github.repository}}:edge-prod
           cache-to: type=inline
 
       # Temp fix
