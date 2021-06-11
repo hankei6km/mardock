@@ -34,7 +34,7 @@ COPY --from=site_cache --chown="mardock:users" "/home/mardock/mardock/.next" "/h
 ENTRYPOINT ["/docker-entrypoint"]
 
 
-FROM site_public_base as site_runner_with_cache
+FROM site_public_base as site_runner-with-cache
 
 COPY --from=site_cache --chown="mardock:users" "/home/mardock/mardock/.mardock" "/home/mardock/mardock/.mardock"
 
@@ -43,7 +43,7 @@ COPY --from=site_cache --chown="mardock:users" "/home/mardock/mardock/.next" "/h
 ENTRYPOINT ["/docker-entrypoint"]
 
 
-FROM site_base as site_runner_only_cache
+FROM site_base as site_runner-only-cache
 
 COPY --from=site_cache --chown="mardock:users" "/home/mardock/mardock/.mardock" "/home/mardock/mardock/.mardock"
 
