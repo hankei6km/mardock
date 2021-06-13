@@ -4,21 +4,45 @@ mardock を利用するための Docker イメージ。
 
 利用方法はリポジトリー直下の `README.md` を参照ください。
 
-tag名              | 概要 
+## イメージとタグ
+
+### `ghcr.io/hankei6km/mardock:main` イメージ
+
+汎用的に利用できるイメージです。
+
+タグ               | 概要 
 ------------------ | ------------------------------
-`latest`           |  `main` ブランチで作成された
-`develop`          |  `main` 以外のブランチで作成された
-`YYYY-MM-<branch>` |  各ブランチで作成された
+`main`             |  `main` ブランチでビルドされた
+`main-prod`        |  `main` ブランチで Production ビルドされた
+`edge`             |  最新のビルド
+`edge-prod`        |  `main` ブランチで Production ビルドされた
+`YYYY-MM-<branch>` |  各ブランチでビルドされた
+
+### `ghcr.io/hankei6km/mardock_site:main` イメージ
+
+GitHub Pages へデプロイしたサイトを含むイメージです。通常は使いません。
+
+タグ                          | 概要 
+----------------------------- | ------------------------------
+`main`                        | `main` ブランチでビルドされた
+`main-with-cache`             | mardock のキャッシュを含む
+`main-only-cache`             | mardock のキャッシュのむを含む
+`edge`                        | 最新のビルド
+`edge-with-cache`             | mardock のキャッシュを含む
+`edge-only-cache`             | mardock のキャッシュのむを含む
+`YYYY-MM-<branch>`            | 各ブランチでビルドされた
+`YYYY-MM-<branch>-with-cache` | mardock のキャッシュを含む
+`YYYY-MM-<branch>-only-cache` | mardock のキャッシュのむを含む
 
 
 ## 既知の問題
 
-### `mardock_develop` ベースのコンテナで PDF 等を作成するときに以下のような症状が発生する
+### コンテナで PDF 等を作成するときに以下のような症状が発生する
 
 - コンテナのログで `Cache path: demo-slide false` 等を表示した後に反応しない
 - コンテナのログで `Cache path: demo-slide false` 等に `timeout` エラーが表示される
 
-現在の `Ddockerfile` では発生は抑えられているが、原因は不明なので再発の可能性あり。
+現在の `Ddockerfile` では発生は抑えられていますが、原因は不明なので再発の可能性あります
 
 なお、頻発しているのは以下の環境。
 
