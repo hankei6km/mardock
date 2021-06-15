@@ -11,9 +11,19 @@ Marp + CMS のエディターでスライドを作成するウェブアプリ。
 - 「プレゼンテーション用スライド」「PDF」「PPTX」の自動生成
 - 「PDF」などを共有サイトへアップロード(まだ未実装)
 
+なお、デモとして GitHub Pages へデプロイしていますが、基本的にはローカルでコンテナを動かして利用することを想定しています。
 
-なお、デモを兼ねて GitHub Pages へデプロイしていますが、基本的にはローカルでコンテナを動かして利用することを想定しています。
 
+## ライブデモ
+
+[mardock で作成したサイト](https://hankei6km.github.io/mardock)を GitHub Pages で公開しています。
+
+[![mardock で作成したサイト](https://hankei6km.github.io/mardock/assets/deck/mardock-intro/mardock-intro.png)](https://hankei6km.github.io/mardock)
+
+
+## 動画
+
+[Marp &#43; CMS のエディターでスライドを作成するウェブアプリのデモ - YouTube](https://www.youtube.com/watch?v=vjxWVm8c8YA)
 
 ## セットアップ
 
@@ -21,13 +31,13 @@ Marp + CMS のエディターでスライドを作成するウェブアプリ。
 
 ### CMS
 
-スライドソースを入力するたの環境として、microCMS でサービスを作成。
+スライドソースを入力する環境として、microCMS でサービスを作成します。
 
 おおまかには、以下の手順でサービスを作成できます。
 
 1. microCMS へユーザーを登録し新規にサービスを作成
 1. `docker/api-scheme/` の各スキーマーを元に API を作成
-1. `pages` API に以下の id でコンテンツを作成
+1. `pages` API に以下の id でコンテンツを作成(必須項目だけ適用に埋めてください)
    - `home`: ホーム画面 (`/`)
    - `deck`: スライド一覧画面 (`/deck`)
    - `docs`: ドキュメント一覧画面 (`/docs`)
@@ -35,18 +45,18 @@ Marp + CMS のエディターでスライドを作成するウェブアプリ。
 
 ### コンテナ
 
-#### 環境変数
-
-以下の内容でコンテナに設定する環境変数のファイル(ファイル名は `.env` 等)を作成。
+以下の内容でコンテナに設定する環境変数のファイル(ファイル名は `.env` 等)を作成します。
 
 ```
 API_BASE_URL=https://<サービス名>.microcms.io/
 GET_API_KEY=<GET API 用のシークレット>
 PREVIEW_SECRET=<画面プレビュー用のシークレット>
 BASE_URL=localhost:3000
+STATICK_BUILD=true
+LANG=ja_JP.UTF-8
 ```
 
-リバースプロキシ等で利用する場合以下を追加。この場合、`BASE_URL` もプロキシに合わせて変更。
+リバースプロキシ等で利用する場合以下を追加。この場合、`BASE_URL` もプロキシに合わせて変更します。
 
 ```
 ASSET_PREFIX=/mardock
@@ -61,46 +71,148 @@ BASE_URL=https://<your-docs-server>/mardock
 BUILD_ASSETS_DECK=dynamic
 ```
 
-## 実行
+## 利用
 
-ローカルで `next` が実行されるコンテナを稼働させるための手順。
+mardock では `next build` などが利用できる汎用的な Docker イメージを用意してあるので、利用形態をいくつか選択できます。
 
-基本的な構造は Marp-CLI の Docker イメージを参考にしています。`docker run` のフラグ等は [marpteam/marp-cli](https://hub.docker.com/r/marpteam/marp-cli/) が参考になります。
-
-### コンテナの実行
-
-```
-# docker run --rm --init --env-file .env --env "LANG=${LANG}" -p 3000:3000 -v "${PWD}/cache:/home/mardock/mardock/.mardock/cache" ghcr.io/hankei6km/mardock_develop:latest
-```
-
-以下の点に注意してください。
-
-- 引数に `--init` が必要
-- 環境変数の `$LANG` の指定がないと日本語のフォントが使われない
+最初は、コンテンツの設定状況等が確認できる「動作確認」から始めるのがおすすめです。
 
 
-#### PDF 等のキャッシュを永続化
+### 動作確認
 
-```
-# docker run --rm --init --env-file .env --env "LANG=${LANG}" -p 3000:3000 -v "${PWD}/cache:/home/mardock/mardock/.mardock/cache" ghcr.io/hankei6km/mardock_develop:latest
-```
+コンテナを開発用のサーバーとして起動するとことで簡単に(ビルド等の手間をかけず)その場で動作確認できます。
 
-キャッシュは `uid=1000` `gid=100` で作成されます。キャッシュファイルのオーナーを変更する場合は、以下のように `uid` と `gid` を指定。
+#### サーバーを起動する
 
-- 参考: [marpteam/marp-cli](https://hub.docker.com/r/marpteam/marp-cli/) の「Troubleshooting」
+以下のコマンドを実行するとサーバーが起動されます。ブラウザーで `localhost:3000` を開くと mardock を利用できます。また、プレビューモード等にも利用できます。
 
+ただし、以下のような制限があります。
+
+- 動作はそれなりに重いです
+- PDF ファイル等は生成されません
 
 ```
-# docker run --rm --init --env-file .env --env "LANG=${LANG}" -p 3000:3000 -v "${PWD}/cache:/home/mardock/mardock/.mardock/cache" -u root --env MARDOCK_USER=<uid:gid> ghcr.io/hankei6km/mardock_develop:latest
+docker run --rm --init --env-file=.env -p 3000:3000 \
+    ghcr.io/hankei6km/mardock:main develop
 ```
 
-#### 「雨」等のフォントがおかしい場合
 
-PDF を表示したときに「雨」等の一部フォントがおかしい場合、`$LANG` の指定を明示的に `ja_JP.UTF-8` 等へ変更してみてください。
+### サーバー(next start)として利用する 
 
-なお、このときに「キャッシュの永続化」を行っている場合はキャッシュを一旦削除してください。
+ローカルでサイトをビルドし、ビルドした内容でサーバーを起動するシナリオです。
 
-#### その他
+ビルドとサーバーには mardock の汎用的な Docker イメージを利用します。
+
+#### ビルド内容を永続化する準備
+
+以下のフォルダーを作成します。
+
+  - `vols/next`
+  - `vols/public`
+  - `vols/mardock`
+
+
+#### サイトをビルド
+
+以下のコマンドを実行するとサイトのビルド結果が各フォルダーに保存されます。
+
+```
+docker run --rm --init --env-file=.env \
+    -v "${PWD}/vols/next:/home/mardock/mardock/.next" \
+    -v "${PWD}/vols/public:/home/mardock/mardock/public" \
+    -v "${PWD}/vols/mardock:/home/mardock/mardock/.mardock" \
+    ghcr.io/hankei6km/mardock:main build
+```
+
+永続化したファイルのアクセス権に問題がある場合は、以下を追加します。
+
+```
+    -u root -e "MARDOCK_USER=$(id -u):$(id -g)" 
+```
+
+#### サーバーを起動する
+
+以下のコマンドを実行するとサーバーが起動されます。ブラウザーで `localhost:3000` を開くと mardock を利用できます。また、プレビューモード等にも利用できます。
+
+なお、ビルドのときと使っているイメージのタグが異なります(`main-prod`)。
+
+```
+docker run --rm --init --env-file=.env -p 3000:3000 \
+    -v "${PWD}/vols/next:/home/mardock/mardock/.next" \
+    -v "${PWD}/vols/public:/home/mardock/mardock/public" \
+    -v "${PWD}/vols/mardock:/home/mardock/mardock/.mardock" \
+    ghcr.io/hankei6km/mardock:main-prod start
+```
+
+
+### 静的サイトとしてエクスポートする
+
+
+ローカルでサイトをビルドし、ビルドした内容を静的サイトとしてエクスポートするシナリオです。
+
+ビルドとサーバーには mardock の汎用的な Docker イメージを利用します。
+
+
+#### ビルド内容を永続化する準備
+
+以下のフォルダーを作成します。
+
+  - `vols/next`
+  - `vols/public`
+  - `vols/mardock`
+
+
+#### サイトをビルド
+
+以下のコマンドを実行するとサイトのビルド結果が各フォルダーに保存されます。
+
+```
+docker run --rm --init --env-file=.env \
+    -v "${PWD}/vols/next:/home/mardock/mardock/.next" \
+    -v "${PWD}/vols/public:/home/mardock/mardock/public" \
+    -v "${PWD}/vols/mardock:/home/mardock/mardock/.mardock" \
+    ghcr.io/hankei6km/mardock:main build
+```
+
+永続化したファイルのアクセス権に問題がある場合は、以下を追加します。
+
+```
+    -u root -e "MARDOCK_USER=$(id -u):$(id -g)" 
+```
+
+#### 静的サイトとしてエクスポートする
+
+以下のコマンドを実行するとエクスポートされたサイトが `vols/mardock/out` へ保存されます。
+
+```
+docker run --rm --init --env-file=.env \
+    -v "${PWD}/vols/next:/home/mardock/mardock/.next" \
+    -v "${PWD}/vols/public:/home/mardock/mardock/public" \
+    -v "${PWD}/vols/mardock:/home/mardock/mardock/.mardock" \
+    ghcr.io/hankei6km/mardock:main export
+```
+
+
+## 動作がおかしいとき
+
+### Dokcer 関連
+
+主な注意点として以下があります。
+
+
+- `docker run` の引数に `--init` が必要です
+- 環境変数の `$LANG` の指定がないと日本語のフォントが使われません
+  - `$LANG` を変更するときは `vols/mardock/cache` を削除ください
+- 永続化したファイルのアクセス権に問題がある場合は、ビルド等の実行時に以下を追加します
+
+```
+    -u root -e "MARDOCK_USER=$(id -u):$(id -g)" 
+```
+
+Docker イメージの基本的な構造は Marp-CLI の Docker イメージを参考にしています。`docker run` のフラグ等は [marpteam/marp-cli](https://hub.docker.com/r/marpteam/marp-cli/) が参考になります。
+
+
+### その他
 
 `docker/README.md` に既知の問題等の記述があります。
 
@@ -110,6 +222,3 @@ PDF を表示したときに「雨」等の一部フォントがおかしい場�
 MIT License
 
 Copyright (c) 2021 hankei6km
-
-
-
