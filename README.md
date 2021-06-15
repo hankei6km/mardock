@@ -14,7 +14,6 @@ Marp + CMS のエディターでスライドを作成するウェブアプリ。
 
 なお、デモを兼ねて GitHub Pages へデプロイしていますが、基本的にはローカルでコンテナを動かして利用することを想定しています。
 
-
 ## セットアップ
 
 仕様が固まっていないので暫定的な手順です。
@@ -63,6 +62,29 @@ BUILD_ASSETS_DECK=dynamic
 
 ## 利用
 
+mardock では `next build` などが利用できる汎用的な Docker イメージを用意してあるので、利用形態をいくつか選択できます。
+
+最初は、コンテンツの設定状況等が確認できる「動作確認」から始めるのがおすすめです。
+
+
+### 動作確認
+
+コンテナを開発用のサーバーとして起動するとことで簡単に(ビルド等の手間をかけず)その場で動作確認できます。
+
+#### サーバーを起動する
+
+以下のコマンドを実行するとサーバーが起動されます。ブラウザーで `localhost:3000` を開くと mardock を利用できます。また、プレビューモード等にも利用できます。
+
+ただし、以下のような制限があります。
+
+- 動作はそれなりに重いです
+- PDF ファイル等は生成されません
+
+```
+docker run --rm --init --env-file=.env -p 3000:3000 \
+    ghcr.io/hankei6km/mardock:main develop
+```
+
 
 ### サーバー(next start)として利用する 
 
@@ -84,7 +106,7 @@ BUILD_ASSETS_DECK=dynamic
 以下のコマンドを実行するとサイトのビルド結果が各フォルダーに保存されます。
 
 ```
-docker run --rm --init -it --env-file=.env \
+docker run --rm --init --env-file=.env \
     -v "${PWD}/vols/next:/home/mardock/mardock/.next" \
     -v "${PWD}/vols/public:/home/mardock/mardock/public" \
     -v "${PWD}/vols/mardock:/home/mardock/mardock/.mardock" \
@@ -101,13 +123,16 @@ docker run --rm --init -it --env-file=.env \
 
 以下のコマンドを実行するとサーバーが起動されます。ブラウザーで `localhost:3000` を開くと mardock を利用できます。また、プレビューモード等にも利用できます。
 
+なお、ビルドのときと使っているイメージのタグが異なります(`main-prod`)。
+
 ```
-docker run --rm --init -it --env-file=.env -p 3000:3000 \
+docker run --rm --init --env-file=.env -p 3000:3000 \
     -v "${PWD}/vols/next:/home/mardock/mardock/.next" \
     -v "${PWD}/vols/public:/home/mardock/mardock/public" \
     -v "${PWD}/vols/mardock:/home/mardock/mardock/.mardock" \
-    ghcr.io/hankei6km/mardock:main start
+    ghcr.io/hankei6km/mardock:main-prod start
 ```
+
 
 ### 静的サイトとしてエクスポートする
 

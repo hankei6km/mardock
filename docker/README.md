@@ -12,11 +12,11 @@ mardock を利用するための Docker イメージ。
 
 タグ               | 概要 
 ------------------ | ------------------------------
-`main`             |  `main` ブランチでビルドされた
-`main-prod`        |  `main` ブランチで Production ビルドされた
-`edge`             |  最新のビルド
-`edge-prod`        |  `main` ブランチで Production ビルドされた
-`YYYY-MM-<branch>` |  各ブランチでビルドされた
+`main`             |  `main` ブランチでビルドされたイメージ
+`main-prod`        |  `main` ブランチで Production ビルドされたイメージ
+`edge`             |  最新のブランチ(`main` 含む)でビルドされたイメージ
+`edge-prod`        |  最新のブランチ(`main` 含む)でビルドされた Production イメージ
+`YYYY-MM-<branch>` |  各ブランチでビルドされたイメージ
 
 ### `ghcr.io/hankei6km/mardock_site:main` イメージ
 
@@ -24,13 +24,13 @@ GitHub Pages へデプロイしたサイトを含むイメージです。通常�
 
 タグ                          | 概要 
 ----------------------------- | ------------------------------
-`main`                        | `main` ブランチでビルドされた
+`main`                        | `main` ブランチでビルドされたイメージ
 `main-with-cache`             | mardock のキャッシュを含む
 `main-only-cache`             | mardock のキャッシュのむを含む
-`edge`                        | 最新のビルド
+`edge`                        | 最新のブランチ(`main` 含むでビルドされたイメージ
 `edge-with-cache`             | mardock のキャッシュを含む
 `edge-only-cache`             | mardock のキャッシュのむを含む
-`YYYY-MM-<branch>`            | 各ブランチでビルドされた
+`YYYY-MM-<branch>`            | 各ブランチでビルドされたイメージ
 `YYYY-MM-<branch>-with-cache` | mardock のキャッシュを含む
 `YYYY-MM-<branch>-only-cache` | mardock のキャッシュのむを含む
 
