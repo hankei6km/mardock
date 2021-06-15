@@ -12,7 +12,15 @@ Marp + CMS のエディターでスライドを作成するウェブアプリ。
 - 「PDF」などを共有サイトへアップロード(まだ未実装)
 
 
-なお、デモを兼ねて GitHub Pages へデプロイしていますが、基本的にはローカルでコンテナを動かして利用することを想定しています。
+## ライブデモ
+
+[mardock で作成したサイト](https://hankei6km.github.io/mardock)を GitHub Pages で公開しています。
+
+[![mardock で作成したサイト](https://hankei6km.github.io/mardock/assets/deck/mardock-intro/mardock-intro.png)](https://hankei6km.github.io/mardock)
+
+
+なお、デモとして GitHub Pages へデプロイしていますが、基本的にはローカルでコンテナを動かして利用することを想定しています。
+
 
 ## セットアップ
 
