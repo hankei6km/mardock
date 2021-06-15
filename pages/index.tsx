@@ -9,6 +9,7 @@ import Link from '../components/Link';
 import ListDeck from '../components/ListDeck';
 import NavHtmlToc from '../components/NavHtmlToc';
 // import Typography from '@material-ui/core/Typography';
+import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import { PageData, IndexList } from '../types/pageTypes';
 import { getPagesData, getSortedIndexData } from '../lib/pages';
 import { GetQuery } from '../types/client/queryTypes';
@@ -92,6 +93,7 @@ const IndexPage = ({ pageData, intro, items }: Props) => {
               <Button
                 component={Link}
                 href="/deck/page/2"
+                startIcon={<ExpandMoreIcon />}
                 className={`MuiButton-containedPrimary ${classes['MoreListDeck']}`}
               >
                 <Typography component="span">続きを表示</Typography>
@@ -109,6 +111,7 @@ const IndexPage = ({ pageData, intro, items }: Props) => {
           <Button
             component={Link}
             href="/deck"
+            startIcon={<ExpandMoreIcon />}
             className={`MuiButton-containedPrimary ${classes['JumpToListDeck']}`}
           >
             <Typography component="span">スライド一覧を表示</Typography>
