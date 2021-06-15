@@ -11,6 +11,8 @@ Marp + CMS のエディターでスライドを作成するウェブアプリ。
 - 「プレゼンテーション用スライド」「PDF」「PPTX」の自動生成
 - 「PDF」などを共有サイトへアップロード(まだ未実装)
 
+なお、デモとして GitHub Pages へデプロイしていますが、基本的にはローカルでコンテナを動かして利用することを想定しています。
+
 
 ## ライブデモ
 
@@ -19,8 +21,9 @@ Marp + CMS のエディターでスライドを作成するウェブアプリ。
 [![mardock で作成したサイト](https://hankei6km.github.io/mardock/assets/deck/mardock-intro/mardock-intro.png)](https://hankei6km.github.io/mardock)
 
 
-なお、デモとして GitHub Pages へデプロイしていますが、基本的にはローカルでコンテナを動かして利用することを想定しています。
+## 動画
 
+[Marp &#43; CMS のエディターでスライドを作成するウェブアプリのデモ - YouTube](https://www.youtube.com/watch?v=vjxWVm8c8YA)
 
 ## セットアップ
 
