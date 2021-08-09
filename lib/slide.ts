@@ -19,6 +19,7 @@ import { metaDeck } from './meta';
 import themes from '../src/marp-theme';
 // import qrcode from '../src/markdown-it-qrcode';
 const { Element } = require('@marp-team/marpit');
+const  externalLinkPlugin =require('../src/markdown-it-external-link');
 
 // temp ファイル、fifo 等も考えたが今回は pipe で楽する。
 // 速度的に不利になったら考える。
@@ -429,6 +430,7 @@ export async function _slideDeck(
 ): Promise<DeckData> {
   if (source) {
     themes.forEach((t) => marp.themeSet.add(t));
+    marp.use(externalLinkPlugin);
     const { html, css } = marp.render(source, { htmlAsArray: true });
     // array を指定すると script が取得できない
     // 以下、とりあすの対応.
