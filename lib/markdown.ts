@@ -4,6 +4,7 @@ import highlight from 'remark-highlight.js';
 import gfm from 'remark-gfm';
 import remark2rehype from 'remark-rehype';
 import raw from 'rehype-raw';
+import { externalLinkTransformer } from './html';
 
 export function processorMarkdownToHtml() {
   return unified()
@@ -11,5 +12,6 @@ export function processorMarkdownToHtml() {
     .use(highlight)
     .use(gfm)
     .use(remark2rehype, { allowDangerousHtml: true })
+    .use(externalLinkTransformer)
     .use(raw);
 }

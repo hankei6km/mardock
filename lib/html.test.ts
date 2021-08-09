@@ -1,10 +1,14 @@
 import cheerio from 'cheerio';
+import unified from 'unified';
+import rehypeParse from 'rehype-parse';
+import stringify from 'rehype-stringify';
 import {
   splitStrToParagraph,
   getTocLabel,
   getArticleData,
   adjustHeading,
-  htmlToc
+  htmlToc,
+  externalLinkTransformer
 } from './html';
 
 describe('splitStrToParagraph()', () => {
@@ -242,5 +246,39 @@ describe('getArticleData()', () => {
         items: []
       }
     });
+  });
+});
+
+describe('externalLinkTransformer()', () => {
+  const f = async (html: string): Promise<string> => {
+    return new Promise((resolve, reject) => {
+      unified()
+        .use(rehypeParse, { fragment: true })
+        .use(externalLinkTransformer)
+        .use(stringify)
+        .freeze()
+        .process(html, (err, file) => {
+          if (err) {
+            reject(err);
+          }
+          resolve(String(file));
+        });
+    });
+  };
+  it('should add target="_blank" to <a> tag', async () => {
+    expect(await f('<p><a href="foo">test1</a></p>')).toEqual(
+      '<p><a href="foo" target="_blank" rel="noopener noreferrer">test1</a></p>'
+    );
+    expect(await f('<p><a href="foo"><img src="bar"></a></p>')).toEqual(
+      '<p><a href="foo" target="_blank" rel="noopener noreferrer"><img src="bar"></a></p>'
+    );
+    expect(await f('<p><a href="foo" target="_blank">test3</a></p>')).toEqual(
+      '<p><a href="foo" target="_blank" rel="noopener noreferrer">test3</a></p>'
+    );
+  });
+  it('should not add target="_blank" to <a> tag', async () => {
+    expect(await f('<p><a href="foo" target="foo">test1</a></p>')).toEqual(
+      '<p><a href="foo" target="foo">test1</a></p>'
+    );
   });
 });
