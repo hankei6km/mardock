@@ -6,6 +6,9 @@ import rehypeSanitize from 'rehype-sanitize';
 import merge from 'deepmerge';
 import gh from 'hast-util-sanitize/lib/github.json';
 import { Schema } from 'hast-util-sanitize';
+import { Transformer } from 'unified';
+import { Node, Element } from 'hast';
+import visit from 'unist-util-visit';
 import cheerio from 'cheerio';
 import { TocItems, HtmlToc } from '../types/pageTypes';
 import { processorMarkdownToHtml } from './markdown';
@@ -20,7 +23,7 @@ const schema = merge(gh, {
     source: ['srcSet', 'sizes'],
     img: ['alt', 'srcSet', 'sizes', 'className'],
     code: ['className'],
-    span: ['className','style'],
+    span: ['className', 'style'],
     iframe: [
       'height',
       'style',
@@ -237,5 +240,23 @@ export async function getArticleDataFromContent(
       items: htmlToc($)
     },
     html: $('body').html() || ''
+  };
+}
+
+export function externalLinkTransformer(): Transformer {
+  return function transformer(tree: Node): void {
+    function visitor(node: Element) {
+      if (node.tagName === 'a') {
+        node.properties = node.properties || {};
+        if (
+          !('target' in node.properties) ||
+          node.properties.target === '_blank'
+        ) {
+          node.properties.target = '_blank';
+          node.properties.rel = 'noopener noreferrer';
+        }
+      }
+    }
+    visit(tree, 'element', visitor);
   };
 }
