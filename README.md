@@ -21,9 +21,10 @@ Marp + CMS のエディターでスライドを作成するウェブアプリ。
 [![mardock で作成したサイト](https://hankei6km.github.io/mardock/assets/deck/mardock-intro/mardock-intro.png)](https://hankei6km.github.io/mardock)
 
 
-## 動画
+## デモ動画
 
-[Marp &#43; CMS のエディターでスライドを作成するウェブアプリのデモ - YouTube](https://www.youtube.com/watch?v=vjxWVm8c8YA)
+[![デモ動画へのリンク](https://images.microcms-assets.io/assets/bc4007b30bdf402f96161596bd7cbcca/89d1dc2babc143429999bbdf3f63dfbf/youtube-thumb.png?auto=compress&mark64=aHR0cHM6Ly9pbWcueW91dHViZS5jb20vdmkvdmp4V1ZtOGM4WUEvMC5qcGc&mark-pad64=MA&txt64=4pa277iP&txt-align64=Y2VudGVyLG1pZGRsZQ&txt-shad64=Mw&txt-size64=NjA)](https://www.youtube.com/watch?v=vjxWVm8c8YA)
+
 
 ## セットアップ
 
@@ -36,12 +37,12 @@ Marp + CMS のエディターでスライドを作成するウェブアプリ。
 おおまかには、以下の手順でサービスを作成できます。
 
 1. microCMS へユーザーを登録し新規にサービスを作成
-1. `docker/api-scheme/` の各スキーマーを元に API を作成
+1. [`docker/api-scheme/`](https://github.com/hankei6km/mardock/tree/main/docker/api-scheme) の各スキーマーを元に API を作成
 1. `pages` API に以下の id でコンテンツを作成(必須項目だけ適用に埋めてください)
-   - `home`: ホーム画面 (`/`)
-   - `deck`: スライド一覧画面 (`/deck`)
-   - `docs`: ドキュメント一覧画面 (`/docs`)
-   - `about`: アバウト画面 (`/about`)
+   - id = `home`: ホーム画面 (`/`)
+   - id = `deck`: スライド一覧画面 (`/deck`)
+   - id = `docs`: ドキュメント一覧画面 (`/docs`)
+   - id = `about`: アバウト画面 (`/about`)
 
 ### コンテナ
 
@@ -214,7 +215,7 @@ Docker イメージの基本的な構造は Marp-CLI の Docker イメージを�
 
 ### その他
 
-`docker/README.md` に既知の問題等の記述があります。
+[`docker/README.md`](https://github.com/hankei6km/mardock/blob/main/docker/README.md) に既知の問題等の記述があります。
 
 
 ## ライセンス
@@ -222,3 +223,4 @@ Docker イメージの基本的な構造は Marp-CLI の Docker イメージを�
 MIT License
 
 Copyright (c) 2021 hankei6km
+
