@@ -37,7 +37,7 @@ Marp + CMS のエディターでスライドを作成するウェブアプリ。
 おおまかには、以下の手順でサービスを作成できます。
 
 1. microCMS へユーザーを登録し新規にサービスを作成
-1. `[docker/api-scheme/](https://github.com/hankei6km/mardock/tree/main/docker/api-scheme)` の各スキーマーを元に API を作成
+1. [`docker/api-scheme/`](https://github.com/hankei6km/mardock/tree/main/docker/api-scheme) の各スキーマーを元に API を作成
 1. `pages` API に以下の id でコンテンツを作成(必須項目だけ適用に埋めてください)
    - id = `home`: ホーム画面 (`/`)
    - id = `deck`: スライド一覧画面 (`/deck`)
@@ -215,7 +215,7 @@ Docker イメージの基本的な構造は Marp-CLI の Docker イメージを�
 
 ### その他
 
-`[docker/README.md](https://github.com/hankei6km/mardock/blob/main/docker/README.md)` に既知の問題等の記述があります。
+[`docker/README.md`](https://github.com/hankei6km/mardock/blob/main/docker/README.md) に既知の問題等の記述があります。
 
 
 ## ライセンス
