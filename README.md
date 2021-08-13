@@ -21,9 +21,10 @@ Marp + CMS のエディターでスライドを作成するウェブアプリ。
 [![mardock で作成したサイト](https://hankei6km.github.io/mardock/assets/deck/mardock-intro/mardock-intro.png)](https://hankei6km.github.io/mardock)
 
 
-## 動画
+## デモ動画
 
-[Marp &#43; CMS のエディターでスライドを作成するウェブアプリのデモ - YouTube](https://www.youtube.com/watch?v=vjxWVm8c8YA)
+[![デモ動画へのリンク](https://images.microcms-assets.io/assets/bc4007b30bdf402f96161596bd7cbcca/89d1dc2babc143429999bbdf3f63dfbf/youtube-thumb.png?auto=compress&mark64=aHR0cHM6Ly9pbWcueW91dHViZS5jb20vdmkvdmp4V1ZtOGM4WUEvMC5qcGc&mark-pad64=MA&txt64=4pa277iP&txt-align64=Y2VudGVyLG1pZGRsZQ&txt-shad64=Mw&txt-size64=NjA)](https://www.youtube.com/watch?v=vjxWVm8c8YA)
+
 
 ## セットアップ
 
@@ -222,3 +223,4 @@ Docker イメージの基本的な構造は Marp-CLI の Docker イメージを�
 MIT License
 
 Copyright (c) 2021 hankei6km
+
