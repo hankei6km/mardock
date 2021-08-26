@@ -20,7 +20,7 @@ import {
   blankIndexList
 } from '../types/pageTypes';
 import siteServerSideConfig from '../src/site.server-side-config';
-import { applyPreviewDataToIdQuery } from './preview';
+import { applyPreviewDataToIdQuery, PreviewData } from './preview';
 import { getArticleData, getArticleDataFromContent } from './html';
 import { draftLint } from './draftlint';
 import { rewrite, rewriteEmbed, rewriteImg } from './rewrite';
@@ -237,7 +237,7 @@ export async function getPagesData(
   try {
     const [id, query] = applyPreviewDataToIdQuery<GetContentQuery>(
       preview,
-      previewData,
+      previewData as PreviewData,
       apiName,
       params.id as string,
       {

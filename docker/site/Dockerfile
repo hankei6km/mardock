@@ -11,8 +11,8 @@ USER "root"
 # next build すると .next/ 以下が必ず変更されるので、
 # docker build としてはキャッシュに含めない.
 COPY "cache.tar.gz" /tmp/"cache.tar.gz"
-RUN apk --no-cache add tar \
-    && tar -zxf /tmp/cache.tar.gz 
+RUN tar -zxf /tmp/cache.tar.gz \
+    && rm /tmp/cache.tar.gz 
 
 USER "mardock"
 

@@ -1,4 +1,4 @@
-#!/bin/ash
+#!/bin/bash
 
 case "${1}" in
   "start") exec /docker-entrypoint-start.sh ;;

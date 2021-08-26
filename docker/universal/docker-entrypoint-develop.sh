@@ -1,4 +1,6 @@
-#!/bin/ash
+#!/bin/bash
+
+yarn --cwd "${MARDOCK_CWD}" api:build && yarn --cwd "${MARDOCK_CWD}" config:fetch
 
 SCRIPT_NAME="dev"
 

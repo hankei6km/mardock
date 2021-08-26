@@ -60,6 +60,9 @@ module.exports = (phase) => {
     assetPrefix,
     basePath,
     ...withTM(),
-    env
+    env,
+    images: {
+      disableStaticImages: true
+    }
   };
 };
