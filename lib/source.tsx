@@ -19,7 +19,7 @@ import {
 } from '../types/client/contentTypes';
 import { codeDockHandler } from './codedock';
 import siteServerSideConfig from '../src/site.server-side-config';
-import { qrcodeToDataUrl } from './qrcode';
+import { editMarkdown } from './markdown';
 var toText = require('hast-util-to-text');
 
 const fenceToFrontMatterRegExp = /^---\n(.+)\n---\n*$/s;
@@ -189,8 +189,8 @@ export async function htmlToMarkdown(html: string): Promise<string> {
   });
   // console.log(md);
   // return md;
-  // console.log(await qrcodeToDataUrl(md));
-  return await qrcodeToDataUrl(md);
+  // console.log(await editMarkdown(md));
+  return await editMarkdown(md);
 }
 
 export async function sourceSetMarkdown(sourceSet: {
