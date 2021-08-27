@@ -1,14 +1,15 @@
-FROM alpine:edge as base
+FROM node:14-buster-slim as base
 
-SHELL ["/bin/ash", "-o", "pipefail", "-c"]
+SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 
-RUN apk --no-cache add \
-       libc6-compat \
-       git \
-       nodejs \
-       yarn \
-       zip \
-    && adduser -S -g "users" --uid "1000" "mardock" \
+RUN apt-get update \ 
+    && apt-get install -y --no-install-recommends \
+      ca-certificates \
+      git \
+      zip \
+    && apt-get -y clean \
+    && rm -rf /var/lib/apt/lists/* \
+    && useradd -m -g "users" --uid "10000" "mardock" \
     && mkdir "/home/mardock/mardock" \
     && chown "mardock:users" "/home/mardock/mardock"
 
@@ -19,7 +20,7 @@ RUN apk --no-cache add \
 # (と思う).
 FROM base as modules
 
-SHELL ["/bin/ash", "-o", "pipefail", "-c"]
+SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 
 RUN mkdir -p /tmp/mardock/scripts \
     && chown "mardock:users" "/tmp/mardock" \
@@ -44,7 +45,7 @@ RUN INST_PATH="/tmp/mardock" \
 
 FROM modules as modules_prod
 
-SHELL ["/bin/ash", "-o", "pipefail", "-c"]
+SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 
 USER "mardock"
 
@@ -56,7 +57,7 @@ RUN INST_PATH="/tmp/mardock" \
 
 FROM modules as builder
 
-SHELL ["/bin/ash", "-o", "pipefail", "-c"]
+SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 
 USER root
 
@@ -95,20 +96,25 @@ RUN echo "${NO_CACHE_CLONE}" \
     && find "${INST_PATH}" -name "*.test.ts*" -type f -print0 | xargs -0 rm
 
 
-FROM alpine:edge as runner_base
+FROM node:14-buster as runner_base 
 
-RUN apk add --no-cache \
-       libc6-compat \
-       nodejs \
-       yarn \
-       chromium  \
+RUN apt-get update \ 
+    && apt-get install -y --no-install-recommends \
+       chromium \
        curl \
-       font-noto-cjk \
+       fonts-noto-cjk \
        grep \
-       su-exec \
-    && adduser -S -g "users" --uid "1000" "mardock" \
+    && apt-get -y clean \
+    && rm -rf /var/lib/apt/lists/* \
+    && useradd -m -g "users" --uid "10000" "mardock" \
     && mkdir "/home/mardock/mardock" \
-    && chown "mardock:users" "/home/mardock/mardock"
+    && chown "mardock:users" "/home/mardock/mardock" \
+    && curl -o /usr/local/bin/su-exec.c https://raw.githubusercontent.com/ncopa/su-exec/master/su-exec.c \
+    && gcc -Wall /usr/local/bin/su-exec.c -o/usr/local/bin/su-exec \
+    && chown root:root /usr/local/bin/su-exec \
+    && chmod 0755 /usr/local/bin/su-exec \
+    && rm /usr/local/bin/su-exec.c \
+    && ln -s /usr/bin/chromium /usr/bin/chromium-browser
 
 ENV MARDOCK_USER "mardock:users"
 ENV MARDOCK_CWD "/home/mardock/mardock"

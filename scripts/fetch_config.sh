@@ -9,11 +9,15 @@ BLANK_CONFIG="{\"config\": [{\"raw\":\"{}\"}]}"
 # のように保存される.
 # これをシェルスクリプトで展開するのは面倒なので今回は import 側にまかせる.
 
-echo "${BLANK_CONFIG}"  > "${DRAFTLINT_CONFIG_PATH}" 
+if [ ! -f "${DRAFTLINT_CONFIG_PATH}" ] ; then
 
-if [ "${API_BASE_URL}" != "" ] && [ "${GET_API_KEY}"  != "" ] ; then
-  curl "${API_BASE_URL}api/v1/config/draftlint-config?fields=config" -s -H "X-API-KEY:${GET_API_KEY}" \
-      > "${DRAFTLINT_CONFIG_PATH}" \
-      || echo "${BLANK_CONFIG}"  \
-      > "${DRAFTLINT_CONFIG_PATH}" 
+  echo "${BLANK_CONFIG}"  > "${DRAFTLINT_CONFIG_PATH}" 
+
+  if [ "${API_BASE_URL}" != "" ] && [ "${GET_API_KEY}"  != "" ] ; then
+    curl "${API_BASE_URL}api/v1/config/draftlint-config?fields=config" -s -H "X-API-KEY:${GET_API_KEY}" \
+        > "${DRAFTLINT_CONFIG_PATH}" \
+        || echo "${BLANK_CONFIG}"  \
+        > "${DRAFTLINT_CONFIG_PATH}" 
+  fi
+
 fi

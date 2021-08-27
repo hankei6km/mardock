@@ -215,8 +215,7 @@ jobs:
 
       - name: Restore mardock builder cahce into service container
         run: |
-          docker exec -u root "${{ job.services.mardock_builder.id }}" apk --no-cache add  tar
-          docker exec -u root "${{ job.services.mardock_builder.id }}" chown 1000 .next public .mardock
+          docker exec -u root "${{ job.services.mardock_builder.id }}" chown 10000 .next public .mardock
           test -f /tmp/cache/cache.tar.gz && cat /tmp/cache/cache.tar.gz |  docker exec -i -u root "${{ job.services.mardock_builder.id }}" tar -zx -- || true
 
       - name: Build site inside service container
