@@ -1,4 +1,5 @@
 import { NextApiRequest, NextApiResponse } from 'next';
+import { join } from 'path';
 import { previewSetupHandler } from '../../../lib/preview';
 
 // apiName によって、どの API のプレビューか決定する..
@@ -38,6 +39,9 @@ const handler = async (
       break;
   }
   if (location) {
+    if (process.env.API_REDIRECT_ASSET_PREFIX) {
+      location = join(process.env.API_REDIRECT_ASSET_PREFIX, location);
+    }
     res.writeHead(307, { Location: location });
     return res.end('Preview mode enabled');
   }
