@@ -45,7 +45,6 @@ module.exports = (phase) => {
       if (process.env.GITHUB_REPOSITORY) return 'true';
       return '';
     })(),
-    API_REDIRECT_ASSET_PREFIX: assetPrefix
   };
 
   console.log(`assetPrefix:${assetPrefix}`);

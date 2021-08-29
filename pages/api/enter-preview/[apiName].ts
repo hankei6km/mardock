@@ -39,8 +39,11 @@ const handler = async (
       break;
   }
   if (location) {
-    if (process.env.API_REDIRECT_ASSET_PREFIX) {
-      location = join(process.env.API_REDIRECT_ASSET_PREFIX, location);
+    if (
+      process.env.PREVIEW_REDIRECT_BASE_PATH &&
+      process.env.PREVIEW_REDIRECT_BASE_PATH.startsWith('/')
+    ) {
+      location = join(process.env.PREVIEW_REDIRECT_BASE_PATH, location);
     }
     res.writeHead(307, { Location: location });
     return res.end('Preview mode enabled');

@@ -163,7 +163,7 @@ describe('apienter-.preview[apiName].handler()', () => {
   });
 
   it('should enter preview mode with asset prefix', async () => {
-    process.env.API_REDIRECT_ASSET_PREFIX = '/path/to';
+    process.env.PREVIEW_REDIRECT_BASE_PATH = '/path/to';
     fetchMock.mockResponseOnce(
       JSON.stringify({ id: 'abcdefg-123', draftKey: 'qqqqqq-56' })
     );
