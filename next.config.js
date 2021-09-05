@@ -17,18 +17,6 @@ module.exports = (phase) => {
 
   console.log(`isDev:${isDev}  isProd:${isProd}   isStaging:${isStaging}`);
 
-  const env = {
-    STATIC_BUILD: (() => {
-      // fallback 等の利用可能判定を行うためのフラグ.
-      // 今回は GitHub 上で実行されていたら pages に export されるという想定.
-      // Pages with `fallback` enabled in `getStaticPaths` can not be exported.
-      // See more info here: https://err.sh/next.js/ssg-fallback-true-export
-      if (process.env.STATIC_BUILD) return 'true';
-      if (process.env.GITHUB_REPOSITORY) return 'true';
-      return '';
-    })()
-  };
-
   // https://docs.github.com/ja/actions/reference/environment-variables
   let _assetPrefix = process.env.GITHUB_REPOSITORY
     ? `/${process.env.GITHUB_REPOSITORY.split('/', 2)[1]}`
@@ -46,6 +34,18 @@ module.exports = (phase) => {
   const assetPrefix = _assetPrefix;
   // util/baseUrl.ts 内で baseUrl を独自に設定しているので注意
   const basePath = assetPrefix;
+
+  const env = {
+    STATIC_BUILD: (() => {
+      // fallback 等の利用可能判定を行うためのフラグ.
+      // 今回は GitHub 上で実行されていたら pages に export されるという想定.
+      // Pages with `fallback` enabled in `getStaticPaths` can not be exported.
+      // See more info here: https://err.sh/next.js/ssg-fallback-true-export
+      if (process.env.STATIC_BUILD) return 'true';
+      if (process.env.GITHUB_REPOSITORY) return 'true';
+      return '';
+    })(),
+  };
 
   console.log(`assetPrefix:${assetPrefix}`);
   console.log(`env:\n${JSON.stringify(env, null, ' ')}`);

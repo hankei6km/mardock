@@ -134,7 +134,7 @@ describe('apienter-.preview[apiName].handler()', () => {
   beforeEach(() => {
     process.env = { ...OLD_ENV, PREVIEW_SECRET: previewSecret };
   });
-  afterAll(() => {
+  afterEach(() => {
     process.env = OLD_ENV;
   });
 
@@ -157,6 +157,31 @@ describe('apienter-.preview[apiName].handler()', () => {
     expect(res.writeHead.mock.calls[0][0]).toStrictEqual(307);
     expect(res.writeHead.mock.calls[0][1]).toStrictEqual({
       Location: '/deck/abcdefg-123'
+    });
+    expect(res.end).toHaveBeenCalledTimes(1);
+    expect(res.end.mock.calls[0][0]).toStrictEqual('Preview mode enabled');
+  });
+
+  it('should enter preview mode with asset prefix', async () => {
+    process.env.PREVIEW_REDIRECT_BASE_PATH = '/path/to';
+    fetchMock.mockResponseOnce(
+      JSON.stringify({ id: 'abcdefg-123', draftKey: 'qqqqqq-56' })
+    );
+    const reqQuery = {
+      previewSecret,
+      apiName: 'deck',
+      slug: 'abcdefg-123',
+      draftKey: 'qqqqqq-56'
+    };
+    const req = mockNextApiRequest(reqQuery);
+    const res = mockNextApiResponse();
+    await handlerEnter(req, res);
+
+    // redirect で振られるところだけチェック:
+    expect(res.writeHead).toHaveBeenCalledTimes(1);
+    expect(res.writeHead.mock.calls[0][0]).toStrictEqual(307);
+    expect(res.writeHead.mock.calls[0][1]).toStrictEqual({
+      Location: '/path/to/deck/abcdefg-123'
     });
     expect(res.end).toHaveBeenCalledTimes(1);
     expect(res.end.mock.calls[0][0]).toStrictEqual('Preview mode enabled');
