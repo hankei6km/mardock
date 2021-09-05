@@ -51,7 +51,7 @@ export default function Page({ pageData, items }: Props) {
           pageNo={pageData.pageNo}
           pageCount={pageData.pageCount}
           curCategory={pageData.curCategory}
-          paginationHref={'/deck/category/[..id]'}
+          paginationHref={`/deck/category/${pageData.curCategory}/[..id]`}
           paginationBaseAs={'/deck/category'}
           paginationPagePath={pagePath}
           paginationFirstPageHref={`/deck/category/${pageData.curCategory}`}
