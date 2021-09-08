@@ -28,6 +28,9 @@ var toHtml = require('hast-util-to-html');
 
 const schema = merge(gh, {
   tagNames: ['u'],
+  attributes: {
+    span: ['style']
+  },
   allowComments: true
 });
 
@@ -76,7 +79,9 @@ const htmlToMarkdownProcessor = unified()
     handlers: {
       pre: codeDockHandler,
       u: (h: any, node: any) => {
-        // <br> が `/` になってしまうので暫定対応
+        return h(node, 'html', toHtml(node));
+      },
+      span: (h: any, node: any) => {
         return h(node, 'html', toHtml(node));
       },
       br: (h: any, node: any) => {

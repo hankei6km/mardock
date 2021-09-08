@@ -93,6 +93,12 @@ describe('pageHtmlMarkdown()', () => {
         html: '<p>test<u>under</u>test</p>'
       })
     ).toEqual('test<u>under</u>test\n');
+    expect(
+      await pageHtmlMarkdown({
+        fieldId: 'sourceHtml',
+        html: '<p>test<span style="color:red;">under</span>test</p>'
+      })
+    ).toEqual('test<span style="color:red;">under</span>test\n');
   });
 });
 
