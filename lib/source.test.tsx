@@ -8,9 +8,9 @@ import {
   pagesMarkdown,
   pageMarkdown,
   sourceSetMarkdown,
-  firstParagraphAsCodeDockTransformer
+  firstParagraphAsCodeDockTransformer,
+  pageHtmlMarkdown
 } from './source';
-
 
 describe('firstParagraphAsCodeDockTransformer()', () => {
   const f = async (html: string): Promise<string> => {
@@ -64,6 +64,41 @@ describe('pageMarkdownMarkdown()', () => {
         markdown: ''
       })
     ).toEqual('\n');
+  });
+});
+
+describe('pageHtmlMarkdown()', () => {
+  it('should returns markdown from html source', async () => {
+    expect(
+      await pageHtmlMarkdown({
+        fieldId: 'sourceHtml',
+        html: '<p>test1</p><p>test2</p>'
+      })
+    ).toEqual('test1\n\ntest2\n');
+    expect(
+      await pageHtmlMarkdown({
+        fieldId: 'sourceHtml',
+        html: '<ul><li>test1</li><li>test2</li></ul>'
+      })
+    ).toEqual('*   test1\n*   test2\n');
+    expect(
+      await pageHtmlMarkdown({
+        fieldId: 'sourceHtml',
+        html: '<p>test1\ntest2</p>'
+      })
+    ).toEqual('test1 test2\n');
+    expect(
+      await pageHtmlMarkdown({
+        fieldId: 'sourceHtml',
+        html: '<p>test<u>under</u>test</p>'
+      })
+    ).toEqual('test<u>under</u>test\n');
+    expect(
+      await pageHtmlMarkdown({
+        fieldId: 'sourceHtml',
+        html: '<p>test<span style="color:red;">under</span>test</p>'
+      })
+    ).toEqual('test<span style="color:red;">under</span>test\n');
   });
 });
 

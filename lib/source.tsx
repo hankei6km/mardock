@@ -3,6 +3,9 @@ import unified from 'unified';
 import rehypeParse from 'rehype-parse';
 import rehype2Remark from 'rehype-remark';
 import rehypeSanitize from 'rehype-sanitize';
+import merge from 'deepmerge';
+import gh from 'hast-util-sanitize/lib/github.json';
+import { Schema } from 'hast-util-sanitize';
 import stringify from 'remark-stringify';
 import { Transformer } from 'unified';
 import { Node } from 'hast';
@@ -21,6 +24,15 @@ import { codeDockHandler } from './codedock';
 import siteServerSideConfig from '../src/site.server-side-config';
 import { editMarkdown } from './markdown';
 var toText = require('hast-util-to-text');
+var toHtml = require('hast-util-to-html');
+
+const schema = merge(gh, {
+  tagNames: ['u'],
+  attributes: {
+    span: ['style']
+  },
+  allowComments: true
+});
 
 const fenceToFrontMatterRegExp = /^---\n(.+)\n---\n*$/s;
 export function firstParagraphAsCodeDockTransformer(): Transformer {
@@ -61,11 +73,17 @@ const htmlToMarkdownProcessor = unified()
   .use(rehypeParse, { fragment: true })
   .use(firstParagraphAsCodeDockTransformer)
   .use(splitParagraph)
-  .use(rehypeSanitize, { allowComments: true })
+  .use(rehypeSanitize, (schema as unknown) as Schema)
   .use(rehype2Remark, {
     //newlines: false,
     handlers: {
       pre: codeDockHandler,
+      u: (h: any, node: any) => {
+        return h(node, 'html', toHtml(node));
+      },
+      span: (h: any, node: any) => {
+        return h(node, 'html', toHtml(node));
+      },
       br: (h: any, node: any) => {
         // <br> が `/` になってしまうので暫定対応
         return h(node, 'text', ' ');
@@ -77,7 +95,7 @@ const htmlToMarkdownProcessor = unified()
 
 const imageToMarkdownProcessor = unified()
   .use(rehypeParse, { fragment: true })
-  .use(rehypeSanitize, { allowComments: true })
+  .use(rehypeSanitize, (schema as unknown) as Schema)
   .use(rehype2Remark, {})
   .use(stringify)
   .freeze();

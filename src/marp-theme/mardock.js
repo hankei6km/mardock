@@ -16,8 +16,17 @@ const colorLight = '#f5f5f5'; // blueGrey[50]
 const colorDark = '#263238'; // blueGrey[900]
 const colorPrimary = '#556cd6';
 const colorSecondary = '#81d4fa'; // lightBlue[200]
+const colorMarker = '#daf400';
 
-const colorSchemeStyle = ({ bg, text, highlight, blockBg, blockText }) => ({
+const colorSchemeStyle = ({
+  bg,
+  text,
+  highlight,
+  blockBg,
+  blockText,
+  markerText,
+  markerLine
+}) => ({
   // update での更新ではなく、style.section 等で直接展開する
   // (update で展開させるとセレクターが処理されない、と思うが、未確認)
   color: text,
@@ -25,6 +34,11 @@ const colorSchemeStyle = ({ bg, text, highlight, blockBg, blockText }) => ({
 
   '& a, mark': {
     color: highlight
+  },
+
+  '& u': {
+    color: markerText,
+    background: `linear-gradient(transparent 70%, ${markerLine} 70%)`
   },
 
   '& code': {
@@ -185,6 +199,12 @@ const style = {
       }
     },
 
+    u: {
+      textDecoration: 'unset',
+      fontWeight: 'bold',
+      fontSize: '1.1em'
+    },
+
     mark: {
       background: 'transparent'
     },
@@ -237,7 +257,9 @@ const style = {
         text: colorDark,
         highlight: colorPrimary,
         blockBg: `${mix(colorLight, colorPrimary, 90).hex}`,
-        blockText: colorDark
+        blockText: colorDark,
+        markerText: colorDark,
+        markerLine: colorMarker
       })
     },
     'section.invert': colorSchemeStyle({
@@ -245,14 +267,18 @@ const style = {
       text: colorLight,
       highlight: colorPrimary,
       blockBg: `${mix(colorLight, colorPrimary, 90).hex}`,
-      blockText: colorDark
+      blockText: colorDark,
+      markerText: colorLight,
+      markerLine: `${mix(colorMarker, colorDark, 50).hex}`
     }),
     'section.mardock': colorSchemeStyle({
       bg: colorPrimary,
       text: colorLight,
       highlight: colorSecondary,
       blockBg: `${mix(colorLight, colorPrimary, 90).hex}`,
-      blockText: colorDark
+      blockText: colorDark,
+      markerText: colorLight,
+      markerLine: `${mix(colorMarker, colorDark, 50).hex}`
     }),
 
     'section.lead': {
