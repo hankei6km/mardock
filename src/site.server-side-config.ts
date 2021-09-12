@@ -40,6 +40,11 @@ type SiteServerSideConfig = {
     image: {
       transformDefault: string;
     };
+    // TODO: 上の image と統合.
+    imageQuery: {
+      start: string;
+      defaultParams: string;
+    };
   };
   draft: {
     // types/pageType Notification
@@ -85,6 +90,10 @@ const siteServerSideConfig: SiteServerSideConfig = {
   source: {
     image: {
       transformDefault: 'w=600'
+    },
+    imageQuery: {
+      start: 'https://images.microcms-assets.io/assets/',
+      defaultParams: 'auto=compress'
     }
   },
   draft: {
