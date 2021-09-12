@@ -9,7 +9,8 @@ import { Schema } from 'hast-util-sanitize';
 import stringify from 'remark-stringify';
 import { Transformer } from 'unified';
 import { Node } from 'hast';
-// import visit from 'unist-util-visit';
+import type { Element } from 'hast';
+import visit from 'unist-util-visit';
 import splitParagraph from 'rehype-split-paragraph';
 import {
   PagesSourcePages,
@@ -23,6 +24,7 @@ import {
 import { codeDockHandler } from './codedock';
 import siteServerSideConfig from '../src/site.server-side-config';
 import { editMarkdown } from './markdown';
+import { editImageQuery, imageQueryParamsFromAlt } from './image';
 var toText = require('hast-util-to-text');
 var toHtml = require('hast-util-to-html');
 
@@ -69,9 +71,37 @@ export function firstParagraphAsCodeDockTransformer(): Transformer {
   };
 }
 
+export function imageQueryTransformer(p: {
+  start: string;
+  defaultParams: string;
+}): Transformer {
+  return function transformer(tree: Node): void {
+    function visitor(node: Node) {
+      const e = node as Element;
+      if (e.tagName === 'img' && e.properties) {
+        const src = (e.properties.src || '') as string;
+        const alt = (e.properties.alt || '') as string;
+        const res = imageQueryParamsFromAlt(alt);
+        const edited = editImageQuery(
+          p.start,
+          src,
+          res.cmd !== '' ? res.params : p.defaultParams,
+          res.cmd === 'Q'
+        );
+        e.properties.src = edited;
+        if (e.properties.alt !== undefined) {
+          e.properties.alt = res.alt;
+        }
+      }
+    }
+    visit(tree, ['element'], visitor);
+  };
+}
+
 const htmlToMarkdownProcessor = unified()
   .use(rehypeParse, { fragment: true })
   .use(firstParagraphAsCodeDockTransformer)
+  .use(imageQueryTransformer, siteServerSideConfig.source.imageQuery)
   .use(splitParagraph)
   .use(rehypeSanitize, (schema as unknown) as Schema)
   .use(rehype2Remark, {

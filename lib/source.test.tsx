@@ -9,7 +9,8 @@ import {
   pageMarkdown,
   sourceSetMarkdown,
   firstParagraphAsCodeDockTransformer,
-  pageHtmlMarkdown
+  pageHtmlMarkdown,
+  imageQueryTransformer
 } from './source';
 
 describe('firstParagraphAsCodeDockTransformer()', () => {
@@ -40,6 +41,47 @@ describe('firstParagraphAsCodeDockTransformer()', () => {
       )
     ).toEqual(
       '<pre><code>===md\n---\n\nfoo:&#x3C;/code>&#x3C;/pre>\n\n---\n</code></pre><p>tes4</p>'
+    );
+  });
+});
+
+describe('imageQueryTransformer()', () => {
+  const f = async (html: string): Promise<string> => {
+    return new Promise((resolve, reject) => {
+      unified()
+        .use(rehypeParse, { fragment: true })
+        .use(imageQueryTransformer, {
+          start: 'https://',
+          defaultParams: 'auto=compress'
+        })
+        .use(stringify)
+        .freeze()
+        .process(html, (err, file) => {
+          if (err) {
+            reject(err);
+          }
+          resolve(String(file));
+        });
+    });
+  };
+  it('should convert image to query params edited', async () => {
+    expect(await f('<img src="https://test/i.jpg">')).toEqual(
+      '<img src="https://test/i.jpg?auto=compress">'
+    );
+    expect(await f('<img src="https://test/i.jpg?w=100&h=100">')).toEqual(
+      '<img src="https://test/i.jpg?w=100&#x26;h=100&#x26;auto=compress">'
+    );
+    expect(
+      await f('<img src="https://test/i.jpg?w=100&h=100" alt="test">')
+    ).toEqual(
+      '<img src="https://test/i.jpg?w=100&#x26;h=100&#x26;auto=compress" alt="test">'
+    );
+    expect(
+      await f(
+        '<img src="https://test/i.jpg?w=100&h=100" alt="test:q:auto=enhance">'
+      )
+    ).toEqual(
+      '<img src="https://test/i.jpg?w=100&#x26;h=100&#x26;auto=enhance" alt="test">'
     );
   });
 });

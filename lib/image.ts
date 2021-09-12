@@ -47,3 +47,46 @@ export async function imageInfo(imageUrl: string): Promise<ImageInfo> {
 
   return imageInfo;
 }
+
+type ImageQueryParamsResult = {
+  cmd: '' | 'q' | 'Q';
+  alt: string;
+  params: string;
+};
+const imageQueryParamsRegExp = /((.*):|^)([q|Q]):([^:]+):*(.*)/;
+export function imageQueryParamsFromAlt(alt: string): ImageQueryParamsResult {
+  const m = alt.match(imageQueryParamsRegExp);
+  if (m) {
+    // console.log(m);
+    return {
+      cmd: m[3] === 'q' ? 'q' : 'Q',
+      alt: `${m[2] || ''}${m[5]}`,
+      params: m[4]
+    };
+  }
+  return {
+    cmd: '',
+    alt,
+    params: ''
+  };
+}
+
+export function editImageQuery(
+  start: string,
+  src: string,
+  params: string,
+  replace?: boolean
+): string {
+  if (src.startsWith(start)) {
+    const u = src.split('?', 2);
+    const srcQ = new URLSearchParams(replace ? '' : u[1] || '');
+    const q = new URLSearchParams(params);
+    q.forEach((v, k) => srcQ.append(k, v));
+    const p = srcQ.toString();
+    if (p) {
+      return `${u[0]}?${p}`;
+    }
+    return u[0];
+  }
+  return src;
+}
