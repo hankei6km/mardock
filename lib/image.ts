@@ -71,6 +71,26 @@ export function imageQueryParamsFromAlt(alt: string): ImageQueryParamsResult {
   };
 }
 
+type ImageAsThumbResult = {
+  asThumb: boolean;
+  params: string;
+};
+const imageAsThumbRegExp = /^thumb\.jpg((\?(.*))|$)/;
+export function imageAsThumbFromLink(link: string): ImageAsThumbResult {
+  const m = link.match(imageAsThumbRegExp);
+  if (m) {
+    // console.log(m);
+    return {
+      asThumb: true,
+      params: m[3] || ''
+    };
+  }
+  return {
+    asThumb: false,
+    params: ''
+  };
+}
+
 export function editImageQuery(
   start: string,
   src: string,

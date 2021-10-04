@@ -24,7 +24,11 @@ import {
 import { codeDockHandler } from './codedock';
 import siteServerSideConfig from '../src/site.server-side-config';
 import { editMarkdown } from './markdown';
-import { editImageQuery, imageQueryParamsFromAlt } from './image';
+import {
+  editImageQuery,
+  imageAsThumbFromLink,
+  imageQueryParamsFromAlt
+} from './image';
 var toText = require('hast-util-to-text');
 var toHtml = require('hast-util-to-html');
 
@@ -98,10 +102,41 @@ export function imageQueryTransformer(p: {
   };
 }
 
+export function imageAsThumbTransformer(p: {
+  defaultParams: string;
+}): Transformer {
+  return function transformer(tree: Node): void {
+    function visitor(node: Node) {
+      const e = node as Element;
+      if (
+        e.tagName === 'a' &&
+        e.properties &&
+        e.children &&
+        e.children[0] &&
+        e.children[0].tagName === 'img'
+      ) {
+        const img = e.children[0] as Element;
+        const { asThumb, params } = imageAsThumbFromLink(
+          (e.properties.href || '') as string
+        );
+        if (asThumb) {
+          const src = ((img.properties?.src || '') as string).split('?', 2);
+          e.properties.href = src[0];
+          if (params) {
+            e.properties.href = `${src[0]}?${params}`;
+          }
+        }
+      }
+    }
+    visit(tree, ['element'], visitor);
+  };
+}
+
 const htmlToMarkdownProcessor = unified()
   .use(rehypeParse, { fragment: true })
   .use(firstParagraphAsCodeDockTransformer)
   .use(imageQueryTransformer, siteServerSideConfig.source.imageQuery)
+  .use(imageAsThumbTransformer, { defaultParams: '' })
   .use(splitParagraph)
   .use(rehypeSanitize, (schema as unknown) as Schema)
   .use(rehype2Remark, {
