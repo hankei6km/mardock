@@ -102,9 +102,7 @@ export function imageQueryTransformer(p: {
   };
 }
 
-export function imageAsThumbTransformer(p: {
-  defaultParams: string;
-}): Transformer {
+export function imageAsThumbTransformer(): Transformer {
   return function transformer(tree: Node): void {
     function visitor(node: Node) {
       const e = node as Element;
@@ -136,7 +134,7 @@ const htmlToMarkdownProcessor = unified()
   .use(rehypeParse, { fragment: true })
   .use(firstParagraphAsCodeDockTransformer)
   .use(imageQueryTransformer, siteServerSideConfig.source.imageQuery)
-  .use(imageAsThumbTransformer, { defaultParams: '' })
+  .use(imageAsThumbTransformer)
   .use(splitParagraph)
   .use(rehypeSanitize, (schema as unknown) as Schema)
   .use(rehype2Remark, {

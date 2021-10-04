@@ -92,7 +92,7 @@ describe('imageAsThumbTransformer()', () => {
     return new Promise((resolve, reject) => {
       unified()
         .use(rehypeParse, { fragment: true })
-        .use(imageAsThumbTransformer, { defaultParams: '' })
+        .use(imageAsThumbTransformer)
         .use(stringify)
         .freeze()
         .process(html, (err, file) => {
