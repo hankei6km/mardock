@@ -10,7 +10,8 @@ import {
   sourceSetMarkdown,
   firstParagraphAsCodeDockTransformer,
   pageHtmlMarkdown,
-  imageQueryTransformer
+  imageQueryTransformer,
+  imageAsThumbTransformer
 } from './source';
 
 describe('firstParagraphAsCodeDockTransformer()', () => {
@@ -82,6 +83,45 @@ describe('imageQueryTransformer()', () => {
       )
     ).toEqual(
       '<img src="https://test/i.jpg?w=100&#x26;h=100&#x26;auto=enhance" alt="test">'
+    );
+  });
+});
+
+describe('imageAsThumbTransformer()', () => {
+  const f = async (html: string): Promise<string> => {
+    return new Promise((resolve, reject) => {
+      unified()
+        .use(rehypeParse, { fragment: true })
+        .use(imageAsThumbTransformer)
+        .use(stringify)
+        .freeze()
+        .process(html, (err, file) => {
+          if (err) {
+            reject(err);
+          }
+          resolve(String(file));
+        });
+    });
+  };
+  it('should convert image to as thumbnail', async () => {
+    expect(
+      await f('<a href="thumb.jpg"><img src="https://test/i.jpg"></a>')
+    ).toEqual(
+      '<a href="https://test/i.jpg"><img src="https://test/i.jpg"></a>'
+    );
+    expect(
+      await f(
+        '<a href="thumb.jpg"><img src="https://test/i.jpg?w=100&h=100"></a>'
+      )
+    ).toEqual(
+      '<a href="https://test/i.jpg"><img src="https://test/i.jpg?w=100&#x26;h=100"></a>'
+    );
+    expect(
+      await f(
+        '<a href="thumb.jpg?w=1000"><img src="https://test/i.jpg?w=100&h=100"></a>'
+      )
+    ).toEqual(
+      '<a href="https://test/i.jpg?w=1000"><img src="https://test/i.jpg?w=100&#x26;h=100"></a>'
     );
   });
 });

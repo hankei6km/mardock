@@ -1,5 +1,10 @@
 import { FetchMock } from 'jest-fetch-mock';
-import { editImageQuery, imageInfo, imageQueryParamsFromAlt } from './image';
+import {
+  editImageQuery,
+  imageAsThumbFromLink,
+  imageInfo,
+  imageQueryParamsFromAlt
+} from './image';
 import { queryParams } from '../test/testUtils';
 // https://github.com/jefflau/jest-fetch-mock/issues/83
 const fetchMock = fetch as FetchMock;
@@ -58,6 +63,23 @@ describe('imageQueryParamsFromAlt()', () => {
       cmd: 'Q',
       alt: 'test',
       params: 'auto=compress'
+    });
+  });
+});
+
+describe('imageAsThumbFromAlt()', () => {
+  it('should return flag to switch image to as thumb', () => {
+    expect(imageAsThumbFromLink('thumb.jpg')).toEqual({
+      asThumb: true,
+      params: ''
+    });
+    expect(imageAsThumbFromLink('thumb.jpg?w=800&h=400')).toEqual({
+      asThumb: true,
+      params: 'w=800&h=400'
+    });
+    expect(imageAsThumbFromLink('http://localhostt/thumb.jpg')).toEqual({
+      asThumb: false,
+      params: ''
     });
   });
 });
