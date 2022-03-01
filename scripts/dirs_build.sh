@@ -19,4 +19,4 @@ ASSETS_FEEDS_PATH="public/assets/feeds"
 # 再作成する
 test "${1}" = "rebuild" && test -d "${ASSETS_PATH}" && rm -r "${ASSETS_PATH}"
 test -d  "${ASSETS_DECK_PATH}" || mkdir -p "${ASSETS_DECK_PATH}" 
-test -d  "${ASSETS_DECK_PATH}" || mkdir -p "${ASSETS_FEEDS_PATH}" 
+test -d  "${ASSETS_FEEDS_PATH}" || mkdir -p "${ASSETS_FEEDS_PATH}" 
